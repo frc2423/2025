@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.1444205629528006,
+        "y": 3.9504634542264014
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.847731711750555,
+        "y": 2.6142548522570896
+      },
+      "isLocked": false,
+      "linkedName": "Feeder Start"
+    },
+    {
+      "anchor": {
+        "x": 7.883798934502291,
+        "y": 0.7846260485673593
+      },
+      "prevControl": {
+        "x": 6.883798934502291,
+        "y": 0.7846260485673593
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Feeder Far Middle"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Middle Auto Paths",
+  "previewStartingState": {
+    "rotation": -54.0578881286176,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

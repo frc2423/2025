@@ -1,0 +1,120 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeDown"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "distanceShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeSequence"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "lookAtAmpNote"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "setRotationTargetAmpNote"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Amp Go Forward"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "setRotationTargetSpeaker"
+                }
+              },
+              {
+                "type": "parallel",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Amp forward"
+                      }
+                    },
+                    {
+                      "type": "sequential",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "HandOff"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "IntakeDown"
+                            }
+                          },
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "ShooterToAngle"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "distanceShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "WEEK 4 AUTOS",
+  "choreoAuto": false
+}

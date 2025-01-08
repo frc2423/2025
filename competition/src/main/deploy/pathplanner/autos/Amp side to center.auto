@@ -1,0 +1,62 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7812469471092803,
+      "y": 6.739121939782341
+    },
+    "rotation": 59.03624346792652
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeDown"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "distanceShoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Amp side to center wall"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeSequence"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "HandOff"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "New Yo",
+  "choreoAuto": false
+}

@@ -1,0 +1,74 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.83,
+      "y": 4.13
+    },
+    "rotation": -62.24000000000001
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "RevvvvvandShoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeSequence"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Feeder to Far Middle Note"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Back from Far Middle Note"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "HandOff"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "distanceShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Middle Autos",
+  "choreoAuto": false
+}

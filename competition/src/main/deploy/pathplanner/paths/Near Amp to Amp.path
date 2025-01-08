@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.250886555981385,
+        "y": 6.686887667641241
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.4733924503512337,
+        "y": 6.8157068696448375
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.7076091812668635,
+        "y": 6.921104398556871
+      },
+      "prevControl": {
+        "x": 2.5497380962939244,
+        "y": 6.871769684502827
+      },
+      "nextControl": null,
+      "isLocked": true,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 27.824096384253224,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "WEEK 4 PATHS",
+  "previewStartingState": {
+    "rotation": 28.319573168599845,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

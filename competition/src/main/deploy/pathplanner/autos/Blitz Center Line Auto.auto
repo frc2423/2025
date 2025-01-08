@@ -1,0 +1,94 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeSequence"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Blitz to Center Line"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "shooterHandOffAngle"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Back from Far Middle Note"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "HandOff"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "distanceShoot"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeSequence"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Blitz End Pickup"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Blitz End Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "distanceShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "WEEK 4 AUTOS",
+  "choreoAuto": false
+}

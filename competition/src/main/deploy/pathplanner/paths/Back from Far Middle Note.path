@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.103570318815764,
+        "y": 0.7500879976379238
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 0.7987428243044774,
+        "y": 0.40987927910235306
+      },
+      "isLocked": false,
+      "linkedName": "Blitz to Center Source End"
+    },
+    {
+      "anchor": {
+        "x": 1.665344728692309,
+        "y": 3.8528652235621155
+      },
+      "prevControl": {
+        "x": 2.8715608929078043,
+        "y": 1.5106979144058137
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Back From Source Center End"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0.0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -48.50353164478446,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Middle Auto Paths",
+  "previewStartingState": {
+    "rotation": 0.0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

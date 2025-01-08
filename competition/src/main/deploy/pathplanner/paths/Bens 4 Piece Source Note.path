@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.0635131712488803,
+        "y": 5.550936522700434
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.8410072768790318,
+        "y": 4.684334618312603
+      },
+      "isLocked": false,
+      "linkedName": "Bens Amp 3 Peice End Pose"
+    },
+    {
+      "anchor": {
+        "x": 2.4499707772596704,
+        "y": 4.180768646843998
+      },
+      "prevControl": {
+        "x": 1.9346939692452838,
+        "y": 4.578937089400569
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Bens 4 Piece Source Note End"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.6,
+      "rotationDegrees": -8.56543221461054,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -7.495857639729857,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "WEEK 4 PATHS",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

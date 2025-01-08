@@ -1,0 +1,113 @@
+{
+  "version": 1.0,
+  "startingPose": null,
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeDown"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "runDAS"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "parallel",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "IntakeSequence"
+                            }
+                          },
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "Blitz to Center Line"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Back from Far Middle Note"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "lookAtSpeaker"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "shootFromIntake"
+                      }
+                    },
+                    {
+                      "type": "parallel",
+                      "data": {
+                        "commands": [
+                          {
+                            "type": "named",
+                            "data": {
+                              "name": "IntakeSequence"
+                            }
+                          },
+                          {
+                            "type": "path",
+                            "data": {
+                              "pathName": "Blitz End Pickup"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "Blitz End Score"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "lookAtSpeaker"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "shootFromIntake"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": "WEEK 4 AUTOS",
+  "choreoAuto": false
+}

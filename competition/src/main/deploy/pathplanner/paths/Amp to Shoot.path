@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.34,
+        "y": 7.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.5365255266887123,
+        "y": 6.511225119454518
+      },
+      "isLocked": false,
+      "linkedName": "Amp Retrieve End"
+    },
+    {
+      "anchor": {
+        "x": 1.3140196323188638,
+        "y": 6.4292492636340475
+      },
+      "prevControl": {
+        "x": 1.1969112668610487,
+        "y": 6.394116753996703
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 36.869897645844105,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "New Yo Autos",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}

@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 1.665344728692309,
+        "y": 3.8528652235621155
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.766582939178018,
+        "y": 2.6370729613981996
+      },
+      "isLocked": false,
+      "linkedName": "Back From Source Center End"
+    },
+    {
+      "anchor": {
+        "x": 1.1444205629528006,
+        "y": 1.9088663569623863
+      },
+      "prevControl": {
+        "x": 1.0798029014032335,
+        "y": 2.85744411717069
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Blitz End Score End Pose"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.4,
+      "rotationDegrees": -84.73375707324256,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 1.5,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -85.69835805947845,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": null,
+  "previewStartingState": {
+    "rotation": -59.360000000000014,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

@@ -1,0 +1,58 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.7167669684778822,
+        "y": 6.71030934073254
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 0.08438179500567988,
+        "y": 8.502067332237118
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.02432897305167,
+        "y": 7.459802879662821
+      },
+      "prevControl": {
+        "x": 6.747847789561487,
+        "y": 7.553489572029072
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.35,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Yo Autos",
+  "previewStartingState": {
+    "rotation": 55.61965527615516,
+    "velocity": 0
+  },
+  "useDefaultConstraints": false
+}

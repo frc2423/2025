@@ -1,0 +1,52 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.2977299021645106,
+        "y": 6.382405917450922
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.098645680886225,
+        "y": 5.703177397795595
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.0635131712488803,
+        "y": 5.550936522700434
+      },
+      "prevControl": {
+        "x": 2.21575404634404,
+        "y": 5.726599070887157
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Bens Amp 3 Peice End Pose"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 350.0,
+    "maxAngularAcceleration": 535.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "WEEK 4 PATHS",
+  "previewStartingState": {
+    "rotation": 44.169684513742,
+    "velocity": 0
+  },
+  "useDefaultConstraints": true
+}
