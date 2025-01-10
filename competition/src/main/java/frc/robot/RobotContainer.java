@@ -5,6 +5,9 @@
 package frc.robot;
 
 import java.io.File;
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -31,8 +34,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class RobotContainer {
   String deployDirectory = (Robot.isSimulation()) ? "neo" : "swerve";
   // The robot's subsystems and commands are defined here...
-  private final SwerveSubsystem drivebase = new SwerveSubsystem(
-      new File(Filesystem.getDeployDirectory(), deployDirectory));
+  private final SwerveSubsystem drivebase;
 
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
@@ -45,9 +47,13 @@ public class RobotContainer {
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
+   * @throws ParseException
+   * @throws IOException
    */
-  public RobotContainer() {
+  public RobotContainer() throws IOException, ParseException {
     // Configure the trigger bindings
+    drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), deployDirectory));
+
     configureBindings();
     
     

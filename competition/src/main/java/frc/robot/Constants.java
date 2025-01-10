@@ -36,6 +36,7 @@ public final class Constants {
         new Rotation3d(0, -0.419, Math.PI));
 
     // The layout of the AprilTags on the field
+    // Deprecated
     public static final AprilTagFieldLayout kTagLayout;
 
     static {

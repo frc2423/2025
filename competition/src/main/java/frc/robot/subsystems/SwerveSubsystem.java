@@ -5,19 +5,20 @@
 package frc.robot.subsystems;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
-import com.choreo.lib.Choreo;
-import com.choreo.lib.ChoreoTrajectory;
+import org.json.simple.parser.ParseException;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.util.FileVersionException;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -85,8 +86,10 @@ public class SwerveSubsystem extends SubsystemBase {
    * Initialize {@link SwerveDrive} with the directory provided.
    *
    * @param directory Directory of swerve drive config files.
-   */
-  public SwerveSubsystem(File directory) {
+      * @throws ParseException
+      * @throws IOException
+      */
+     public SwerveSubsystem(File directory) throws IOException, ParseException {
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Angle conversion factor is 360 / (GEAR RATIO * ENCODER RESOLUTION)
@@ -130,32 +133,29 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param controllerCfg Swerve Controller.
    */
   public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
-    swerveDrive = new SwerveDrive(driveCfg, controllerCfg, Units.feetToMeters(20));
+    swerveDrive = new SwerveDrive(driveCfg, controllerCfg, Units.feetToMeters(20), new Pose2d());
   }
 
   /**
    * Setup AutoBuilder for PathPlanner.
+   * @throws ParseException
+   * @throws IOException
    */
-  public void setupPathPlanner() {
-    AutoBuilder.configureHolonomic(
+  public void setupPathPlanner() throws IOException, ParseException {
+    AutoBuilder.configure(
         this::getPose, // Robot pose supplier
         this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
         this::getRobotVelocity, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
         this::setChassisSpeeds, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-            new PIDConstants(5.0, 0.0, 0.0),
-            // Translation PID constants
-            new PIDConstants(swerveDrive.swerveController.config.headingPIDF.p,
-                swerveDrive.swerveController.config.headingPIDF.i,
-                swerveDrive.swerveController.config.headingPIDF.d),
-            // Rotation PID constants
-            4.5,
-            // Max module speed, in m/s
-            swerveDrive.swerveDriveConfiguration.getDriveBaseRadiusMeters(),
-            // Drive base radius in meters. Distance from robot center to furthest module.
-            new ReplanningConfig()
-        // Default path replanning config. See the API for the options here
+        new PPHolonomicDriveController(
+          new PIDConstants(5.0, 0.0, 0.0),
+          // Translation PID constants
+          new PIDConstants(swerveDrive.swerveController.config.headingPIDF.p,
+              swerveDrive.swerveController.config.headingPIDF.i,
+              swerveDrive.swerveController.config.headingPIDF.d)
+          // Rotation PID constants
         ),
+        RobotConfig.fromGUISettings(),
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red
           // alliance
@@ -192,31 +192,17 @@ public class SwerveSubsystem extends SubsystemBase {
         return driveFieldOrientedAngularVelocity;
   }
 
-  public Command followChoreoPath(String path) {
-    ChoreoTrajectory traj = Choreo.getTrajectory(path); //
-    return Choreo.choreoSwerveCommand(
-        traj, //
-        this::getPose, //
-        new PIDController(5.0, 0.0, 0.0), //
-        new PIDController(5.0, 0.0, 0.0), //
-        new PIDController(swerveDrive.swerveController.config.headingPIDF.p,
-            swerveDrive.swerveController.config.headingPIDF.i, swerveDrive.swerveController.config.headingPIDF.d), //
-        this::setChassisSpeeds,
-        () -> {
-          Optional<DriverStation.Alliance> alliance = DriverStation.getAlliance();
-          return alliance.isPresent() && alliance.get() == Alliance.Red;
-        }, //
-        this);
-  }
-
   /**
    * Get the path follower with events.
    *
    * @param pathName       PathPlanner path name.
    * @param setOdomToStart Set the odometry position to the start of the path.
    * @return {@link AutoBuilder#followPath(PathPlannerPath)} path command.
+   * @throws ParseException
+   * @throws IOException
+   * @throws FileVersionException
    */
-  public Command getAutonomousCommand(String pathName, boolean setOdomToStart) {
+  public Command getAutonomousCommand(String pathName, boolean setOdomToStart) throws FileVersionException, IOException, ParseException {
     // Load the path you want to follow using its name in the GUI
     PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
 
