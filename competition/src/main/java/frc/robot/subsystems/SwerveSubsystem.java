@@ -167,7 +167,17 @@ public class SwerveSubsystem extends SubsystemBase {
         this // Reference to this subsystem to set requirements
     );
   }
-
+  public void actuallyLookAngle(Rotation2d rotation2d) {
+    ChassisSpeeds desiredSpeeds = this.getTargetSpeeds(0.0, 0.0,
+        rotation2d);
+    double maxRadsPerSecond = 2.5;
+    // Make the robot move
+    if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+      desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
+    }
+    this.drive(desiredSpeeds);
+  }
+  
   public Command getTeleopDriveCommand(){
     Command driveFieldOrientedAngularVelocity = driveCommand(
         () -> {
@@ -602,5 +612,8 @@ public class SwerveSubsystem extends SubsystemBase {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, speed);
     drive(speeds);
   }
-
+  public void turnAndGo(double x, double turn) {
+    ChassisSpeeds speeds = new ChassisSpeeds(x, 0, turn);
+    drive(speeds);
+  }
 }
