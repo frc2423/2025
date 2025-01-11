@@ -14,13 +14,16 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
+import frc.robot.subsystems.CoralArm.CoralArmSubSystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.CoralArm.CoralArmCommands;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -110,6 +113,8 @@ public class RobotContainer
   Command driveFieldOrientedDirectAngleSim = drivebase.driveFieldOriented(driveDirectAngleSim);
 
   Command driveSetpointGenSim = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleSim);
+  CoralArmSubSystem coralarmsubsystem = new CoralArmSubSystem();
+  CoralArmCommands coralarmcommands = new CoralArmCommands(coralarmsubsystem);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -164,6 +169,9 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
+      driverXbox.a().onTrue(coralarmcommands.goForward());
+      driverXbox.b().onTrue(coralarmcommands.stop());
+
     }
 
   }
