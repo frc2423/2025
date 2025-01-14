@@ -32,6 +32,8 @@ import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawCommands;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -152,6 +154,7 @@ public class RobotContainer {
         drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
         DriverStation.silenceJoystickConnectionWarning(true);
         NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+        SmartDashboard.putData("elevatorSubsystem", elevator);
     }
 
     /**
@@ -202,6 +205,8 @@ public class RobotContainer {
         // driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new
         // Pose2d(3, 3, new Rotation2d()))));
         // }
+        RobotModeTriggers.teleop().onTrue(RobotContainer.elevator.stopElevator());
+        RobotModeTriggers.disabled().whileTrue(RobotContainer.elevator.stopElevator());
 
         new JoystickButton(driverXbox, XboxController.Button.kStart.value)
                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
@@ -212,14 +217,12 @@ public class RobotContainer {
         // new JoystickButton(driverXbox, XboxController.Button.kY.value)
         // .onTrue(elevator.goUp());
         new Trigger(() -> operator.getPOV() == 270)
-                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_BOTTOM_PANEL
-                        : Constants.SetpointConstants.ROCKET_BOTTOM_BALLZ));
+                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
+                        : Constants.SetpointConstants.REEF_L2));
         new Trigger(() -> operator.getPOV() == 0)
-                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_MIDDLE_PANEL
-                        : Constants.SetpointConstants.ROCKET_MIDDLE_BALLZ));
-        new Trigger(() -> operator.getPOV() == 90)
-                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_TOP_PANEL
-                        : Constants.SetpointConstants.ROCKET_TOP_BALLZ));
+                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
+                        : Constants.SetpointConstants.REEF_L3));
+     
         // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
         new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
                 .onTrue(elevator.goLittleDown(1));

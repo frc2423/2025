@@ -82,13 +82,8 @@ public final class Constants {
 
     public static class SetpointConstants {
 
-        public static final double ROCKET_BOTTOM_PANEL = 0.5;
-        public static final double ROCKET_MIDDLE_PANEL = 10;
-        public static final double ROCKET_TOP_PANEL = 2;
-
-        public static final double ROCKET_BOTTOM_BALLZ = 0.5;
-        public static final double ROCKET_MIDDLE_BALLZ = inchToSetPoint(60);
-        public static final double ROCKET_TOP_BALLZ = inchToSetPoint(60);
+        public static final double REEF_L2 = 20;
+        public static final double REEF_L3 = 37.77;
 
     }
 
