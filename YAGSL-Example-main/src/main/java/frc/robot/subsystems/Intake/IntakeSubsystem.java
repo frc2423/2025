@@ -2,7 +2,7 @@ package frc.robot.subsystems.Intake;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-//import au.grapplerobotics.LaserCan;
+// import au.grapplerobotics.LaserCan;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public class IntakeSubsystem extends SubsystemBase {
     private SparkFlex motor = new SparkFlex(23 , MotorType.kBrushless);
-    //private LaserCan intakeDist = new LaserCan(26);
+    // private LaserCan intakeDist = new LaserCan(26);
     
 
     public IntakeSubsystem() {

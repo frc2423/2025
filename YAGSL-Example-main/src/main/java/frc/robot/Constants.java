@@ -84,6 +84,8 @@ public final class Constants {
 
         public static final double REEF_L2 = 20;
         public static final double REEF_L3 = 37.77;
+        public static final double ZERO = 0.1;
+
 
     }
 
