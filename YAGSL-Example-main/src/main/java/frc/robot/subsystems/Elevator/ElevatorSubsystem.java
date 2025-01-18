@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Elevator;
 
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
@@ -9,20 +8,15 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.NTHelper;
-import frc.robot.Robot;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = .05;
@@ -65,8 +59,20 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         double calculatedPID = calculatePid(setpoint);
-        motor1.set(calculatedPID);
-        motor2.set(-calculatedPID); // ONE OF THEM IS NEGITIVE, NICE :O
+
+        // if (elevatorCurrentPose > setpoint + 5) {
+        //     motor1CalculatedPID = Math.min(motor1CalculatedPID, 0);
+        //     motor2CalculatedPID = Math.min(motor2CalculatedPID, 0);
+        // } else if (elevatorCurrentPose < setpoint - 5) {
+        //     motor1CalculatedPID = Math.max(motor1CalculatedPID, 0);
+        //     motor2CalculatedPID = Math.max(motor2CalculatedPID, 0);
+        // }
+
+        if (elevatorCurrentPose > highestPoint) {
+            calculatedPID = Math.min(calculatedPID, 0);
+        } else if (elevatorCurrentPose < lowestPoint) {
+            calculatedPID = Math.max(calculatedPID, 0);
+        }
 
         if (Robot.isSimulation()) {
             elevatorSim.periodic();
@@ -74,6 +80,9 @@ public class ElevatorSubsystem extends SubsystemBase {
             bottom.setLength(elevatorSim.getHeight());
             //System.out.println(elevatorSim.getHeight());
         }
+
+        motor1.set(calculatedPID);
+        motor2.set(-calculatedPID); // ONE OF THEM IS NEGITIVE
     }
 
     private double calculatePid(double position) {
@@ -89,41 +98,42 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command goDown() { // for manual control, sick
         return runOnce(() -> {
-            setpoint = lowestPoint;
+            goToSetpoint(lowestPoint);
         });
     }
 
     public Command goUp() {
         // for manual control, sick
         return runOnce(() -> {
-            setpoint = highestPoint;
+            goToSetpoint(highestPoint);
         });
     }
 
     public Command goLittleUp(double constant) {
         // for manual control, sick
         return runOnce(() -> {
-            setpoint = elevatorCurrentPose + constant;
+            goToSetpoint(elevatorCurrentPose + constant);
         });
     }
 
       public Command goLittleDown(double constant) {
         // for manual control, sick
         return runOnce(() -> {
-            setpoint = elevatorCurrentPose - constant;
+            goToSetpoint(elevatorCurrentPose - constant);
         });
     }
 
     public Command goToSetpoint(double position) {
         return runOnce(() -> {
-            setpoint = position;
+            if(position < highestPoint && position > lowestPoint)
+                setpoint = position;
         }
         );
     }
 
     public Command stopElevator() { // for manual control, sick
         return runOnce(() -> {
-            setpoint = elevatorCurrentPose;
+            goToSetpoint(elevatorCurrentPose);
         });
     }
 
