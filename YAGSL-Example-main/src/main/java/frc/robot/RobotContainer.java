@@ -157,6 +157,8 @@ public class RobotContainer {
                 DriverStation.silenceJoystickConnectionWarning(true);
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
+                SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
+
         }
 
         /**
@@ -193,7 +195,7 @@ public class RobotContainer {
                                         }
                                         return m_xspeedLimiter.calculate(x);
                                 },
-                                () -> -driverXbox.getRightX());
+                                () -> driverXbox.getRightX());
                 return driveFieldOrientedAngularVelocity; // :P
         }
 
