@@ -147,7 +147,7 @@
       *         used for estimation.
       */
      public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-         var visionEst = photonEstimator.update();
+         var visionEst = photonEstimator.update(getLatestNoteResult());
          double latestTimestamp = aprilTagCamera.getLatestResult().getTimestampSeconds();
          boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
          if (Robot.isSimulation()) {
