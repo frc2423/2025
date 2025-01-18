@@ -29,6 +29,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 40;
     private double lowestPoint = 0.1;
+    private final double MAX_VOLTAGE = .2;
 
     private ElevatorSim elevatorSim = new ElevatorSim();
 
@@ -67,6 +68,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     motor1CalculatedPID = Math.max(motor1CalculatedPID, 0);
         //     motor2CalculatedPID = Math.max(motor2CalculatedPID, 0);
         // }
+
+        if(calculatedPID > MAX_VOLTAGE){
+            calculatedPID = MAX_VOLTAGE;
+        } else if (calculatedPID < -MAX_VOLTAGE){
+            calculatedPID = -MAX_VOLTAGE;
+        }
 
         if (elevatorCurrentPose > highestPoint) {
             calculatedPID = Math.min(calculatedPID, 0);
