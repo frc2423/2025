@@ -1,8 +1,5 @@
 {
   "NetworkTables": {
-    "Transitory Values": {
-      "open": false
-    },
     "transitory": {
       "SmartDashboard": {
         "intakeSubsystewm": {
@@ -33,8 +30,7 @@
     },
     "Server": {
       "open": true
-    },
-    "visible": true
+    }
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
