@@ -77,11 +77,6 @@
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
     },
     "windows": {
-      "/FMSInfo": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
         "OdometryPose": {
           "arrowColor": [
@@ -122,17 +117,16 @@
   },
   "NetworkTables": {
     "transitory": {
-      "FMSInfo": {
-        "open": true
-      },
       "SmartDashboard": {
         "Field": {
           "open": true
         },
-        "open": true,
         "swerve": {
           "open": true
         }
+      },
+      "gyro": {
+        "open": true
       }
     }
   },

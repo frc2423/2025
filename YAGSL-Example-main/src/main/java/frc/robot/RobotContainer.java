@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.events.EventTrigger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -307,5 +309,10 @@ public class RobotContainer {
 
         public void setMotorBrake(boolean brake) {
                 drivebase.setMotorBrake(brake);
+        }
+
+        public void autoTriggers(){
+                new EventTrigger("elevatorL2").onTrue(elevator.goToSetpoint(20));
+                NamedCommands.registerCommand("outTake", intakeCommands.intakeOut());
         }
 }
