@@ -140,7 +140,6 @@ public class Robot extends TimedRobot
       CommandScheduler.getInstance().cancelAll();
     }
     m_robotContainer.setDriveMode();
-    RobotContainer.elevator.stopElevator();
   }
 
   /**

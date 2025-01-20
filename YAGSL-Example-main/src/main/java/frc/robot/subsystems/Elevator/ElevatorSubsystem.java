@@ -61,14 +61,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
         double calculatedPID = calculatePid(setpoint);
 
-        // if (elevatorCurrentPose > setpoint + 5) {
-        //     motor1CalculatedPID = Math.min(motor1CalculatedPID, 0);
-        //     motor2CalculatedPID = Math.min(motor2CalculatedPID, 0);
-        // } else if (elevatorCurrentPose < setpoint - 5) {
-        //     motor1CalculatedPID = Math.max(motor1CalculatedPID, 0);
-        //     motor2CalculatedPID = Math.max(motor2CalculatedPID, 0);
-        // }
-
         if(calculatedPID > MAX_VOLTAGE){
             calculatedPID = MAX_VOLTAGE;
         } else if (calculatedPID < -MAX_VOLTAGE){
@@ -85,7 +77,6 @@ public class ElevatorSubsystem extends SubsystemBase {
             elevatorSim.periodic();
             elevator.setLength(50);
             bottom.setLength(elevatorSim.getHeight());
-            //System.out.println(elevatorSim.getHeight());
         }
 
         motor1.set(calculatedPID);
@@ -99,35 +90,26 @@ public class ElevatorSubsystem extends SubsystemBase {
         var setpoint = elevator_PID.getSetpoint();
         
         double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
-        // return feedforward + pid;
         return (feedforward + pid) / RobotController.getBatteryVoltage(); //+pid
     }
 
     public Command goDown() { // for manual control, sick
-        return runOnce(() -> {
-            goToSetpoint(lowestPoint);
-        });
+        return goToSetpoint(lowestPoint);
     }
 
     public Command goUp() {
         // for manual control, sick
-        return runOnce(() -> {
-            goToSetpoint(highestPoint);
-        });
+        return goToSetpoint(highestPoint);
     }
 
     public Command goLittleUp(double constant) {
         // for manual control, sick
-        return runOnce(() -> {
-            goToSetpoint(elevatorCurrentPose + constant);
-        });
+        return goToSetpoint(elevatorCurrentPose + constant);
     }
 
       public Command goLittleDown(double constant) {
         // for manual control, sick
-        return runOnce(() -> {
-            goToSetpoint(elevatorCurrentPose - constant);
-        });
+        return goToSetpoint(elevatorCurrentPose - constant);
     }
 
     public Command goToSetpoint(double position) {
@@ -139,9 +121,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command stopElevator() { // for manual control, sick
-        return runOnce(() -> {
-            goToSetpoint(elevatorCurrentPose);
-        });
+        return goToSetpoint(elevatorCurrentPose);
     }
 
     public Command getElevatorVelocity() { // for manual control, sick
@@ -170,13 +150,5 @@ public class ElevatorSubsystem extends SubsystemBase {
         builder.addDoubleProperty("calculatePid", ( ) -> calculatePid(setpoint), null);
         builder.addDoubleProperty("elevatorCurrentPose", () -> elevatorCurrentPose, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
-
-        //builder.addBooleanProperty("PIDMode", () -> isPidMode, null);
-        //builder.addBooleanProperty("ShooterOn", () -> shooterOn, null);
-
-        // builder.addDoubleProperty("shooterMotor1Value", shooterMotorOne::getValue,
-        // null);
-        // builder.addDoubleProperty("shooterMotor2Value", shooterMotorTwo::getValue,
-        // null);
     }
 }

@@ -7,12 +7,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -21,19 +17,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
-import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawCommands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -65,26 +57,7 @@ public class RobotContainer {
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
         private static boolean runOnce = false;
-        // Applies deadbands and inverts controls because joysticks
-        // are back-right positive while robot
-        // controls are front-left positive
-        // left stick controls translation
-        // right stick controls the rotational velocity
-        // buttons are quick rotation positions to different ways to face
-        // WARNING: default buttons are on the same buttons as the ones defined in
-        // configureBindings
-        // AbsoluteDriveAdv closedAbsoluteDriveAdv = new AbsoluteDriveAdv(drivebase,
-        // () -> -MathUtil.applyDeadband(driverXbox.getLeftY(),
-        // OperatorConstants.LEFT_Y_DEADBAND),
-        // () -> -MathUtil.applyDeadband(driverXbox.getLeftX(),
-        // OperatorConstants.DEADBAND),
-        // () -> -MathUtil.applyDeadband(driverXbox.getRightX(),
-        // OperatorConstants.RIGHT_X_DEADBAND),
-        // driverXbox.getHID()::getYButtonPressed,
-        // driverXbox.getHID()::getAButtonPressed,
-        // driverXbox.getHID()::getXButtonPressed,
-        // driverXbox.getHID()::getBButtonPressed);
-
+       
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
          * by angular velocity.
@@ -200,24 +173,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                // (Condition) ? Return-On-True : Return-on-False
-                // drivebase.setDefaultCommand(
-                // !RobotBase.isSimulation() ? driveFieldOrientedDirectAngle :
-                // driveFieldOrientedDirectAngleSim);
-
-                // if (Robot.isSimulation()) {
-                // driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new
-                // Pose2d(3, 3, new Rotation2d()))));
-                // }
-                // RobotModeTriggers.teleop().onTrue(Commands.print("yo mama"));
-                // RobotModeTriggers.teleop().whileFalse(Commands.print("yo
-                // mama").withTimeout(0.1));
-                // Command cmd = new Command() {
-                // @Override
-                // public boolean runsWhenDisabled() {
-                // return true;
-                // }
-                // };
+                
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
                         RobotContainer.runOnce = true;
@@ -265,32 +221,6 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
                                 .whileTrue(clawCommands.clawStop());
-
-                // if (DriverStation.isTest()) {
-                // drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides
-                // drive command above!
-
-                // driverXbox.b().whileTrue(drivebase.sysIdDriveMotorCommand());
-                // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock,
-                // drivebase).repeatedly());
-                // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-                // driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-                // driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-                // driverXbox.leftBumper().onTrue(Commands.none());
-                // driverXbox.rightBumper().onTrue(Commands.none());
-                // } else {
-                // driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-                // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-                // driverXbox.b().whileTrue(
-                // drivebase.driveToPose(
-                // new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
-                // //driverXbox.y().whileTrue(drivebase.aimAtSpeaker(2));
-                // // driverXbox.start().whileTrue(Commands.none());
-                // // driverXbox.back().whileTrue(Commands.none());
-                // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock,
-                // drivebase).repeatedly());
-                // driverXbox.rightBumper().onTrue(Commands.none());
-                // }
 
         }
 
