@@ -38,7 +38,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     // the mechanism root node
     private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
 
-    //private final FlywheelSim elevatorSimMotor = new FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
+    // private final FlywheelSim elevatorSimMotor = new
+    // FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
 
     // MechanismLigament2d objects represent each "section"/"stage" of the
     // mechanism, and are based
@@ -54,16 +55,16 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // post the mechanism to the dashboard
         SmartDashboard.putData("Mech2d", mech);
-        //elevatorSimMotor.setInput(0);
+        // elevatorSimMotor.setInput(0);
     }
 
     @Override
     public void periodic() {
         double calculatedPID = calculatePid(setpoint);
 
-        if(calculatedPID > MAX_VOLTAGE){
+        if (calculatedPID > MAX_VOLTAGE) {
             calculatedPID = MAX_VOLTAGE;
-        } else if (calculatedPID < -MAX_VOLTAGE){
+        } else if (calculatedPID < -MAX_VOLTAGE) {
             calculatedPID = -MAX_VOLTAGE;
         }
 
@@ -88,9 +89,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorCurrentPose = motor1.getEncoder().getPosition();
         double pid = elevator_PID.calculate(elevatorCurrentPose, position);
         var setpoint = elevator_PID.getSetpoint();
-        
+
         double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
-        return (feedforward + pid) / RobotController.getBatteryVoltage(); //+pid
+        return (feedforward + pid) / RobotController.getBatteryVoltage(); // +pid
     }
 
     public Command goDown() { // for manual control, sick
@@ -104,30 +105,38 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command goLittleUp(double constant) {
         // for manual control, sick
-        return goToSetpoint(elevatorCurrentPose + constant);
+        return runOnce(() -> {
+            setSetpoint(elevatorCurrentPose + constant);
+        });
     }
 
-      public Command goLittleDown(double constant) {
+    public Command goLittleDown(double constant) {
         // for manual control, sick
-        return goToSetpoint(elevatorCurrentPose - constant);
+        return runOnce(() -> {
+            setSetpoint(elevatorCurrentPose - constant);
+        });
     }
 
     public Command goToSetpoint(double position) {
         return runOnce(() -> {
-            if(position < highestPoint && position > lowestPoint)
-                setpoint = position;
+            setSetpoint(position);
+        });
+    }
+
+    private void setSetpoint(double position) {
+        if (position < highestPoint && position > lowestPoint) {
+            setpoint = position;
         }
-        );
     }
 
     public Command stopElevator() { // for manual control, sick
-        return goToSetpoint(elevatorCurrentPose);
+        return runOnce(() -> {
+            setSetpoint(elevatorCurrentPose);
+        });
     }
 
-    public Command getElevatorVelocity() { // for manual control, sick
-        return runOnce(() -> {
-            motor1.getEncoder().getVelocity();
-        });
+    public double getElevatorVelocity() { // for manual control, sick
+        return motor1.getEncoder().getVelocity();
     }
 
     public void resetElevatorPosition() {
@@ -138,16 +147,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         return motor1.getAbsoluteEncoder().getPosition();
     }
 
-    //public double getHeightSim() {
+    // public double getHeightSim() {
 
-    //}
+    // }
 
-     @Override
+    @Override
     public void initSendable(SendableBuilder builder) {
         // This is used to add things to NetworkTables
         super.initSendable(builder);
 
-        builder.addDoubleProperty("calculatePid", ( ) -> calculatePid(setpoint), null);
+        builder.addDoubleProperty("calculatePid", () -> calculatePid(setpoint), null);
         builder.addDoubleProperty("elevatorCurrentPose", () -> elevatorCurrentPose, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
     }
