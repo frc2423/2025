@@ -5,9 +5,12 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -31,7 +34,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double lowestPoint = 0.05;
     private final double MAX_VOLTAGE = .2;
 
-    private ElevatorSim elevatorSim = new ElevatorSim();
+    private final DCMotor elevatorSimMotor = DCMotor.getNeoVortex(2);
+    private ElevatorSim elevatorSim = new ElevatorSim(LinearSystemId.createElevatorSystem(elevatorSimMotor, 10, 0.05, 0.11), elevatorSimMotor, 0, 2, true, 0.05);
 
     // the main mechanism object
     private Mechanism2d mech = new Mechanism2d(10, 100);
@@ -53,7 +57,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         motor2.getEncoder().setPosition(0);
 
         // post the mechanism to the dashboard
-        SmartDashboard.putData("Mech2d", mech);
+        SmartDashboard.putData("ElevatorMech2d", mech);
         //elevatorSimMotor.setInput(0);
     }
 
@@ -74,9 +78,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
 
         if (Robot.isSimulation()) {
-            elevatorSim.periodic();
-            elevator.setLength(50);
-            bottom.setLength(elevatorSim.getHeight());
+            elevatorSim.setInputVoltage(calculatedPID);
+            elevator.setLength(5);
+            bottom.setLength(elevatorSim.getPositionMeters() * 100);
+            SmartDashboard.putData("ElevatorMech2d", mech);
         }
 
         motor1.set(calculatedPID);
