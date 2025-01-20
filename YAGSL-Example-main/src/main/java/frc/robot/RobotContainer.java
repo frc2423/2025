@@ -238,6 +238,9 @@ public class RobotContainer {
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
                                                 : Constants.SetpointConstants.REEF_L3));
+                new Trigger(() -> operator.getPOV() == 90)
+                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
+                                                : Constants.SetpointConstants.REEF_L4));
                 new Trigger(() -> operator.getPOV() == 180)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ZERO
                                                 : Constants.SetpointConstants.ZERO));
