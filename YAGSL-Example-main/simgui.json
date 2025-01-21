@@ -72,6 +72,7 @@
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/Swerve Drive": "Alerts",
       "/SmartDashboard/VisionSystemSim-Vision/Sim Field": "Field2d",
+      "/SmartDashboard/elevatorSubsystem": "Subsystem",
       "/SmartDashboard/navX-Sensor[1]": "Gyro",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
     },
@@ -125,13 +126,7 @@
         "open": true
       },
       "SmartDashboard": {
-        "Field": {
-          "open": true
-        },
-        "open": true,
-        "swerve": {
-          "open": true
-        }
+        "open": true
       }
     }
   },

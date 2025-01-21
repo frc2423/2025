@@ -81,15 +81,12 @@ public final class Constants {
     }
 
     public static class SetpointConstants {
+        public static final double REEF_L4 = 69.56; //noice
+        public static final double REEF_L2 = 20;
+        public static final double REEF_L3 = 37.77;
+        public static final double ALGAE_DESCORE_L3 = 25;
 
-        public static final double ROCKET_BOTTOM_PANEL = 0.5;
-        public static final double ROCKET_MIDDLE_PANEL = 10;
-        public static final double ROCKET_TOP_PANEL = 2;
-
-        public static final double ROCKET_BOTTOM_BALLZ = 0.5;
-        public static final double ROCKET_MIDDLE_BALLZ = inchToSetPoint(60);
-        public static final double ROCKET_TOP_BALLZ = inchToSetPoint(60);
-
+        public static final double ZERO = 0.1;
     }
 
     public static double inchToSetPoint(double inches) {
