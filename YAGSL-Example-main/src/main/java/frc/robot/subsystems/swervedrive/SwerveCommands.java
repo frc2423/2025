@@ -28,7 +28,7 @@ public class SwerveCommands {
 
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                2.0, 4.0,
+                0.5, 1.0,
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
