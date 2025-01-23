@@ -7,6 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,6 +25,8 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 import java.io.File;
+import java.util.Optional;
+
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
@@ -58,13 +61,12 @@ public class RobotContainer {
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
         VisionSubsystem visionSubsystem = new VisionSubsystem();
 
-
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
         private static boolean runOnce = false;
-       
+
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
          * by angular velocity.
@@ -181,7 +183,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                
+
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
                         RobotContainer.runOnce = true;
@@ -250,5 +252,22 @@ public class RobotContainer {
 
         public void setMotorBrake(boolean brake) {
                 drivebase.setMotorBrake(brake);
+        }
+
+        public void addVision() {
+                var estimatedPose = visionSubsystem.getEstimatedRobotPose();
+                var std = visionSubsystem.getStandardDeviations();
+                if (estimatedPose.isPresent() && std.isPresent()) {
+
+                        drivebase.addCameraInput(estimatedPose.get().estimatedPose.toPose2d(),
+                                        visionSubsystem.getTimestampSeconds(), std.get());
+                }
+        }
+
+        public void updateVision() {
+                Optional<Transform3d> bestResult = visionSubsystem.getLatestResult();
+                if (bestResult != null && bestResult.isPresent()) {
+                        addVision();
+                }
         }
 }
