@@ -208,6 +208,8 @@ public class RobotContainer {
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
                 new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
                                 .onTrue(elevator.goLittleDown(1));
+                new JoystickButton(operator, XboxController.Button.kBack.value)
+                                .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
                 new JoystickButton(operator, XboxController.Button.kRightBumper.value)
                                 .onTrue(elevator.goLittleUp(1));
 
