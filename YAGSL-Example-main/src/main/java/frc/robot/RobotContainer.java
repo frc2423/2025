@@ -25,6 +25,7 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawCommands;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -57,6 +58,9 @@ public class RobotContainer {
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
         private static boolean runOnce = false;
+
+          SendableChooser<String> m_chooser = new SendableChooser<>();
+
        
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -131,6 +135,15 @@ public class RobotContainer {
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
+                SmartDashboard.putData("autoChooser", m_chooser);
+
+                m_chooser.setDefaultOption("First Auto", "First Auto");
+
+                // auto commands
+    // EXAMPLE: NamedCommands.registerCommand("useless",
+    // exampleSubsystem.exampleCommand());
+
+    NamedCommands.registerCommand("Elevator to Reef L2", elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
 
         }
 
