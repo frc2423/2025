@@ -56,7 +56,8 @@ public class RobotContainer {
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
-        VisionSubsystem visionSubsystem = new VisionSubsystem();
+        SwerveSubsystem swerveSubsystem = new SwerveSubsystem(null);
+        // VisionSubsystem visionSubsystem = new VisionSubsystem();
 
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -135,7 +136,7 @@ public class RobotContainer {
                 Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
                 drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
                 DriverStation.silenceJoystickConnectionWarning(true);
-                SmartDashboard.putData("VisionSubsystem", visionSubsystem);
+                // SmartDashboard.putData("VisionSubsystem", visionSubsystem);
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
@@ -209,6 +210,19 @@ public class RobotContainer {
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ZERO
                                                 : Constants.SetpointConstants.ZERO));
 
+                new Trigger(() -> driverXbox.getPOV() == 0)
+                                .whileTrue(swerveSubsystem.lookAtAngle(0));
+                new Trigger(() -> driverXbox.getPOV() == 315)
+                                .whileTrue(swerveSubsystem.lookAtAngle(60));
+                new Trigger(() -> driverXbox.getPOV() == 225)
+                                .whileTrue(swerveSubsystem.lookAtAngle(120));
+                new Trigger(() -> driverXbox.getPOV() == 180)
+                                .whileTrue(swerveSubsystem.lookAtAngle(180));
+                new Trigger(() -> driverXbox.getPOV() == 135)
+                                .whileTrue(swerveSubsystem.lookAtAngle(240));
+                new Trigger(() -> driverXbox.getPOV() == 45)
+                                .whileTrue(swerveSubsystem.lookAtAngle(300));
+
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
                 new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
                                 .onTrue(elevator.goLittleDown(1));
@@ -242,6 +256,7 @@ public class RobotContainer {
         public Command getAutonomousCommand() {
                 // An example command will be run in autonomous
                 return drivebase.getAutonomousCommand("New Auto");
+                // return drivebase.aimAtAngle();
         }
 
         public void setDriveMode() {
