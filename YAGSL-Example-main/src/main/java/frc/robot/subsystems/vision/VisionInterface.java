@@ -133,7 +133,7 @@
      }
  
      public PhotonPipelineResult getLatestNoteResult() {
-         return noteCamera.getLatestResult();
+         return aprilTagCamera.getLatestResult();
      }
  
      /**
@@ -146,7 +146,7 @@
       *         used for estimation.
       */
      public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-         var visionEst = photonEstimator.update(getLatestNoteResult());
+         var visionEst = photonEstimator.update(aprilTagCamera.getLatestResult());
          double latestTimestamp = aprilTagCamera.getLatestResult().getTimestampSeconds();
          boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
          if (Robot.isSimulation()) {

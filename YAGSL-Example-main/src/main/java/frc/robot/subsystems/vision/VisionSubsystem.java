@@ -27,7 +27,10 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        // System.out.println("VISION PERIODIC");
         estimatedPose = visionInterface.getEstimatedGlobalPose();
+        System.out.println(visionInterface.getEstimatedGlobalPose());
+
         aprilTagResult = visionInterface.getLatestResult();
         if (aprilTagResult.hasTargets()) {
             tagPitch = aprilTagResult.getBestTarget().getPitch();
