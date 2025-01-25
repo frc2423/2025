@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -51,6 +52,7 @@ public class RobotContainer {
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase);
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -131,7 +133,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
-
+                SmartDashboard.putData("swerveSub", drivebase);
         }
 
         /**
@@ -218,24 +220,24 @@ public class RobotContainer {
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                                 .whileTrue(intakeCommands.intakeStop());
 
-                new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .whileTrue(clawCommands.clawRelease());
+                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                                // .whileTrue(clawCommands.clawRelease());
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
                                 .whileTrue(clawCommands.clawStop());
 
                 new Trigger(() -> driverXbox.getPOV() == 0)
-                                .onTrue(drivebase.lookAtAngle(0));
+                                .onTrue(swerveCommands.lookAtAngle(0));
                 new Trigger(() -> driverXbox.getPOV() == 315)
-                                .onTrue(drivebase.lookAtAngle(60));
+                                .onTrue(swerveCommands.lookAtAngle(60));
                 new Trigger(() -> driverXbox.getPOV() == 225)
-                                .onTrue(drivebase.lookAtAngle(120));
+                                .onTrue(swerveCommands.lookAtAngle(120));
                 new Trigger(() -> driverXbox.getPOV() == 180)
-                                .onTrue(drivebase.lookAtAngle(180));
+                                .onTrue(swerveCommands.lookAtAngle(180));
                 new Trigger(() -> driverXbox.getPOV() == 135)
-                                .onTrue(drivebase.lookAtAngle(240));
+                                .onTrue(swerveCommands.lookAtAngle(240));
                 new Trigger(() -> driverXbox.getPOV() == 45)
-                                .onTrue(drivebase.lookAtAngle(300));
+                                .onTrue(swerveCommands.lookAtAngle(300));
 
         }
 

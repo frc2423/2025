@@ -805,13 +805,6 @@ public class SwerveSubsystem extends SubsystemBase
     return swerveDrive;
   }
 
-  public Command lookAtAngle(double angle){
-    var command = run(() -> {
-      actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
-    });
-    return command;
-  }
-
   public void actuallyLookAngleButMove(Rotation2d rotation2d) { //here
     double x = MathUtil.applyDeadband(
         driverXbox.getLeftX(),
