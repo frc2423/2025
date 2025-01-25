@@ -57,7 +57,7 @@ public class RobotContainer {
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
         private static boolean runOnce = false;
-       
+
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
          * by angular velocity.
@@ -173,7 +173,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                
+
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
                         RobotContainer.runOnce = true;
@@ -223,6 +223,19 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
                                 .whileTrue(clawCommands.clawStop());
+
+                new Trigger(() -> driverXbox.getPOV() == 0)
+                                .onTrue(drivebase.lookAtAngle(0));
+                new Trigger(() -> driverXbox.getPOV() == 315)
+                                .onTrue(drivebase.lookAtAngle(60));
+                new Trigger(() -> driverXbox.getPOV() == 225)
+                                .onTrue(drivebase.lookAtAngle(120));
+                new Trigger(() -> driverXbox.getPOV() == 180)
+                                .onTrue(drivebase.lookAtAngle(180));
+                new Trigger(() -> driverXbox.getPOV() == 135)
+                                .onTrue(drivebase.lookAtAngle(240));
+                new Trigger(() -> driverXbox.getPOV() == 45)
+                                .onTrue(drivebase.lookAtAngle(300));
 
         }
 
