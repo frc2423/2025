@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -26,7 +27,6 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawCommands;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -61,7 +61,7 @@ public class RobotContainer {
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
         private static boolean runOnce = false;
-       
+
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
          * by angular velocity.
@@ -177,7 +177,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                
+
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
                         RobotContainer.runOnce = true;
@@ -247,4 +247,5 @@ public class RobotContainer {
         public void setMotorBrake(boolean brake) {
                 drivebase.setMotorBrake(brake);
         }
+
 }
