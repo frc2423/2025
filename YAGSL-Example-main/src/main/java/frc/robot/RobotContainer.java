@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -42,7 +43,7 @@ public class RobotContainer {
         XboxController driverXbox = new XboxController(0);
         XboxController operator = new XboxController(1);
         boolean isPanel = false;
-        String deployDirectory = (Robot.isSimulation()) ? "swerve" : "swerve";
+        String deployDirectory = (Robot.isSimulation()) ? "sim-swerve/neo" : "swerve";
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
@@ -50,12 +51,15 @@ public class RobotContainer {
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
+
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase);
+
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
-        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
-        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
+        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
+        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
         private static boolean runOnce = false;
        
         /**
