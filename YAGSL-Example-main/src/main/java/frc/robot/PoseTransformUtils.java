@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class PoseTransformUtils {
 
-    public static final double FIELD_LENGTH_METERS = 16.54;
-    public static final double FIELD_WIDTH_METERS = 8.21;
+    public static final double FIELD_LENGTH_METERS = 17.55;
+    public static final double FIELD_WIDTH_METERS = 8.05;
 
     public static boolean isRedAlliance() {
         var alliance = DriverStation.getAlliance();
