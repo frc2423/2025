@@ -223,7 +223,7 @@ public class RobotContainer {
                                 .whileTrue(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .whileTrue(swerveCommands.autoAlign(Constants.AprilTagPoses.TEST_POSE2D));
+                                .whileTrue(clawCommands.clawRelease());
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
                                 .whileTrue(clawCommands.clawStop());
