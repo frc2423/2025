@@ -54,7 +54,6 @@
  
  public class VisionInterface {
      private final PhotonCamera aprilTagCamera;
-     private final PhotonCamera noteCamera;
      private final PhotonPoseEstimator photonEstimator;
      private double lastEstTimestamp = 0;
  
@@ -64,8 +63,6 @@
  
      public VisionInterface() {
          aprilTagCamera = new PhotonCamera(kCameraName);
-         noteCamera = new PhotonCamera(knoteCameraName);
-         noteCamera.setPipelineIndex(0);
  
          photonEstimator = new PhotonPoseEstimator(kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, kRobotToCam);
                  
@@ -106,10 +103,6 @@
  
      public boolean isAprilTagCameraConnected() {
          return aprilTagCamera.isConnected();
-     }
- 
-     public boolean isNoteCameraConnected() {
-         return noteCamera.isConnected();
      }
  
      public PhotonPipelineResult getLatestResult() {
@@ -204,9 +197,6 @@
          return aprilTagCamera;
      }
  
-     public PhotonCamera getNoteCamera() {
-         return noteCamera;
-     }
  
      // ----- Simulation
  

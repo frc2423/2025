@@ -257,7 +257,6 @@ public class RobotContainer {
         public void addVision() {
                 var estimatedPose = visionSubsystem.getEstimatedRobotPose();
                 var std = visionSubsystem.getStandardDeviations();
-                // System.out.println("addVision: " + estimatedPose.isPresent() + ", " + std.isPresent());
                 if (estimatedPose.isPresent() && std.isPresent()) {
 
                         drivebase.addCameraInput(estimatedPose.get().estimatedPose.toPose2d(),

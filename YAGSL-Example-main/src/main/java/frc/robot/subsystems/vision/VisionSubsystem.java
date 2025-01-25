@@ -27,10 +27,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // System.out.println("VISION PERIODIC");
         estimatedPose = visionInterface.getEstimatedGlobalPose();
-        System.out.println(visionInterface.getEstimatedGlobalPose());
-
         aprilTagResult = visionInterface.getLatestResult();
         if (aprilTagResult.hasTargets()) {
             tagPitch = aprilTagResult.getBestTarget().getPitch();
@@ -67,7 +64,6 @@ public class VisionSubsystem extends SubsystemBase {
         PhotonTrackedTarget getLatestResult = aprilTagResult.getBestTarget();
         if (getLatestResult != null) {
             getLatestId = getLatestResult.getFiducialId();
-            // setLEDColor();
             return Optional.ofNullable(getLatestResult.getBestCameraToTarget());
         }
         return null;
@@ -78,45 +74,6 @@ public class VisionSubsystem extends SubsystemBase {
             return true;
         }
         return false;
-    }
-
-    // public double getOffset() {
-    //     if (!noteResult.hasTargets()) {
-    //         return 0; //
-    //     }
-    //     double x = getX(notePitch);
-    //     double y = getY(noteYaw);
-
-    //     double angle = Math.tan(x / y);
-    //     return angle;
-    // }
-
-
-    private double getX(double camx) {
-        double x = (.163 * Math.pow(camx, 2)) + (1.298 * camx) + 28.7;
-        return x;
-    }
-
-    private double getY(double camy) {
-        double y = (.0376 * Math.pow(camy, 2)) + 4.2598;
-        return y;
-    }
-
-    // public Rotation2d getTurn() {
-    //     // gets how much the robot needs to turn to get the note in the center
-    //     return new Rotation2d(getOffset());
-    // }
-
-    // public Pose2d getNotePose(Pose2d robotPose){
-    // var result = noteVision.getLatestNoteResult();
-    // if (result != null) {
-    // //return 0; //
-    // }
-    // double x = robotPose.getX() + getX(result.getBestTarget().getPitch());
-    // double y = robotPose.getY() + getY(result.getBestTarget().getYaw());
-    // }
-    public void printCameraStuff(){
-        System.out.println("pitch: " + tagPitch + " skew: " + tagSkew + " yaw: " + tagYaw);
     }
 
     @Override
