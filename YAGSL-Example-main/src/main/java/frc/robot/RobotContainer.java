@@ -19,13 +19,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.Constants.Vision;
+
 import frc.robot.commands.swervedrive.drivebase.AbsoluteDriveAdv;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+
 
 import java.io.File;
-import java.util.Optional;
+
 
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
@@ -59,7 +59,7 @@ public class RobotContainer {
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
-        // VisionSubsystem visionSubsystem = new VisionSubsystem();
+  
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -137,7 +137,6 @@ public class RobotContainer {
                 Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
                 drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
                 DriverStation.silenceJoystickConnectionWarning(true);
-                // SmartDashboard.putData("VisionSubsystem", visionSubsystem);
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
@@ -254,20 +253,4 @@ public class RobotContainer {
                 drivebase.setMotorBrake(brake);
         }
 
-        // public void addVision() {
-        //         var estimatedPose = visionSubsystem.getEstimatedRobotPose();
-        //         var std = visionSubsystem.getStandardDeviations();
-        //         if (estimatedPose.isPresent() && std.isPresent()) {
-
-        //                 drivebase.addCameraInput(estimatedPose.get().estimatedPose.toPose2d(),
-        //                                 visionSubsystem.getTimestampSeconds(), std.get());
-        //         }
-        // }
-
-        // public void updateVision() {
-        //         Optional<Transform3d> bestResult = visionSubsystem.getLatestResult();
-        //         if (bestResult != null && bestResult.isPresent()) {
-        //                 addVision();
-        //         }
-        // }
 }
