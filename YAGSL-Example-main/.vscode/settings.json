@@ -14,6 +14,10 @@
     "**/.factorypath": true,
     "**/*~": true
   },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
   "java.test.config": [
     {
       "name": "WPIlibUnitTests",
@@ -25,5 +29,9 @@
       }
     },
   ],
-  "java.test.defaultConfig": "WPIlibUnitTests"
+  "java.test.defaultConfig": "WPIlibUnitTests",
+  "java.format.settings.url": "eclipse-formatter.xml",
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  }
 }
