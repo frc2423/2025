@@ -59,7 +59,7 @@ public class RobotContainer {
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
-        VisionSubsystem visionSubsystem = new VisionSubsystem();
+        // VisionSubsystem visionSubsystem = new VisionSubsystem();
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -137,7 +137,7 @@ public class RobotContainer {
                 Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
                 drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
                 DriverStation.silenceJoystickConnectionWarning(true);
-                SmartDashboard.putData("VisionSubsystem", visionSubsystem);
+                // SmartDashboard.putData("VisionSubsystem", visionSubsystem);
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
@@ -254,20 +254,20 @@ public class RobotContainer {
                 drivebase.setMotorBrake(brake);
         }
 
-        public void addVision() {
-                var estimatedPose = visionSubsystem.getEstimatedRobotPose();
-                var std = visionSubsystem.getStandardDeviations();
-                if (estimatedPose.isPresent() && std.isPresent()) {
+        // public void addVision() {
+        //         var estimatedPose = visionSubsystem.getEstimatedRobotPose();
+        //         var std = visionSubsystem.getStandardDeviations();
+        //         if (estimatedPose.isPresent() && std.isPresent()) {
 
-                        drivebase.addCameraInput(estimatedPose.get().estimatedPose.toPose2d(),
-                                        visionSubsystem.getTimestampSeconds(), std.get());
-                }
-        }
+        //                 drivebase.addCameraInput(estimatedPose.get().estimatedPose.toPose2d(),
+        //                                 visionSubsystem.getTimestampSeconds(), std.get());
+        //         }
+        // }
 
-        public void updateVision() {
-                Optional<Transform3d> bestResult = visionSubsystem.getLatestResult();
-                if (bestResult != null && bestResult.isPresent()) {
-                        addVision();
-                }
-        }
+        // public void updateVision() {
+        //         Optional<Transform3d> bestResult = visionSubsystem.getLatestResult();
+        //         if (bestResult != null && bestResult.isPresent()) {
+        //                 addVision();
+        //         }
+        // }
 }

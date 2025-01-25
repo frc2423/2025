@@ -80,7 +80,7 @@ public class Robot extends TimedRobot
     CommandScheduler.getInstance().run();
 
     if (!isSimulation()) {
-      m_robotContainer.updateVision();
+      // m_robotContainer.updateVision();
     }
   }
 
