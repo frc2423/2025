@@ -1,6 +1,13 @@
 # This gitignore has been specially created by the WPILib team.
 # If you remove items from this file, intellisense might break.
 
+# Ignore generated sim files.
+simgui.json
+simgui-*.json
+.Glass/*.json
+.OutlineViewer/*.json
+
+
 ### C++ ###
 # Prerequisites
 *.d
