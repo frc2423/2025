@@ -17,9 +17,7 @@ public class SwerveCommands {
         this.swerve = swerve;
     }
 
-
     public Command autoAlign(Pose2d pose) {
-
 
         // Since we are using a holonomic drivetrain, the rotation component of this
         // pose
@@ -36,8 +34,8 @@ public class SwerveCommands {
                 targetPose,
                 constraints,
                 0.0 // Goal end velocity in meters/sec
-                );// Rotation delay distance in meters. This is how far the robot should travel
-                     // before attempting to rotate.
+        );// Rotation delay distance in meters. This is how far the robot should travel
+          // before attempting to rotate.
 
         pathfindingCommand.setName("Align to Pose");
 
