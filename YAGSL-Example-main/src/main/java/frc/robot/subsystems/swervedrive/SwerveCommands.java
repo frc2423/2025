@@ -6,12 +6,18 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.PoseTransformUtils;
+import frc.robot.subsystems.Elevator.ElevatorSubsystem;
+import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 
 public class SwerveCommands {
 
     private SwerveSubsystem swerve;
+    private IntakeCommands intakeCommands;
+    private ElevatorSubsystem elevatorSubsystem;
 
     public SwerveCommands(SwerveSubsystem swerve) {
         this.swerve = swerve;
@@ -40,5 +46,23 @@ public class SwerveCommands {
         pathfindingCommand.setName("Align to Pose");
 
         return pathfindingCommand;
+    }
+
+    public void autoScoral(Pose2d pose) {
+        Command command1 = autoAlign(new Pose2d()).until(() -> {
+            Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
+            if (pose = targetPose) {
+                return true;
+            }
+            return false;
+        });
+
+        // Command command2 = ElevatorSubsystem.goToSetpoint().until(() -> {
+        // if(position = ){
+        // return true;
+        // }
+        // return false;
+        // });
+        // Command command3 = IntakeCommands.intakeOut()
     }
 }
