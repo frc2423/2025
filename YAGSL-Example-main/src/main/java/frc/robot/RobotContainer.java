@@ -54,6 +54,8 @@ public class RobotContainer {
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
+        public static IntakeSubsystem intake = new IntakeSubsystem();
+
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
@@ -144,7 +146,7 @@ public class RobotContainer {
     // exampleSubsystem.exampleCommand());
 
     NamedCommands.registerCommand("Elevator to Reef L2", elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
-
+    NamedCommands.registerCommand("Outtake Reef L2", intakeCommands.intakeOut());
         }
 
         /**
