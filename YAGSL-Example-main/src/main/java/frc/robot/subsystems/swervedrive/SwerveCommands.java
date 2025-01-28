@@ -60,11 +60,11 @@ public class SwerveCommands {
     }
 
     public void actuallyLookAngleButMove(Rotation2d rotation2d) { // here
-        var swerveDrive = swerve.getSwerveDrive();
+        // var swerveDrive = swerve.getSwerveDrive();
         final double maxRadsPerSecond = 5;
-        final double minRadsPerSecond = .25; // hella slow
-        double slowRange = 10;
-        double t = (swerveDrive.getYaw().getDegrees() + slowRange) / (slowRange * 2);
+        // final double minRadsPerSecond = .25; // hella slow
+        // double slowRange = 10;
+        // double t = (swerveDrive.getYaw().getDegrees() + slowRange) / (slowRange * 2);
 
         double x = MathUtil.applyDeadband(
                 driverXbox.getLeftX(),
@@ -85,22 +85,33 @@ public class SwerveCommands {
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(xSpeedTarget, ySpeedTarget,
                 rotation2d);
 
-        double high = slowRange + rotation2d.getDegrees();
-        double low = rotation2d.getDegrees() - slowRange;
+        // double high = slowRange + rotation2d.getDegrees();
+        // double low = rotation2d.getDegrees() - slowRange;
 
-        if (swerveDrive.getYaw().getDegrees() < high && swerveDrive.getYaw().getDegrees() > low) {
-            desiredSpeeds.omegaRadiansPerSecond = MathUtil.interpolate(-maxRadsPerSecond, maxRadsPerSecond, t);
-        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+        // if (swerveDrive.getYaw().getDegrees() < high &&
+        // swerveDrive.getYaw().getDegrees() > low) {
+        // desiredSpeeds.omegaRadiansPerSecond = MathUtil.interpolate(-maxRadsPerSecond,
+        // maxRadsPerSecond, t);
+        // } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond)
+        // {
+        // desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
+        // desiredSpeeds.omegaRadiansPerSecond);
+        // } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) < minRadsPerSecond)
+        // {
+        // desiredSpeeds.omegaRadiansPerSecond = Math.copySign(minRadsPerSecond,
+        // desiredSpeeds.omegaRadiansPerSecond);
+        // }
+
+        if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
             desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
-        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) < minRadsPerSecond) {
-            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(minRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
         }
 
-        double dead = 1; // band
+        // double dead = 1; // band
 
-        if (Math.abs(swerveDrive.getYaw().getDegrees() - rotation2d.getDegrees()) < dead) {
-            desiredSpeeds.omegaRadiansPerSecond = 0;
-        }
+        // if (Math.abs(swerveDrive.getYaw().getDegrees() - rotation2d.getDegrees()) <
+        // dead) {
+        // desiredSpeeds.omegaRadiansPerSecond = 0;
+        // }
 
         swerve.driveFieldOriented(desiredSpeeds);
     }
