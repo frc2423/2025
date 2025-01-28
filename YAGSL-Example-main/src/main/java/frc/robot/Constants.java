@@ -83,7 +83,7 @@ public final class Constants {
     }
 
     public static class SetpointConstants {
-        public static final double REEF_L4 = 69.56; //noice
+        public static final double REEF_L4 = 69.56; // noice
         public static final double REEF_L2 = 20;
         public static final double REEF_L3 = 37.77;
         public static final double ALGAE_DESCORE_L3 = 25;
@@ -96,7 +96,6 @@ public final class Constants {
         public static final Pose2d REEF_TAG_6 = new Pose2d(2.76, 13.786, REEF_TAG_6_Rotation);
         public static final Pose2d TEST_POSE2D = new Pose2d(1, 1, REEF_TAG_6_Rotation);
 
-       
     }
 
     public static double inchToSetPoint(double inches) {
