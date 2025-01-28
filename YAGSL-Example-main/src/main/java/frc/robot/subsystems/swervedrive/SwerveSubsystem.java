@@ -821,6 +821,11 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void actuallyLookAngleButMove(Rotation2d rotation2d) { // here
+    final double maxRadsPerSecond = 5;
+    final double minRadsPerSecond = .25; // hella slow
+    double slowRange = 10;
+    double t = (swerveDrive.getYaw().getDegrees() + slowRange) / (slowRange * 2);
+
     double x = MathUtil.applyDeadband(
         driverXbox.getLeftX(),
         OperatorConstants.LEFT_X_DEADBAND);
@@ -828,7 +833,6 @@ public class SwerveSubsystem extends SubsystemBase {
       x *= -1;
     }
     double ySpeedTarget = m_xspeedLimiter.calculate(x);
-    double messingupformating = 93485; // iwebfiwebifbeiw
 
     double y = MathUtil.applyDeadband(
         driverXbox.getLeftY(),
@@ -840,11 +844,24 @@ public class SwerveSubsystem extends SubsystemBase {
 
     ChassisSpeeds desiredSpeeds = this.getTargetSpeeds(xSpeedTarget, ySpeedTarget,
         rotation2d);
-    double maxRadsPerSecond = 10000; // 2.5
-    // Make the robot move
-    if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+
+    double high = slowRange + rotation2d.getDegrees();
+    double low = rotation2d.getDegrees() - slowRange;
+
+    if (swerveDrive.getYaw().getDegrees() < high && swerveDrive.getYaw().getDegrees() > low) {
+      desiredSpeeds.omegaRadiansPerSecond = MathUtil.interpolate(-maxRadsPerSecond, maxRadsPerSecond, t);
+    } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
       desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
+    } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) < minRadsPerSecond) {
+      desiredSpeeds.omegaRadiansPerSecond = Math.copySign(minRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
     }
+
+    double dead = 1; // band
+
+    if (Math.abs(swerveDrive.getYaw().getDegrees() - rotation2d.getDegrees()) < dead) {
+      desiredSpeeds.omegaRadiansPerSecond = 0;
+    }
+
     this.driveFieldOriented(desiredSpeeds);
   }
 }
