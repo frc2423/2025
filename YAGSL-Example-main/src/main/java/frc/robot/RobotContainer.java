@@ -58,7 +58,6 @@ public class RobotContainer {
         SwerveCommands swerveCommands = new SwerveCommands(drivebase);
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
-        public static IntakeSubsystem intake = new IntakeSubsystem();
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
@@ -141,7 +140,7 @@ public class RobotContainer {
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
                 SmartDashboard.putData("autoChooser", m_chooser);
 
-                m_chooser.setDefaultOption("First Auto", "First Auto");
+                m_chooser.setDefaultOption("Middle Side Auto", "Middle Side Auto");
 
                 // auto commands
                 // EXAMPLE: NamedCommands.registerCommand("useless",
@@ -251,7 +250,7 @@ public class RobotContainer {
          */
         public Command getAutonomousCommand() {
                 // An example command will be run in autonomous
-                return drivebase.getAutonomousCommand("New Auto");
+                return drivebase.getAutonomousCommand("Middle Side Auto");
         }
 
         public void setDriveMode() {
@@ -263,5 +262,3 @@ public class RobotContainer {
         }
 
 }
-        
-        

@@ -1,5 +1,8 @@
 {
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
       "SmartDashboard": {
         "intakeSubsystewm": {
@@ -17,18 +20,32 @@
       "/SmartDashboard/JSON": "Alerts",
       "/SmartDashboard/Mech2d": "Mechanism2d",
       "/SmartDashboard/Motors": "Alerts",
+      "/SmartDashboard/Pigeon 2 (v6) [13]": "Gyro",
       "/SmartDashboard/Swerve Drive": "Alerts",
       "/SmartDashboard/VisionSubsystem": "Subsystem",
+      "/SmartDashboard/VisionSystemSim-Vision/Sim Field": "Field2d",
+      "/SmartDashboard/autoChooser": "String Chooser",
       "/SmartDashboard/elevatorSubsystem": "Subsystem"
     },
     "windows": {
       "/SmartDashboard/Field": {
-        "bottom": 1476,
-        "height": 8.210550308227539,
-        "left": 150,
-        "right": 2961,
-        "top": 79,
-        "width": 16.541748046875,
+        "bottom": 1638,
+        "builtin": "2025 Reefscape",
+        "height": 8.051901817321777,
+        "left": 534,
+        "right": 3466,
+        "top": 291,
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/autoChooser": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/elevatorSubsystem": {
         "window": {
           "visible": true
         }
@@ -49,6 +66,6 @@
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "serverTeam": "2423"
+    "serverTeam": "localhost"
   }
 }

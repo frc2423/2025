@@ -73,8 +73,8 @@
       "/SmartDashboard/Swerve Drive": "Alerts",
       "/SmartDashboard/VisionSubsystem": "Subsystem",
       "/SmartDashboard/VisionSystemSim-Vision/Sim Field": "Field2d",
-      "/SmartDashboard/autoChooser": "String Chooser",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
+      "/SmartDashboard/autoChooser": "String Chooser",
       "/SmartDashboard/elevatorSubsystem": "Subsystem",
       "/SmartDashboard/navX-Sensor[1]": "Gyro",
       "/SmartDashboard/navX-Sensor[4]": "Gyro"
