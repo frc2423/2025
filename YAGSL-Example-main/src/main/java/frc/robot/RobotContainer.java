@@ -239,7 +239,6 @@ public class RobotContainer {
                 new Trigger(() -> driverXbox.getPOV() == 45)
                                 .onTrue(swerveCommands.lookAtAngle(300));
 
-
         }
 
         /**
