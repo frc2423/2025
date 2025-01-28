@@ -8,6 +8,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -81,10 +83,19 @@ public final class Constants {
     }
 
     public static class SetpointConstants {
-        public static final double REEF_L4 = 69.56;
+        public static final double REEF_L4 = 69.56; // noice
         public static final double REEF_L2 = 20;
         public static final double REEF_L3 = 37.77;
+        public static final double ALGAE_DESCORE_L3 = 25;
+
         public static final double ZERO = 0.1;
+    }
+
+    public static class AprilTagPoses {
+        public static final Rotation2d REEF_TAG_6_Rotation = new Rotation2d(Math.PI / 3);
+        public static final Pose2d REEF_TAG_6 = new Pose2d(2.76, 13.786, REEF_TAG_6_Rotation);
+        public static final Pose2d TEST_POSE2D = new Pose2d(1, 1, REEF_TAG_6_Rotation);
+
     }
 
     public static double inchToSetPoint(double inches) {

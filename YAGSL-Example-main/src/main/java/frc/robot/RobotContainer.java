@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -43,7 +45,7 @@ public class RobotContainer {
         XboxController driverXbox = new XboxController(0);
         XboxController operator = new XboxController(1);
         boolean isPanel = false;
-        String deployDirectory = (Robot.isSimulation()) ? "swerve" : "swerve";
+        String deployDirectory = (Robot.isSimulation()) ? "sim-swerve/neo" : "swerve";
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
@@ -51,19 +53,19 @@ public class RobotContainer {
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
+
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase);
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
         public static IntakeSubsystem intake = new IntakeSubsystem();
 
-
-        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
-        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
+        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
+        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
         private static boolean runOnce = false;
 
-          SendableChooser<String> m_chooser = new SendableChooser<>();
+        SendableChooser<String> m_chooser = new SendableChooser<>();
 
-       
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
          * by angular velocity.
@@ -142,11 +144,12 @@ public class RobotContainer {
                 m_chooser.setDefaultOption("First Auto", "First Auto");
 
                 // auto commands
-    // EXAMPLE: NamedCommands.registerCommand("useless",
-    // exampleSubsystem.exampleCommand());
+                // EXAMPLE: NamedCommands.registerCommand("useless",
+                // exampleSubsystem.exampleCommand());
 
-    NamedCommands.registerCommand("Elevator to Reef L2", elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
-    NamedCommands.registerCommand("Outtake Reef L2", intakeCommands.intakeOut());
+                NamedCommands.registerCommand("Elevator to Reef L2",
+                                elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+                NamedCommands.registerCommand("Outtake Reef L2", intakeCommands.intakeOut());
         }
 
         /**
@@ -188,7 +191,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
-                
+
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
                         RobotContainer.runOnce = true;
@@ -219,6 +222,8 @@ public class RobotContainer {
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
                 new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
                                 .onTrue(elevator.goLittleDown(1));
+                new JoystickButton(operator, XboxController.Button.kBack.value)
+                                .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
                 new JoystickButton(operator, XboxController.Button.kRightBumper.value)
                                 .onTrue(elevator.goLittleUp(1));
 
@@ -256,4 +261,7 @@ public class RobotContainer {
         public void setMotorBrake(boolean brake) {
                 drivebase.setMotorBrake(brake);
         }
+
 }
+        
+        

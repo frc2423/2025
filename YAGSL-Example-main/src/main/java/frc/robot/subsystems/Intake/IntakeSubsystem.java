@@ -1,4 +1,5 @@
 package frc.robot.subsystems.Intake;
+
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -15,31 +16,30 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private SparkFlex motor = new SparkFlex(23 , MotorType.kBrushless);
+    private SparkFlex motor = new SparkFlex(23, MotorType.kBrushless);
     private LaserCan intakeDist = new LaserCan(26);
-    
 
     public IntakeSubsystem() {
-        
+
     }
 
-    public void intake(double speed){
-        motor.set(speed); 
-    }
-
-    public void outtake(double speed){
+    public void intake(double speed) {
         motor.set(speed);
     }
 
-    public void stop(){
+    public void outtake(double speed) {
+        motor.set(speed);
+    }
+
+    public void stop() {
         motor.set(0);
     }
 
-    public double distMm(){
+    public double distMm() {
         var dist = intakeDist.getMeasurement();
-        if(dist == null){
+        if (dist == null) {
             return 10000;
-        } else{
+        } else {
             return dist.distance_mm;
         }
     }
