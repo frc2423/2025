@@ -3,7 +3,9 @@ package frc.robot.subsystems.swervedrive;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -48,14 +50,20 @@ public class SwerveCommands {
         return pathfindingCommand;
     }
 
-    public void autoScoral(Pose2d pose) {
+    public void autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
+        Pose2d pose1 = new Pose2d();
+        Pose2d pose2 = new Pose2d();
+        Transform2d poseDiff = pose1.minus(pose2);
         Command command1 = autoAlign(new Pose2d()).until(() -> {
             Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-            if (pose = targetPose) {
+            double distance = Math.sqrt(Math.pow(pose.getX(), 2) + Math.pow(pose.getY(), 2)); // distance in meters
+
+            if (distance <= .0833) {
                 return true;
+            } else {
+                return false;
             }
-            return false;
-        });
+        }).andThen(elevatorSubsystem.goToSetpoint(setpoint)).andThen(intakeCommands.intakeOut());
 
         // Command command2 = ElevatorSubsystem.goToSetpoint().until(() -> {
         // if(position = ){
