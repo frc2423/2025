@@ -147,6 +147,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return motor1.getAbsoluteEncoder().getPosition();
     }
 
+    public boolean isAtSetpoint() {
+        return elevator_PID.atSetpoint();
+    }
+
     // public double getHeightSim() {
 
     // }

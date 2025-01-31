@@ -50,27 +50,16 @@ public class SwerveCommands {
         return pathfindingCommand;
     }
 
-    public void autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
-        Pose2d pose1 = new Pose2d();
-        Pose2d pose2 = new Pose2d();
-        Transform2d poseDiff = pose1.minus(pose2);
-        Command command1 = autoAlign(new Pose2d()).until(() -> {
+    public Command autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
+        return autoAlign(pose).until(() -> {
             Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-            double distance = Math.sqrt(Math.pow(pose.getX(), 2) + Math.pow(pose.getY(), 2)); // distance in meters
-
-            if (distance <= .0833) {
-                return true;
-            } else {
-                return false;
-            }
-        }).andThen(elevatorSubsystem.goToSetpoint(setpoint)).andThen(intakeCommands.intakeOut());
-
-        // Command command2 = ElevatorSubsystem.goToSetpoint().until(() -> {
-        // if(position = ){
-        // return true;
-        // }
-        // return false;
-        // });
-        // Command command3 = IntakeCommands.intakeOut()
+            Pose2d robotPose = swerve.getPose();
+            Transform2d poseDiff = targetPose.minus(robotPose);
+            double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) + Math.pow(poseDiff.getY(), 2)); // distance in
+                                                                                                      // meters
+            return distance <= .0833;
+        }).andThen(elevatorSubsystem.goToSetpoint(setpoint)).until(() -> {
+            return elevatorSubsystem.isAtSetpoint();
+        }).andThen(intakeCommands.intakeOut());
     }
 }

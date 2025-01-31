@@ -192,8 +192,9 @@ public class RobotContainer {
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
-                                                : Constants.SetpointConstants.REEF_L2));
+                                .whileTrue(swerveCommands.autoScoral(Constants.AprilTagPoses.REEF_TAG_6,
+                                                (isPanel) ? Constants.SetpointConstants.REEF_L2
+                                                                : Constants.SetpointConstants.REEF_L2));
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
                                                 : Constants.SetpointConstants.REEF_L3));
