@@ -56,6 +56,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         // post the mechanism to the dashboard
         SmartDashboard.putData("Mech2d", mech);
         // elevatorSimMotor.setInput(0);
+
+        elevator_PID.setTolerance(3);
     }
 
     @Override
@@ -148,7 +150,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public boolean isAtSetpoint() {
-        return elevator_PID.atSetpoint();
+        return (Math.abs(getHeight() - setpoint) < 2);
+        // return elevator_PID.atGoal();
     }
 
     // public double getHeightSim() {

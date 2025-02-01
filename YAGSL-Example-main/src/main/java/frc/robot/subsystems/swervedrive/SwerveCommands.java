@@ -37,7 +37,7 @@ public class SwerveCommands {
     }
 
     public Pose2d addScoringOffset(Pose2d pose, double distance) {
-        Transform2d offset = new Transform2d(distance, 0, Rotation2d.kPi);
+        Transform2d offset = new Transform2d(distance, .178, Rotation2d.kPi);
         Pose2d targetPose = pose.plus(offset);
         return targetPose;
     }
@@ -48,7 +48,7 @@ public class SwerveCommands {
         // pose
         // represents the goal holonomic rotation
         // Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-        Pose2d targetPose = addScoringOffset(pose, 1);
+        Pose2d targetPose = addScoringOffset(pose, .49);
 
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
@@ -84,6 +84,7 @@ public class SwerveCommands {
                 elevatorSubsystem.goToSetpoint(setpoint).until(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
+                Commands.waitSeconds(2),
                 intakeCommands.intakeOut());
 
         // var command = autoAlign(pose).until(() -> {
