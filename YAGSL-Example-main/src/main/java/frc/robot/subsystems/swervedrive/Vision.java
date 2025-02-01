@@ -101,6 +101,10 @@ public class Vision {
     }
   }
 
+  public static Pose2d getTagPose(int id) {
+    return fieldLayout.getTagPose(id).get().toPose2d();
+  }
+
   /**
    * Calculates a target pose relative to an AprilTag on the field.
    *
@@ -354,7 +358,7 @@ public class Vision {
     /**
      * Estimated robot pose.
      */
-    public Optional<EstimatedRobotPose> estimatedRobotPose;
+    public Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
     /**
      * Simulated camera instance which only exists during simulations.
      */
@@ -527,6 +531,7 @@ public class Vision {
         visionEst = poseEstimator.update(change);
         updateEstimationStdDevs(visionEst, change.getTargets());
       }
+      resultsList.clear();
       estimatedRobotPose = visionEst;
     }
 
