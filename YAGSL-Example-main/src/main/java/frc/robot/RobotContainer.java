@@ -234,6 +234,19 @@ public class RobotContainer {
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
                                 .whileTrue(clawCommands.clawStop());
 
+                new Trigger(() -> driverXbox.getPOV() == 0)
+                                .onTrue(swerveCommands.lookAtAngle(0));
+                new Trigger(() -> driverXbox.getPOV() == 315)
+                                .onTrue(swerveCommands.lookAtAngle(60));
+                new Trigger(() -> driverXbox.getPOV() == 225)
+                                .onTrue(swerveCommands.lookAtAngle(120));
+                new Trigger(() -> driverXbox.getPOV() == 180)
+                                .onTrue(swerveCommands.lookAtAngle(180));
+                new Trigger(() -> driverXbox.getPOV() == 135)
+                                .onTrue(swerveCommands.lookAtAngle(240));
+                new Trigger(() -> driverXbox.getPOV() == 45)
+                                .onTrue(swerveCommands.lookAtAngle(300));
+
         }
 
         /**

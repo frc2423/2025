@@ -3,10 +3,14 @@ package frc.robot.subsystems.swervedrive;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -14,12 +18,17 @@ import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.Constants.OperatorConstants;
+import frc.robot.PoseTransformUtils;
 
 public class SwerveCommands {
 
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
     private ElevatorSubsystem elevatorSubsystem;
+    private XboxController driverXbox = new XboxController(0);
+    private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
+    private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem, IntakeCommands intakeCommands) {
         this.swerve = swerve;
@@ -89,4 +98,40 @@ public class SwerveCommands {
         return command;
     }
 
+    public Command lookAtAngle(double angle) {
+        var command = Commands.run(() -> {
+            actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
+        }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
+        command.addRequirements(swerve);
+        return command;
+    }
+
+    public void actuallyLookAngleButMove(Rotation2d rotation2d) { // here
+        final double maxRadsPerSecond = 5;
+
+        double x = MathUtil.applyDeadband(
+                driverXbox.getLeftX(),
+                OperatorConstants.LEFT_X_DEADBAND);
+        if (PoseTransformUtils.isRedAlliance()) {
+            x *= -1;
+        }
+        double ySpeedTarget = m_xspeedLimiter.calculate(x);
+
+        double y = MathUtil.applyDeadband(
+                driverXbox.getLeftY(),
+                OperatorConstants.LEFT_Y_DEADBAND);
+        if (PoseTransformUtils.isRedAlliance()) {
+            y *= -1;
+        }
+        double xSpeedTarget = m_yspeedLimiter.calculate(y);
+
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(xSpeedTarget, ySpeedTarget,
+                rotation2d);
+
+        if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
+        }
+
+        swerve.driveFieldOriented(desiredSpeeds);
+    }
 }
