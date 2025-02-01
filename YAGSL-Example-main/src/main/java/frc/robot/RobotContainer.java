@@ -21,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.Vision;
+
 import java.io.File;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
@@ -194,7 +196,7 @@ public class RobotContainer {
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(swerveCommands.autoScoral(Constants.AprilTagPoses.REEF_TAG_6,
+                                .whileTrue(swerveCommands.autoScoral(Vision.getTagPose(6),
                                                 (isPanel) ? Constants.SetpointConstants.REEF_L2
                                                                 : Constants.SetpointConstants.REEF_L2));
                 // new Trigger(() -> operator.getPOV() == 270)
