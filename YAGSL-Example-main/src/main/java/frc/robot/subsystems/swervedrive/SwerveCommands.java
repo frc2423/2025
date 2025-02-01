@@ -21,8 +21,10 @@ public class SwerveCommands {
     private IntakeCommands intakeCommands;
     private ElevatorSubsystem elevatorSubsystem;
 
-    public SwerveCommands(SwerveSubsystem swerve) {
+    public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem, IntakeCommands intakeCommands) {
         this.swerve = swerve;
+        this.elevatorSubsystem = elevatorSubsystem;
+        this.intakeCommands = intakeCommands;
     }
 
     public Command autoAlign(Pose2d pose) {
@@ -39,27 +41,44 @@ public class SwerveCommands {
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         Command pathfindingCommand = AutoBuilder.pathfindToPose(
-                targetPose,
+                pose,
                 constraints,
                 0.0 // Goal end velocity in meters/sec
         );// Rotation delay distance in meters. This is how far the robot should travel
           // before attempting to rotate.
 
         pathfindingCommand.setName("Align to Pose");
+        pathfindingCommand.addRequirements(swerve);
 
         return pathfindingCommand;
     }
 
     public Command autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
-        return autoAlign(pose).until(() -> {
-            Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-            Pose2d robotPose = swerve.getPose();
-            Transform2d poseDiff = targetPose.minus(robotPose);
-            double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) + Math.pow(poseDiff.getY(), 2)); // distance in
-                                                                                                      // meters
-            return distance <= .0833;
-        }).andThen(elevatorSubsystem.goToSetpoint(setpoint)).until(() -> {
-            return elevatorSubsystem.isAtSetpoint();
-        }).andThen(intakeCommands.intakeOut());
+
+        var command = Commands.sequence(
+                autoAlign(pose).until(() -> {
+                    Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
+                    Pose2d robotPose = swerve.getPose();
+                    Transform2d poseDiff = targetPose.minus(robotPose);
+                    double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) +
+                            Math.pow(poseDiff.getY(), 2)); // distance in
+                    // meters
+                    return distance <= .0833;
+                }),
+                elevatorSubsystem.goToSetpoint(setpoint).until(() -> {
+                    return elevatorSubsystem.isAtSetpoint();
+                }),
+                intakeCommands.intakeOut());
+
+        // var command = autoAlign(pose).until(() -> {
+        // return false;
+        // }).andThen(elevatorSubsystem.goToSetpoint(setpoint)).until(() -> {
+        // return elevatorSubsystem.isAtSetpoint();
+        // });
+
+        command.setName("autoScoral");
+        // command.addRequirements(swerve, elevatorSubsystem);
+
+        return command;
     }
 }

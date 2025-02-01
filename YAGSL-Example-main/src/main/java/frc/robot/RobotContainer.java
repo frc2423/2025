@@ -7,6 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -53,7 +54,7 @@ public class RobotContainer {
         ClawSubsystem clawSubsystem = new ClawSubsystem();
 
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -134,6 +135,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
+                SmartDashboard.putData("swerveSubsystem", drivebase);
 
         }
 
@@ -195,6 +197,8 @@ public class RobotContainer {
                                 .whileTrue(swerveCommands.autoScoral(Constants.AprilTagPoses.REEF_TAG_6,
                                                 (isPanel) ? Constants.SetpointConstants.REEF_L2
                                                                 : Constants.SetpointConstants.REEF_L2));
+                // new Trigger(() -> operator.getPOV() == 270)
+                // .whileTrue(swerveCommands.autoAlign(new Pose2d()));
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
                                                 : Constants.SetpointConstants.REEF_L3));

@@ -354,7 +354,7 @@ public class Vision {
     /**
      * Estimated robot pose.
      */
-    public Optional<EstimatedRobotPose> estimatedRobotPose;
+    public Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
     /**
      * Simulated camera instance which only exists during simulations.
      */
