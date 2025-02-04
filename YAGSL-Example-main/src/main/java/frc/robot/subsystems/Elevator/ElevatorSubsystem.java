@@ -62,6 +62,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        elevatorCurrentPose = motor1.getEncoder().getPosition();
         double calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
@@ -88,7 +89,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private double calculatePid(double position) {
         // updatePivotAngle();
-        elevatorCurrentPose = motor1.getEncoder().getPosition();
         double pid = elevator_PID.calculate(elevatorCurrentPose, position);
         var setpoint = elevator_PID.getSetpoint();
 
@@ -146,7 +146,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getHeight() {
-        return motor1.getAbsoluteEncoder().getPosition();
+        return elevatorCurrentPose;
     }
 
     public boolean isAtSetpoint() {
@@ -164,7 +164,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         super.initSendable(builder);
 
         builder.addDoubleProperty("calculatePid", () -> calculatePid(setpoint), null);
-        builder.addDoubleProperty("elevatorCurrentPose", () -> elevatorCurrentPose, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
+        builder.addDoubleProperty("height", this::getHeight, null);
+        builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
     }
 }

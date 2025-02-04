@@ -42,13 +42,13 @@ public class SwerveCommands {
         return targetPose;
     }
 
-    public Command autoAlign(Pose2d pose) {
+    public Command autoAlign(Pose2d pose, double dist) {
 
         // Since we are using a holonomic drivetrain, the rotation component of this
         // pose
         // represents the goal holonomic rotation
         // Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-        Pose2d targetPose = addScoringOffset(pose, .49);
+        Pose2d targetPose = addScoringOffset(pose, dist);// .55
 
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
@@ -70,21 +70,40 @@ public class SwerveCommands {
     }
 
     public Command autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
-
+        swerve.centerModulesCommand();
+        var stopCommand = Commands.runOnce(() -> swerve.drive(new ChassisSpeeds()));
+        stopCommand.addRequirements(swerve);
         var command = Commands.sequence(
-                autoAlign(pose).until(() -> {
-                    Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-                    Pose2d robotPose = swerve.getPose();
-                    Transform2d poseDiff = targetPose.minus(robotPose);
-                    double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) +
-                            Math.pow(poseDiff.getY(), 2)); // distance in
-                    // meters
-                    return distance <= .0833;
-                }),
-                elevatorSubsystem.goToSetpoint(setpoint).until(() -> {
+                // lookAtAngle(pose.getRotation().getDegrees()),
+                swerve.centerModulesCommand().withTimeout(.5),
+                // autoAlign(pose, 1).until(() -> {
+                // Pose2d targetPose = addScoringOffset(pose, 1);
+                // // Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
+                // Pose2d robotPose = swerve.getPose();
+                // Transform2d poseDiff = targetPose.minus(robotPose);
+                // double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) +
+                // Math.pow(poseDiff.getY(), 2)); // distance in
+                // // meters
+                // return distance <= .0833;
+                // }),
+                autoAlign(pose, 1.2),
+                stopCommand,
+                elevatorSubsystem.goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
-                Commands.waitSeconds(2),
+                autoAlign(pose, .45),
+                // autoAlign(pose, .3).until(() -> {
+                // Pose2d targetPose = addScoringOffset(pose, .55);
+                // // Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
+                // Pose2d robotPose = swerve.getPose();
+                // Transform2d poseDiff = targetPose.minus(robotPose);
+                // double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) +
+                // Math.pow(poseDiff.getY(), 2)); // distance in
+                // // meters
+                // return distance <= .0833;
+                // }),
+                // Commands.waitSeconds(2),
                 intakeCommands.intakeOut());
 
         // var command = autoAlign(pose).until(() -> {
