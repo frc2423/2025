@@ -231,8 +231,10 @@ public class RobotContainer {
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .whileTrue(clawCommands.clawRelease());
 
+                // new JoystickButton(driverXbox, XboxController.Button.kB.value)
+                // .whileTrue(clawCommands.clawStop());
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
-                                .whileTrue(clawCommands.clawStop());
+                                .whileTrue(elevator.goUp());
 
                 new Trigger(() -> driverXbox.getPOV() == 0)
                                 .onTrue(swerveCommands.lookAtAngle(0));

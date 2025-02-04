@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import swervelib.math.Matter;
 
@@ -98,7 +99,16 @@ public final class Constants {
 
     }
 
+    public static class ElevatorSimConstants {
+        public static final double kElevatorGearing = 10.0;
+        public static final double kCarriageMass = 10.0;
+        public static final double kElevatorSprocketDiameter = 1.0 / 12.0;
+        public static final double kMinElevatorHeightMeters = 0.0;
+        public static final double kMaxElevatorHeightMeters = 2.0;
+    }
+
     public static double inchToSetPoint(double inches) {
         return ((10 / 9.0) * inches) - (80 / 9.0);
     }
+
 }
