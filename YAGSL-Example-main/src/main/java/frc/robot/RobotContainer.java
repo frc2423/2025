@@ -7,7 +7,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -42,23 +41,21 @@ import frc.robot.subsystems.Claw.ClawCommands;
 public class RobotContainer {
 
         // Replace with CommandPS4Controller or CommandJoystick if needed
-        // final CommandXboxController driverXbox = new CommandXboxController(0);
         XboxController driverXbox = new XboxController(0);
         XboxController operator = new XboxController(1);
         boolean isPanel = false;
         String deployDirectory = (Robot.isSimulation()) ? "sim-swerve/neo" : "swerve";
+
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
-
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-        IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
+        ElevatorSubsystem elevator = new ElevatorSubsystem();
 
-        ClawCommands clawCommands = new ClawCommands(clawSubsystem);
+        IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
-
-        public static ElevatorSubsystem elevator = new ElevatorSubsystem();
+        ClawCommands clawCommands = new ClawCommands(clawSubsystem);
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
@@ -77,7 +74,7 @@ public class RobotContainer {
                         .allianceRelativeControl(true);
 
         /**
-         * Clone's the angular velocity input stream and converts it to a fieldRelative
+         * Clones the angular velocity input stream and converts it to a fieldRelative
          * input stream.
          */
         SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
@@ -190,17 +187,10 @@ public class RobotContainer {
                 new JoystickButton(driverXbox, XboxController.Button.kStart.value)
                                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                // .onTrue(elevator.goDown());
-
-                // new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                // .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
                                 .whileTrue(swerveCommands.autoScoral(Vision.getTagPose(6),
                                                 (isPanel) ? Constants.SetpointConstants.REEF_L2
                                                                 : Constants.SetpointConstants.REEF_L2));
-                // new Trigger(() -> operator.getPOV() == 270)
-                // .whileTrue(swerveCommands.autoAlign(new Pose2d()));
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
                                                 : Constants.SetpointConstants.REEF_L3));
@@ -210,8 +200,6 @@ public class RobotContainer {
                 new Trigger(() -> operator.getPOV() == 180)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ZERO
                                                 : Constants.SetpointConstants.ZERO));
-
-                // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
                 new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
                                 .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)

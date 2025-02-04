@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private double maxVel = .05;
-    private double maxAccel = .1;
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(15, 22.5));// noice
     private double elevatorCurrentPose = 0;
     private double setpoint = 0;
@@ -38,9 +36,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     // the mechanism root node
     private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
 
-    // private final FlywheelSim elevatorSimMotor = new
-    // FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
-
     // MechanismLigament2d objects represent each "section"/"stage" of the
     // mechanism, and are based
     // off the root node or another ligament object
@@ -55,7 +50,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         // post the mechanism to the dashboard
         SmartDashboard.putData("Mech2d", mech);
-        // elevatorSimMotor.setInput(0);
     }
 
     @Override
@@ -85,7 +79,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private double calculatePid(double position) {
-        // updatePivotAngle();
         elevatorCurrentPose = motor1.getEncoder().getPosition();
         double pid = elevator_PID.calculate(elevatorCurrentPose, position);
         var setpoint = elevator_PID.getSetpoint();
@@ -150,10 +143,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public boolean isAtSetpoint() {
         return elevator_PID.atSetpoint();
     }
-
-    // public double getHeightSim() {
-
-    // }
 
     @Override
     public void initSendable(SendableBuilder builder) {
