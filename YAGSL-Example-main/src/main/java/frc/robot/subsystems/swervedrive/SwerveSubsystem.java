@@ -78,7 +78,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * PhotonVision class to keep an accurate odometry.
    */
-  private Vision vision;
+  public Vision vision;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -237,7 +237,6 @@ public class SwerveSubsystem extends SubsystemBase {
           this
       // Reference to this subsystem to set requirements
       );
-
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();

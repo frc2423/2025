@@ -25,15 +25,18 @@ public class SwerveCommands {
 
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
+
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
 
-    public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem, IntakeCommands intakeCommands) {
+    public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
+            IntakeCommands intakeCommands) {
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
+
     }
 
     public Pose2d addScoringOffset(Pose2d pose, double distance) {
@@ -103,6 +106,17 @@ public class SwerveCommands {
             actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);
+        return command;
+    }
+
+    public Command lookAtNearestTag() {
+        var command = Commands.run(() -> {
+            int tag = swerve.vision.findClosestTagID(swerve.getPose());
+            int angle = swerve.vision.iDtoAngle(tag);
+            lookAtAngle(angle);
+            System.out.println("Angle " + angle + " Tag " + tag);
+        });
+
         return command;
     }
 
