@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import frc.robot.NTHelper;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
@@ -158,6 +159,10 @@ public class Vision {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         var pose = poseEst.get();
+        NTHelper.setDouble("/swerveSubsystem/vision/poseX", pose.estimatedPose.getX());
+        NTHelper.setDouble("/swerveSubsystem/vision/poseX", pose.estimatedPose.getY());
+        NTHelper.setDouble("/swerveSubsystem/vision/poseX",
+            pose.estimatedPose.getRotation().toRotation2d().getDegrees());
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
             pose.timestampSeconds,
             camera.curStdDevs);
