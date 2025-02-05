@@ -114,7 +114,7 @@ public class SwerveCommands {
             int tag = swerve.vision.findClosestTagID(swerve.getPose());
             int angle = swerve.vision.iDtoAngle(tag);
             actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
-            System.out.println("Angle " + angle + " Tag " + tag);
+
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
 
         return command;
