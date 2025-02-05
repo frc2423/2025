@@ -61,6 +61,8 @@
       "/LiveWindow/Ungrouped/Pigeon 2 [13]": "Gyro",
       "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Elevator": "Mechanism2d",
+      "/SmartDashboard/Elevator Sim": "Mechanism2d",
       "/SmartDashboard/Encoders": "Alerts",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/IMU": "Alerts",
@@ -81,6 +83,11 @@
     },
     "windows": {
       "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Elevator Sim": {
         "window": {
           "visible": true
         }
@@ -125,11 +132,29 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
     "transitory": {
       "FMSInfo": {
         "open": true
       },
       "SmartDashboard": {
+        "Elevator Sim": {
+          "open": true
+        },
+        "Encoders": {
+          "open": true
+        },
+        "Mech2d": {
+          "bottom": {
+            "elevator": {
+              "open": true
+            },
+            "open": true
+          },
+          "open": true
+        },
         "open": true
       }
     }
