@@ -231,7 +231,8 @@ public class RobotContainer {
                                 .whileTrue(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .whileTrue(swerveCommands.lookAtNearestTag());
+                                .whileTrue(clawCommands.clawRelease());
+                // .whileTrue(swerveCommands.lookAtNearestTag());
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
                                 .whileTrue(clawCommands.clawStop());

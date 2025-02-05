@@ -116,7 +116,7 @@ public class SwerveCommands {
             actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
 
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
-
+        command.addRequirements(swerve);
         return command;
     }
 
