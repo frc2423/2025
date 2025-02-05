@@ -79,7 +79,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * PhotonVision class to keep an accurate odometry.
    */
-  private Vision vision;
+  public Vision vision;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -238,7 +238,6 @@ public class SwerveSubsystem extends SubsystemBase {
           this
       // Reference to this subsystem to set requirements
       );
-
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
@@ -827,4 +826,7 @@ public class SwerveSubsystem extends SubsystemBase {
     builder.addDoubleProperty("PoseY", () -> getPose().getY(), null);
     builder.addDoubleProperty("PoseHeading", () -> getPose().getRotation().getDegrees(), null);
   }
+
 }
+
+  
