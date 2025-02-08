@@ -21,7 +21,7 @@ import frc.robot.Robot;
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = .05;
     private double maxAccel = .1;
-    ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(15, 22.5));// noice
+    ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(20, 25));// noice
     private double elevatorCurrentPose = 0;
     private double setpoint = 0;
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.18, 0, 0);
