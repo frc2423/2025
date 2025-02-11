@@ -66,7 +66,7 @@ public class SwerveCommands {
         path.preventFlipping = true;
         Command pathFollower = AutoBuilder.followPath(path);
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
-
+        // swerve.postTrajectory(path.generateTrajectory());
         pathFollower.setName("Align to Pose");
         pathFollower.addRequirements(swerve);
 
