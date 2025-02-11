@@ -31,6 +31,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -78,7 +79,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * PhotonVision class to keep an accurate odometry.
    */
-  private Vision vision;
+  public Vision vision;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -237,7 +238,6 @@ public class SwerveSubsystem extends SubsystemBase {
           this
       // Reference to this subsystem to set requirements
       );
-
     } catch (Exception e) {
       // Handle exception as needed
       e.printStackTrace();
@@ -816,4 +816,17 @@ public class SwerveSubsystem extends SubsystemBase {
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
   }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    // This is used to add things to NetworkTables
+    super.initSendable(builder);
+
+    builder.addDoubleProperty("PoseX", () -> getPose().getX(), null);
+    builder.addDoubleProperty("PoseY", () -> getPose().getY(), null);
+    builder.addDoubleProperty("PoseHeading", () -> getPose().getRotation().getDegrees(), null);
+  }
+
 }
+
+  

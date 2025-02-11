@@ -20,14 +20,22 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import frc.robot.NTHelper;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import javax.swing.text.html.Option;
+
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -101,6 +109,10 @@ public class Vision {
     }
   }
 
+  public static Pose2d getTagPose(int id) {
+    return fieldLayout.getTagPose(id).get().toPose2d();
+  }
+
   /**
    * Calculates a target pose relative to an AprilTag on the field.
    *
@@ -147,6 +159,10 @@ public class Vision {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         var pose = poseEst.get();
+        NTHelper.setDouble("/swerveSubsystem/vision/poseX", pose.estimatedPose.getX());
+        NTHelper.setDouble("/swerveSubsystem/vision/poseX", pose.estimatedPose.getY());
+        NTHelper.setDouble("/swerveSubsystem/vision/poseX",
+            pose.estimatedPose.getRotation().toRotation2d().getDegrees());
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
             pose.timestampSeconds,
             camera.curStdDevs);
@@ -258,6 +274,41 @@ public class Vision {
 
   }
 
+  public Integer findClosestTagID(Pose2d currentPose) {
+    int[] AprilTagIDs = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
+    List<Pose2d> poseList = new ArrayList<Pose2d>();
+    Map<Pose2d, Integer> tagMap = new HashMap<Pose2d, Integer>();
+    for (int tag : AprilTagIDs) {
+      poseList.add(fieldLayout.getTagPose(tag).get().toPose2d());
+      tagMap.put(fieldLayout.getTagPose(tag).get().toPose2d(), tag);
+    }
+
+    return tagMap.get(currentPose.nearest(poseList));
+
+  }
+
+  public int iDtoAngle(int tag) {
+    int[] AprilTagIDs = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
+
+    Map<Integer, Integer> tagMap = new HashMap<Integer, Integer>();
+
+    tagMap.put(6, -60);
+    tagMap.put(7, 0);
+    tagMap.put(8, 60);
+    tagMap.put(9, 120);
+    tagMap.put(10, 180);
+    tagMap.put(11, -120);
+    tagMap.put(17, 60);
+    tagMap.put(18, 0);
+    tagMap.put(19, -60);
+    tagMap.put(20, -120);
+    tagMap.put(21, 180);
+    tagMap.put(22, 120);
+
+    return tagMap.get(tag);
+
+  }
+
   /**
    * Vision simulation.
    *
@@ -354,7 +405,7 @@ public class Vision {
     /**
      * Estimated robot pose.
      */
-    public Optional<EstimatedRobotPose> estimatedRobotPose;
+    public Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
     /**
      * Simulated camera instance which only exists during simulations.
      */
@@ -527,6 +578,7 @@ public class Vision {
         visionEst = poseEstimator.update(change);
         updateEstimationStdDevs(visionEst, change.getTargets());
       }
+      resultsList.clear();
       estimatedRobotPose = visionEst;
     }
 

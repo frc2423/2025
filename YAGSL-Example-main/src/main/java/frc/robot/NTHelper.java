@@ -1,17 +1,20 @@
 package frc.robot;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.networktables.NetworkTableEvent.Kind;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.networktables.Topic;
-import edu.wpi.first.networktables.NetworkTable.TableEventListener;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableEvent;
 
 public class NTHelper {
+
+    private static Map<String, StructPublisher<Pose2d>> pose2dPublishers = new HashMap<String, StructPublisher<Pose2d>>();
 
     public static void setPersistent(String key) {
         getEntry(key).setPersistent();
@@ -28,6 +31,15 @@ public class NTHelper {
     public static void listen(String key, Consumer<NetworkTableEvent> listener) {
         var entry = NTHelper.getEntry(key);
         NetworkTableInstance.getDefault().addListener(entry, EnumSet.of(Kind.kValueAll), listener);
+    }
+
+    public static void setPose(String key, Pose2d pose) {
+        if (!pose2dPublishers.containsKey(key)) {
+            StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
+                    .getStructTopic(key, Pose2d.struct).publish();
+            pose2dPublishers.put(key, publisher);
+        }
+        pose2dPublishers.get(key).set(pose);
     }
 
     /**

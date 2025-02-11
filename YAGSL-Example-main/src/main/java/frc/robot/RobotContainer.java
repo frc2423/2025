@@ -7,6 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -17,9 +18,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.Vision;
+
 import java.io.File;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
@@ -51,11 +55,12 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
 
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
         ClawSubsystem clawSubsystem = new ClawSubsystem();
 
         ClawCommands clawCommands = new ClawCommands(clawSubsystem);
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -138,7 +143,11 @@ public class RobotContainer {
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
+<<<<<<< HEAD
                 SmartDashboard.putData("autoChooser", m_chooser);
+=======
+                SmartDashboard.putData("swerveSubsystem", drivebase);
+>>>>>>> main
 
                 m_chooser.setDefaultOption("Middle Side Auto", "Middle Side Auto");
 
@@ -206,8 +215,11 @@ public class RobotContainer {
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
-                                                : Constants.SetpointConstants.REEF_L2));
+                                .whileTrue(swerveCommands.autoScoral(Vision.getTagPose(6),
+                                                (isPanel) ? Constants.SetpointConstants.REEF_L2
+                                                                : Constants.SetpointConstants.REEF_L2));
+                // new Trigger(() -> operator.getPOV() == 270)
+                // .whileTrue(swerveCommands.autoAlign(new Pose2d()));
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
                                                 : Constants.SetpointConstants.REEF_L3));
@@ -237,9 +249,23 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .whileTrue(clawCommands.clawRelease());
+                // .whileTrue(swerveCommands.lookAtNearestTag());
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
                                 .whileTrue(clawCommands.clawStop());
+
+                new Trigger(() -> driverXbox.getPOV() == 0)
+                                .onTrue(swerveCommands.lookAtAngle(0));
+                new Trigger(() -> driverXbox.getPOV() == 315)
+                                .onTrue(swerveCommands.lookAtAngle(60));
+                new Trigger(() -> driverXbox.getPOV() == 225)
+                                .onTrue(swerveCommands.lookAtAngle(120));
+                new Trigger(() -> driverXbox.getPOV() == 180)
+                                .onTrue(swerveCommands.lookAtAngle(180));
+                new Trigger(() -> driverXbox.getPOV() == 135)
+                                .onTrue(swerveCommands.lookAtAngle(240));
+                new Trigger(() -> driverXbox.getPOV() == 45)
+                                .onTrue(swerveCommands.lookAtAngle(300));
 
         }
 
