@@ -3,23 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-<<<<<<< HEAD:YAGSL-Example-main/src/main/deploy/pathplanner/paths/Left Side Human Player.path
         "x": 4.984,
         "y": 4.879
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.0637268222762755,
-        "y": 4.642053521212643
-=======
-        "x": 5.294386588774534,
-        "y": 2.508555327868852
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 7.204610655737704,
-        "y": 2.4486168032786884
->>>>>>> main:YAGSL-Example-main/src/main/deploy/pathplanner/paths/New Path.path
+        "x": 5.109,
+        "y": 4.662493649053889
       },
       "isLocked": false,
       "linkedName": null
@@ -42,21 +32,12 @@
     },
     {
       "anchor": {
-<<<<<<< HEAD:YAGSL-Example-main/src/main/deploy/pathplanner/paths/Left Side Human Player.path
         "x": 1.7087372448979594,
         "y": 7.274585459183673
       },
       "prevControl": {
         "x": 4.439732142857143,
         "y": 7.289508928571427
-=======
-        "x": 12.083606557377047,
-        "y": 2.508555327868852
-      },
-      "prevControl": {
-        "x": 13.066598360655737,
-        "y": 4.00701844262295
->>>>>>> main:YAGSL-Example-main/src/main/deploy/pathplanner/paths/New Path.path
       },
       "nextControl": null,
       "isLocked": false,
@@ -77,21 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-<<<<<<< HEAD:YAGSL-Example-main/src/main/deploy/pathplanner/paths/Left Side Human Player.path
     "rotation": -51.745579647482835
-=======
-    "rotation": -13.081894418000724
->>>>>>> main:YAGSL-Example-main/src/main/deploy/pathplanner/paths/New Path.path
   },
   "reversed": false,
   "folder": "Left Side Auto",
   "idealStartingState": {
     "velocity": 0,
-<<<<<<< HEAD:YAGSL-Example-main/src/main/deploy/pathplanner/paths/Left Side Human Player.path
     "rotation": -122.71562521415662
-=======
-    "rotation": -91.20955558274063
->>>>>>> main:YAGSL-Example-main/src/main/deploy/pathplanner/paths/New Path.path
   },
   "useDefaultConstraints": false
 }
