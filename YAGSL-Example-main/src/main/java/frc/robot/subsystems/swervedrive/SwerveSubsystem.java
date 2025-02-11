@@ -817,4 +817,16 @@ public class SwerveSubsystem extends SubsystemBase {
     return swerveDrive;
   }
 
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    // This is used to add things to NetworkTables
+    super.initSendable(builder);
+
+    builder.addDoubleProperty("PoseX", () -> getPose().getX(), null);
+    builder.addDoubleProperty("PoseY", () -> getPose().getY(), null);
+    builder.addDoubleProperty("PoseHeading", () -> getPose().getRotation().getDegrees(), null);
+  }
+
 }
+
+  

@@ -1,7 +1,12 @@
 package frc.robot.subsystems.swervedrive;
 
+import java.util.List;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -18,6 +23,7 @@ import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import swervelib.SwerveDrive;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.PoseTransformUtils;
 
@@ -40,60 +46,52 @@ public class SwerveCommands {
     }
 
     public Pose2d addScoringOffset(Pose2d pose, double distance) {
-        Transform2d offset = new Transform2d(distance, 0, Rotation2d.kPi);
+        Transform2d offset = new Transform2d(distance, .178, Rotation2d.kPi);
         Pose2d targetPose = pose.plus(offset);
         return targetPose;
     }
 
-    public Command autoAlign(Pose2d pose) {
-
-        // Since we are using a holonomic drivetrain, the rotation component of this
-        // pose
-        // represents the goal holonomic rotation
+    public Command autoAlign(Pose2d pose, double dist) {
         // Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-        Pose2d targetPose = addScoringOffset(pose, 1);
+        Pose2d targetPose = addScoringOffset(pose, dist);// .55
 
-        // Create the constraints to use while pathfinding
+        List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+                addScoringOffset(pose, dist + .5),
+                addScoringOffset(pose, dist));
         PathConstraints constraints = new PathConstraints(
-                0.5, 1.0,
+                .5, 1.0,
                 Units.degreesToRadians(540), Units.degreesToRadians(720));
-
+        PathPlannerPath path = new PathPlannerPath(
+                waypoints, constraints, null, new GoalEndState(0, targetPose.getRotation()));
+        path.preventFlipping = true;
+        Command pathFollower = AutoBuilder.followPath(path);
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
-        Command pathfindingCommand = AutoBuilder.pathfindToPose(
-                targetPose,
-                constraints,
-                0.0 // Goal end velocity in meters/sec
-        );// Rotation delay distance in meters. This is how far the robot should travel
-          // before attempting to rotate.
 
-        pathfindingCommand.setName("Align to Pose");
-        pathfindingCommand.addRequirements(swerve);
+        pathFollower.setName("Align to Pose");
+        pathFollower.addRequirements(swerve);
 
-        return pathfindingCommand;
+        return pathFollower;
+    }
+
+    public Command stopMoving() {
+        Command stopCommand = Commands.runOnce(() -> swerve.drive(new ChassisSpeeds()));
+        stopCommand.addRequirements(swerve);
+        return stopCommand;
     }
 
     public Command autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
-
+        swerve.centerModulesCommand();
         var command = Commands.sequence(
-                autoAlign(pose).until(() -> {
-                    Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-                    Pose2d robotPose = swerve.getPose();
-                    Transform2d poseDiff = targetPose.minus(robotPose);
-                    double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) +
-                            Math.pow(poseDiff.getY(), 2)); // distance in
-                    // meters
-                    return distance <= .0833;
-                }),
-                elevatorSubsystem.goToSetpoint(setpoint).until(() -> {
+                swerve.centerModulesCommand().withTimeout(.5),
+                autoAlign(pose, 1.2),
+                stopMoving(),
+                elevatorSubsystem.goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
+                autoAlign(pose, .4),
+                // new MoveForward(swerve, addScoringOffset(pose, .45).getTranslation(), 1),
                 intakeCommands.intakeOut());
-
-        // var command = autoAlign(pose).until(() -> {
-        // return false;
-        // }).andThen(elevatorSubsystem.goToSetpoint(setpoint)).until(() -> {
-        // return elevatorSubsystem.isAtSetpoint();
-        // });
 
         command.setName("autoScoral");
         // command.addRequirements(swerve, elevatorSubsystem);
@@ -119,6 +117,33 @@ public class SwerveCommands {
         command.addRequirements(swerve);
         return command;
     }
+
+    // public Command lookAtTarget(Pose2d targetAngle, Rotation2d offset) { // to
+    // var command = Commands.sequence(
+    // Commands.runOnce(currentAngleFilter::reset),
+    // Commands.run(() -> {
+    // Pose2d transformedPose = PoseTransformUtils.transformXRedPose(targetAngle);
+    // specialAngle = swerve.getLookAngle(transformedPose).plus(offset);
+    // swerve.actuallyLookAngle(specialAngle);
+    // }, swerve).until(() -> {
+    // double desiredAngle = normalizedAngle(specialAngle.getDegrees());
+    // double currentAngle = currentAngleFilter
+    // .calculate(normalizedAngle(swerve.getHeading().getDegrees()));
+    // double angleDiff = getNormalizedAngleDiff(desiredAngle, currentAngle);
+    // return angleDiff < 3;
+    // }),
+    // Commands.run(() -> {
+    // Pose2d transformedPose = PoseTransformUtils.transformXRedPose(targetAngle);
+    // specialAngle = swerve.getLookAngle(transformedPose).plus(offset);
+    // swerve.actuallyLookAngle(specialAngle);
+    // }, swerve).withTimeout(.5),
+    // Commands.runOnce(() -> {
+    // swerve.stop();
+    // }));
+
+    // command.setName("setLookAngle");
+    // return command;
+    // }
 
     public void actuallyLookAngleButMove(Rotation2d rotation2d) { // here
         final double maxRadsPerSecond = 5;
