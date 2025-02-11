@@ -82,18 +82,7 @@ public class SwerveCommands {
     public Command autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
         swerve.centerModulesCommand();
         var command = Commands.sequence(
-                // lookAtAngle(pose.getRotation().getDegrees()),
                 swerve.centerModulesCommand().withTimeout(.5),
-                // autoAlign(pose, 1).until(() -> {
-                // Pose2d targetPose = addScoringOffset(pose, 1);
-                // // Pose2d targetPose = PoseTransformUtils.transformXRedPose(pose);
-                // Pose2d robotPose = swerve.getPose();
-                // Transform2d poseDiff = targetPose.minus(robotPose);
-                // double distance = Math.sqrt(Math.pow(poseDiff.getX(), 2) +
-                // Math.pow(poseDiff.getY(), 2)); // distance in
-                // // meters
-                // return distance <= .0833;
-                // }),
                 autoAlign(pose, 1.2),
                 stopMoving(),
                 elevatorSubsystem.goToSetpoint(setpoint),
@@ -103,12 +92,6 @@ public class SwerveCommands {
                 autoAlign(pose, .4),
                 // new MoveForward(swerve, addScoringOffset(pose, .45).getTranslation(), 1),
                 intakeCommands.intakeOut());
-
-        // var command = autoAlign(pose).until(() -> {
-        // return false;
-        // }).andThen(elevatorSubsystem.goToSetpoint(setpoint)).until(() -> {
-        // return elevatorSubsystem.isAtSetpoint();
-        // });
 
         command.setName("autoScoral");
         // command.addRequirements(swerve, elevatorSubsystem);
