@@ -2,39 +2,99 @@ package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimberSubsystem extends SubsystemBase {    
-    private SparkMax motor1 = new SparkMax(22, MotorType.kBrushless);
-
+    private SparkMax climbMotor = new SparkMax(22, MotorType.kBrushless);
+    private double speed = .1;
+    private double position;
+    private double minPosition = 0.098; //all the way out
+    private double maxPosition = 0.522; //all the way in
+    private double deadband = .05;
+    private double outPosition = .5;
+    private double inPosition = .1;
+    private double startPosition = .168;
   
     public ClimberSubsystem() {
-        motor1.getEncoder().setPosition(0);
+        climbMotor.getEncoder().setPosition(0);
         setDefaultCommand(climbStop());
     }
 
+    @Override
+    public void periodic() {
+        position = getPosition();
+
+        if (position <= minPosition) {
+            goToSetpoint(minPosition);
+        } else if (position > maxPosition) {
+            goToSetpoint(maxPosition);
+        }
+    }
+
     private void go(double speed){
-        motor1.set(speed);
+        climbMotor.set(speed);
     }
 
-    private void stop() { // for manual control, sick
-        motor1.set(0);
+    private void stop() {
+        climbMotor.set(0);
     }
 
-    public Command climb(){
+    private double getPosition(){
+        return climbMotor.getAbsoluteEncoder().getPosition();
+    }
+
+    private boolean isAtSetpoint(double setpoint){
+        return (getPosition() < setpoint + deadband) && (getPosition() > setpoint - deadband);
+    }
+
+    public Command goToSetpoint(double setpoint){
         var command = run(() -> {
-            go(-.1);
+            if(setpoint > position)
+                go(speed);
+            else if (setpoint < position)
+                go(-speed);
+        }).until(() -> isAtSetpoint(setpoint));
+        command.setName("Going to setpoint");
+        return command;
+    }
+
+    public Command goToStart(){
+        var command = run(() -> {
+            goToSetpoint(startPosition);
+        });
+        command.setName("Start Position");
+        return command;
+    }
+
+    public Command goToClimb(){
+        var command = run(() -> {
+            goToSetpoint(inPosition);
+        });
+        command.setName("Climb Position");
+        return command;
+    }
+
+    public Command goToOut(){
+        var command = run(() -> {
+            goToSetpoint(outPosition);
+        });
+        command.setName("Out Position");
+        return command;
+    }
+
+    public Command in(){
+        var command = run(() -> {
+            go(-speed);
         });
         command.setName("Climber going up");
         return command;
     }
 
-    public Command deClimb(){
+    public Command out(){
         var command = run(() -> {
-            go(.1);
+            go(speed);
         });
         command.setName("Climber going down");
         return command;
@@ -44,5 +104,10 @@ public class ClimberSubsystem extends SubsystemBase {
         var command = run(() -> stop());
         command.setName("Climber Stop");
         return command;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("setpoint", () -> getPosition(), null);
     }
 }

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.ClimberSubsystem;
 
 /**
@@ -32,6 +33,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    SmartDashboard.putData("climberSubsystem", climberSub);
   }
 
   /**
@@ -45,9 +47,15 @@ public class RobotContainer {
    */
   private void configureBindings() {
     new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
-                    .whileTrue(climberSub.deClimb());
+                    .whileTrue(climberSub.out());
     new JoystickButton(operator, XboxController.Button.kRightBumper.value)
-                    .whileTrue(climberSub.climb());
+                    .whileTrue(climberSub.in());
+    new JoystickButton(operator, XboxController.Button.kB.value)
+                    .whileTrue(climberSub.goToOut());
+    new JoystickButton(operator, XboxController.Button.kA.value)
+                    .whileTrue(climberSub.goToClimb());
+    new JoystickButton(operator, XboxController.Button.kStart.value)
+                    .whileTrue(climberSub.goToStart());
   }
 
   /**
