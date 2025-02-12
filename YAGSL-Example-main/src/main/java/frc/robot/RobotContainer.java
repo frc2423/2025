@@ -31,6 +31,8 @@ import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.Claw.ClawSubsystem;
 import frc.robot.subsystems.Claw.ClawCommands;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -65,6 +67,8 @@ public class RobotContainer {
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
         private static boolean runOnce = false;
+
+        SendableChooser<String> m_chooser = new SendableChooser<>();
 
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -139,8 +143,21 @@ public class RobotContainer {
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
+<<<<<<< HEAD
+                SmartDashboard.putData("autoChooser", m_chooser);
+=======
                 SmartDashboard.putData("swerveSubsystem", drivebase);
+>>>>>>> main
 
+                m_chooser.setDefaultOption("Middle Side Auto", "Middle Side Auto");
+
+                // auto commands
+                // EXAMPLE: NamedCommands.registerCommand("useless",
+                // exampleSubsystem.exampleCommand());
+
+                NamedCommands.registerCommand("Elevator to Reef L2",
+                                elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+                NamedCommands.registerCommand("Outtake Reef L2", intakeCommands.intakeOut());
         }
 
         /**
@@ -259,7 +276,7 @@ public class RobotContainer {
          */
         public Command getAutonomousCommand() {
                 // An example command will be run in autonomous
-                return drivebase.getAutonomousCommand("New Auto");
+                return drivebase.getAutonomousCommand("Middle Side Auto");
         }
 
         public void setDriveMode() {

@@ -24,22 +24,19 @@ public class VisionSubsystem extends SubsystemBase {
     public double getLatestId = 0;
     private Optional<EstimatedRobotPose> estimatedPose = Optional.empty();
     private PhotonPipelineResult aprilTagResult = visionInterface.getLatestResult();
-    private PhotonPipelineResult noteResult = visionInterface.getLatestNoteResult();
-    private MedianFilter noteFilter = new MedianFilter(5);
-    private double noteAverage = 0;
-    private double notePitch = 0;
-    private double noteYaw = 0;
+    private double tagPitch = 0;
+    private double tagSkew = 0;
+    private double tagYaw = 0;
 
 
     @Override
     public void periodic() {
         estimatedPose = visionInterface.getEstimatedGlobalPose();
         aprilTagResult = visionInterface.getLatestResult();
-        noteResult = visionInterface.getLatestNoteResult();
-        noteAverage = noteFilter.calculate(seesRawNote() ? 1 : 0);
-        if (noteResult.hasTargets()) {
-            notePitch = noteResult.getBestTarget().getPitch();
-            noteYaw = noteResult.getBestTarget().getYaw();
+        if (aprilTagResult.hasTargets()) {
+            tagPitch = aprilTagResult.getBestTarget().getPitch();
+            tagSkew = aprilTagResult.getBestTarget().getSkew();
+            tagYaw = aprilTagResult.getBestTarget().getYaw();
         }
     }
 
@@ -84,49 +81,17 @@ public class VisionSubsystem extends SubsystemBase {
         return false;
     }
 
-    public double getOffset() {
-        if (!noteResult.hasTargets()) {
-            return 0; //
-        }
-        double x = getX(notePitch);
-        double y = getY(noteYaw);
+    // public double getOffset() {
+    //     if (!noteResult.hasTargets()) {
+    //         return 0; //
+    //     }
+    //     double x = getX(notePitch);
+    //     double y = getY(noteYaw);
 
-        double angle = Math.tan(x / y);
-        return angle;
-    }
+    //     double angle = Math.tan(x / y);
+    //     return angle;
+    // }
 
-    public boolean seesRawNote() {
-        return noteResult.hasTargets();
-    }
-
-    public boolean seesNote() {
-        return noteAverage > .5;
-    }
-
-    public double getNoteYaw() {
-        if (!seesNote()) {
-            return 0;
-        }
-        return noteYaw;
-    }
-
-    public boolean isAlignedNote() {
-        if (!seesNote()) {
-            return false;
-        }
-        return Math.abs(noteYaw) < 4;
-    }
-
-    public double yawAfterAligned(){
-        if (!seesNote()) {
-            return 0;
-        }
-        if(Math.abs(noteYaw) < .5){
-            return 0;
-        } else {
-            return -getNoteYaw() * .075;
-        }
-    }
 
     private double getX(double camx) {
         double x = (.163 * Math.pow(camx, 2)) + (1.298 * camx) + 28.7;
@@ -138,10 +103,10 @@ public class VisionSubsystem extends SubsystemBase {
         return y;
     }
 
-    public Rotation2d getTurn() {
-        // gets how much the robot needs to turn to get the note in the center
-        return new Rotation2d(getOffset());
-    }
+    // public Rotation2d getTurn() {
+    //     // gets how much the robot needs to turn to get the note in the center
+    //     return new Rotation2d(getOffset());
+    // }
 
     // public Pose2d getNotePose(Pose2d robotPose){
     // var result = noteVision.getLatestNoteResult();
@@ -153,14 +118,6 @@ public class VisionSubsystem extends SubsystemBase {
 
     // }
 
-    public void updateNoteV() {
-        // NTHelper.setBoolean("noteVision/connected", visionInterface.isAprilTagCameraConnected());
-        // if (noteResult.hasTargets()) {
-        //     NTHelper.setDouble("noteVision/x", noteResult.getBestTarget().getPitch());
-        //     NTHelper.setDouble("noteVision/y", noteResult.getBestTarget().getYaw());
-        // }
-    }
-
     @Override
     public void initSendable(SendableBuilder builder) {
         // This is used to add things to NetworkTables
@@ -170,5 +127,8 @@ public class VisionSubsystem extends SubsystemBase {
         builder.addBooleanProperty("is connected", () -> visionInterface.isAprilTagCameraConnected(), null);
         builder.addIntegerProperty("pipeline index", () -> visionInterface.getAprilTagCamera().getPipelineIndex(),
                 null);
+        builder.addDoubleProperty("april tag pitch", ()  -> tagPitch, null);
+        builder.addDoubleProperty("april tag skew", ()  -> tagSkew, null);
+        builder.addDoubleProperty("april tag yaw", ()  -> tagYaw, null);
     }
 }
