@@ -51,7 +51,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command goToSetpoint(double setpoint){
         var command = run(() -> {
-            if(setpoint > position)
+            if(setpoint >= position)
                 go(speed);
             else if (setpoint < position)
                 go(-speed);
@@ -61,25 +61,19 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public Command goToStart(){
-        var command = run(() -> {
-            goToSetpoint(startPosition);
-        });
+        var command = goToSetpoint(startPosition);
         command.setName("Start Position");
         return command;
     }
 
     public Command goToClimb(){
-        var command = run(() -> {
-            goToSetpoint(inPosition);
-        });
+        var command = goToSetpoint(inPosition);
         command.setName("Climb Position");
         return command;
     }
 
     public Command goToOut(){
-        var command = run(() -> {
-            goToSetpoint(outPosition);
-        });
+        var command = goToSetpoint(outPosition);
         command.setName("Out Position");
         return command;
     }
