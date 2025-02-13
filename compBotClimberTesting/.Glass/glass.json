@@ -1,0 +1,26 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "arm": {
+          "open": true
+        },
+        "climberSubsystem": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/arm": "Subsystem"
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "2423"
+  }
+}

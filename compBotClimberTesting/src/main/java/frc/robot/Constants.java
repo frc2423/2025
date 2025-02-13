@@ -16,4 +16,11 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
+
+  public static class Arm {
+    public static final double highestPose = -1;
+    public static final double middle = -11.8;
+    public static final double lowestPose = -16.8;
+
+  }
 }
