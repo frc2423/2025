@@ -20,8 +20,8 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
 
-    PIDController translationPIDX = new PIDController(2, 0, 0);
-    PIDController translationPIDY = new PIDController(2, 0, 0);
+    PIDController translationPIDX = new PIDController(3.5, .1, 0);
+    PIDController translationPIDY = new PIDController(3.5, .1, 0);
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -52,13 +52,14 @@ public class SwerveCommands {
         swerve.centerModulesCommand();
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                autoAlign(pose, 1.2),
+                autoAlign(pose, .8),
                 stopMoving(),
                 elevatorSubsystem.goToSetpoint(setpoint),
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
-                autoAlign(pose, .4),
+                autoAlign(pose, .32),
+                stopMoving(),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");
@@ -91,7 +92,7 @@ public class SwerveCommands {
         var command = Commands.run(() -> {
             actuallyMoveTo(targetPose);
         }).until(() -> {
-            return targetPose.getTranslation().getDistance(swerve.getPose().getTranslation()) < 0.2;
+            return targetPose.getTranslation().getDistance(swerve.getPose().getTranslation()) < 0.05;
         });
         command.addRequirements(swerve);
         return command;
@@ -141,11 +142,11 @@ public class SwerveCommands {
             // y *= -1;
         }
 
-        if (Math.abs(x) > 0.75) {
-            x = Math.copySign(0.75, x);
+        if (Math.abs(x) > 0.6) {
+            x = Math.copySign(0.6, x);
         }
-        if (Math.abs(y) > 0.75) {
-            y = Math.copySign(0.75, y);
+        if (Math.abs(y) > 0.6) {
+            y = Math.copySign(0.6, y);
         }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
