@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -10,15 +11,18 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 
 public class ArmSubsystem extends SubsystemBase {
     
      private SparkMax armPivot = new SparkMax(25, MotorType.kBrushless);
+     private SparkFlex scoringWheelMotor = new SparkFlex(23, MotorType.kBrushless);
+     private double scoringWheelSpeed = 0;
      private double armCurrentPose = 0;
-     private double maximum = -1.16; //some value
-     private double minumum = -16.8; //some value
+     private double maximum = 1.9; //some value
+     private double minumum = -13.8; //some value
      private double setpoint = 0;//will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
     private double MAX_VOLTAGE = 0.3;
@@ -29,7 +33,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 
     public ArmSubsystem() {
-        setDefaultCommand(goToSetpoint(armCurrentPose));
+        setDefaultCommand(stop());
     }
 
     @Override
@@ -54,6 +58,7 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         armPivot.set(calculatedPID);
+        scoringWheelMotor.set(scoringWheelSpeed);
 
 
     }
@@ -81,6 +86,30 @@ public class ArmSubsystem extends SubsystemBase {
         });
     }
 
+    public Command stopElevator() {
+        Command command = runOnce(() -> {
+            setSetpoint(armCurrentPose);
+        });
+        command.setName("stop elevator");
+        return command;
+    }
+
+    public Command setScoringWheelSpeed(double speed) {
+        Command command = runOnce(() -> {
+            scoringWheelSpeed = speed;
+        });
+        command.setName("Set scoring wheel speed");
+        return command;
+    }
+
+    public Command stop() {
+        Command command = Commands.repeatingSequence(stopElevator(), setScoringWheelSpeed(0));
+        command.setName("Stop Arm");
+        return command;
+    }
+
+
+
     private void setSetpoint(double position) {
         if (position < maximum && position > minumum) {
             setpoint = position;
@@ -96,6 +125,7 @@ public class ArmSubsystem extends SubsystemBase {
         builder.addDoubleProperty("calculatePid", () -> setpoint, null);
         builder.addDoubleProperty("currentPose", () -> armCurrentPose, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
+        builder.addDoubleProperty("scoringWheelSpeed", () -> scoringWheelSpeed, null);
 
 
 

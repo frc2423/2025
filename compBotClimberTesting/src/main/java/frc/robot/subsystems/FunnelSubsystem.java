@@ -16,7 +16,7 @@ public class FunnelSubsystem extends SubsystemBase {
     }
 
     private void spinInBoth(double speed){
-        orangeMotor.set(-speed);
+        orangeMotor.set(speed);
         greenMotor.set(-speed);
 
     }
