@@ -145,13 +145,12 @@ public class RobotContainer {
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
-<<<<<<< HEAD
                 SmartDashboard.putData("autoChooser", m_chooser);
-=======
                 SmartDashboard.putData("swerveSubsystem", drivebase);
->>>>>>> main
 
-                m_chooser.setDefaultOption("Middle Side Auto", "Middle Side Auto");
+                m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
+                m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
+                m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
 
                 // auto commands
                 // EXAMPLE: NamedCommands.registerCommand("useless",
@@ -159,12 +158,21 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
-                NamedCommands.registerCommand("Outtake Reef L2", intakeCommands.intakeOut());
+
+                NamedCommands.registerCommand("Elevator to Reef L3",
+                                elevator.goToSetpoint(Constants.SetpointConstants.REEF_L3));
+
+                NamedCommands.registerCommand("Elevator to Reef L4",
+                                elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
+
+                NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
+
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here
                         drivebase.getSwerveDrive().field.getObject("AutoAlignPath").setPoses(poses);
                 });
+
         }
 
         /**
@@ -283,7 +291,7 @@ public class RobotContainer {
          */
         public Command getAutonomousCommand() {
                 // An example command will be run in autonomous
-                return drivebase.getAutonomousCommand("Middle Side Auto");
+                return drivebase.getAutonomousCommand(m_chooser.getSelected());
         }
 
         public void setDriveMode() {
