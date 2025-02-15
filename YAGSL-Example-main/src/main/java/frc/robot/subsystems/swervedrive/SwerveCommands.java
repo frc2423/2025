@@ -87,12 +87,27 @@ public class SwerveCommands {
         return command;
     }
 
+    // public Command autoAlign(Pose2d pose2d, double dist) {
+    // Pose2d targetPose = addScoringOffset(pose2d, dist);// .55
+    // var command = Commands.run(() -> {
+    // actuallyMoveTo(targetPose);
+    // }).until(() -> {
+    // return
+    // targetPose.getTranslation().getDistance(swerve.getPose().getTranslation()) <
+    // 0.05;
+    // });
+    // command.addRequirements(swerve);
+    // return command;
+    // }
+
     public Command autoAlign(Pose2d pose2d, double dist) {
         Pose2d targetPose = addScoringOffset(pose2d, dist);// .55
         var command = Commands.run(() -> {
             actuallyMoveTo(targetPose);
         }).until(() -> {
-            return targetPose.getTranslation().getDistance(swerve.getPose().getTranslation()) < 0.05;
+            return Math.abs(targetPose.getX() - swerve.getPose().getX()) < 0.0508 &&
+                    Math.abs(targetPose.getY() - swerve.getPose().getY()) < 0.0508 &&
+                    Math.abs(targetPose.getRotation().getDegrees() - swerve.getPose().getRotation().getDegrees()) < 5;
         });
         command.addRequirements(swerve);
         return command;
