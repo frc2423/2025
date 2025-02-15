@@ -20,8 +20,8 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
 
-    PIDController translationPIDX = new PIDController(3.5, .1, 0);
-    PIDController translationPIDY = new PIDController(3.5, .1, 0);
+    PIDController translationPIDX = new PIDController(3, .4, .3);
+    PIDController translationPIDY = new PIDController(3, .4, .3);
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
