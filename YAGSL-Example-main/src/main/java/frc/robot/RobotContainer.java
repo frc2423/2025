@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -158,6 +160,11 @@ public class RobotContainer {
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
                 NamedCommands.registerCommand("Outtake Reef L2", intakeCommands.intakeOut());
+                // Logging callback for the active path, this is sent as a list of poses
+                PathPlannerLogging.setLogActivePathCallback((poses) -> {
+                        // Do whatever you want with the poses here
+                        drivebase.getSwerveDrive().field.getObject("AutoAlignPath").setPoses(poses);
+                });
         }
 
         /**
