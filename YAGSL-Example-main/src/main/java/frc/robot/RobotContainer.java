@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.swervedrive.AutoScoralClosest;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -205,11 +206,8 @@ public class RobotContainer {
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(swerveCommands.autoScoral(Vision.getTagPose(21),
-                                                (isPanel) ? Constants.SetpointConstants.REEF_L2
-                                                                : Constants.SetpointConstants.REEF_L2));
-                // new Trigger(() -> operator.getPOV() == 270)
-                // .whileTrue(swerveCommands.autoAlign(new Pose2d()));
+                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
+                                                : Constants.SetpointConstants.REEF_L2));
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
                                                 : Constants.SetpointConstants.REEF_L3));
@@ -221,12 +219,16 @@ public class RobotContainer {
                                                 : Constants.SetpointConstants.ZERO));
 
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
-                new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
-                                .onTrue(elevator.goLittleDown(1));
+                new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
+                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                                false));
+                // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
                                 .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
-                new JoystickButton(operator, XboxController.Button.kRightBumper.value)
-                                .onTrue(elevator.goLittleUp(1));
+                new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                                true));
+                // .onTrue(elevator.goLittleUp(1));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.intakeIn());
@@ -234,8 +236,8 @@ public class RobotContainer {
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
 
-                new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
-                                .whileTrue(intakeCommands.intakeStop());
+                // new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+                // .whileTrue(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .whileTrue(clawCommands.clawRelease());

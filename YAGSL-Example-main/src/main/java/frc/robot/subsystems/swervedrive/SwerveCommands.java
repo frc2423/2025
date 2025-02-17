@@ -36,8 +36,9 @@ public class SwerveCommands {
 
     }
 
-    public Pose2d addScoringOffset(Pose2d pose, double distance) {
-        Transform2d offset = new Transform2d(distance, .178, Rotation2d.kPi);
+    public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
+        double y = .178;
+        Transform2d offset = new Transform2d(distance, isRight ? y : -y, Rotation2d.kPi);
         Pose2d targetPose = pose.plus(offset);
         return targetPose;
     }
@@ -48,17 +49,44 @@ public class SwerveCommands {
         return stopCommand;
     }
 
-    public Command autoScoral(Pose2d pose, double setpoint) { // put in desired pose and elevator subsystem
-        swerve.centerModulesCommand();
+    // public Command autoScoralClosest(){
+    // var command = Commands.run(() -> {
+    // Pose2D pose =
+    // });
+    // return command;
+    // }
+
+    public Command autoScoralClosest(double setpoint, boolean isRight) {
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                autoAlign(pose, .8),
+                new AutoAlignClosest(swerve, this, .8, isRight),
                 stopMoving(),
                 elevatorSubsystem.goToSetpoint(setpoint),
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
-                autoAlign(pose, .32),
+                stopMoving(),
+                new AutoAlignClosest(swerve, this, .32, isRight),
+                stopMoving(),
+                intakeCommands.intakeOut());
+
+        command.setName("autoScoral");
+        // command.addRequirements(swerve, elevatorSubsystem);
+
+        return command;
+    }
+
+    public Command autoScoral(Pose2d pose, double setpoint, boolean isRight) { // put in desired pose and elevator
+                                                                               // subsystem
+        var command = Commands.sequence(
+                swerve.centerModulesCommand().withTimeout(.5),
+                autoAlign(pose, .8, isRight),
+                stopMoving(),
+                elevatorSubsystem.goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
+                    return elevatorSubsystem.isAtSetpoint();
+                }),
+                autoAlign(pose, .32, isRight),
                 stopMoving(),
                 intakeCommands.intakeOut());
 
@@ -87,21 +115,8 @@ public class SwerveCommands {
         return command;
     }
 
-    // public Command autoAlign(Pose2d pose2d, double dist) {
-    // Pose2d targetPose = addScoringOffset(pose2d, dist);// .55
-    // var command = Commands.run(() -> {
-    // actuallyMoveTo(targetPose);
-    // }).until(() -> {
-    // return
-    // targetPose.getTranslation().getDistance(swerve.getPose().getTranslation()) <
-    // 0.05;
-    // });
-    // command.addRequirements(swerve);
-    // return command;
-    // }
-
-    public Command autoAlign(Pose2d pose2d, double dist) {
-        Pose2d targetPose = addScoringOffset(pose2d, dist);// .55
+    public Command autoAlign(Pose2d pose2d, double dist, boolean isRight) {
+        Pose2d targetPose = addScoringOffset(pose2d, dist, isRight);// .55
         var command = Commands.run(() -> {
             actuallyMoveTo(targetPose);
         }).until(() -> {
