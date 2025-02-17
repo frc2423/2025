@@ -20,8 +20,8 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
 
-    PIDController translationPIDX = new PIDController(3, .4, .3);
-    PIDController translationPIDY = new PIDController(3, .4, .3);
+    PIDController translationPIDX = new PIDController(3.5, .4, .3);
+    PIDController translationPIDY = new PIDController(3.5, .4, .3);
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -105,9 +105,13 @@ public class SwerveCommands {
         var command = Commands.run(() -> {
             actuallyMoveTo(targetPose);
         }).until(() -> {
-            return Math.abs(targetPose.getX() - swerve.getPose().getX()) < 0.0508 &&
-                    Math.abs(targetPose.getY() - swerve.getPose().getY()) < 0.0508 &&
-                    Math.abs(targetPose.getRotation().getDegrees() - swerve.getPose().getRotation().getDegrees()) < 5;
+            double xDistance = Math.abs(targetPose.getX() - swerve.getPose().getX());
+            double yDistance = Math.abs(targetPose.getY() - swerve.getPose().getY());
+            double angleDistance = Math
+                    .abs(targetPose.getRotation().minus(swerve.getPose().getRotation()).getDegrees());
+            return xDistance < 0.0508 &&
+                    yDistance < 0.0508 &&
+                    angleDistance < 5;
         });
         command.addRequirements(swerve);
         return command;
@@ -155,6 +159,17 @@ public class SwerveCommands {
                 swerve.getPose().getY(), pose2d.getY());
         if (PoseTransformUtils.isRedAlliance()) {
             // y *= -1;
+        }
+
+        double xDistance = Math.abs(pose2d.getX() - swerve.getPose().getX());
+        double yDistance = Math.abs(pose2d.getY() - swerve.getPose().getY());
+
+        if (xDistance > 0.0508) {
+            x = Math.copySign(Math.max(.35, Math.abs(x)), x);
+        }
+
+        if (yDistance > 0.0508) {
+            y = Math.copySign(Math.max(.35, Math.abs(y)), y);
         }
 
         if (Math.abs(x) > 0.6) {
