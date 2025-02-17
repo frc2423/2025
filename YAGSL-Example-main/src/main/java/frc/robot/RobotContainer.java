@@ -205,7 +205,7 @@ public class RobotContainer {
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(swerveCommands.autoScoral(Vision.getTagPose(6),
+                                .whileTrue(swerveCommands.autoScoral(Vision.getTagPose(21),
                                                 (isPanel) ? Constants.SetpointConstants.REEF_L2
                                                                 : Constants.SetpointConstants.REEF_L2));
                 // new Trigger(() -> operator.getPOV() == 270)
