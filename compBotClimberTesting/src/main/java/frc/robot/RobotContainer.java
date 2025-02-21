@@ -61,9 +61,9 @@ public class RobotContainer {
     new JoystickButton(driverXbox, XboxController.Button.kX.value)
                     .whileTrue(Commands.parallel(funnelSubsystem.spinInBoth(), armSubsystem.setScoringWheelSpeed(.8)));
     new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                    .whileTrue(armSubsystem.goToSetpoint(Constants.Arm.middle));
+                    .whileTrue(armSubsystem.goToSetpoint(armSubsystem.middle));
     new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                    .whileTrue(armSubsystem.goToSetpoint(Constants.Arm.lowestPose + 2));
+                    .whileTrue(armSubsystem.goToSetpoint(armSubsystem.lowestPose + 2));
   }
 
   /**
