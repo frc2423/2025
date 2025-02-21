@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swervedrive;
 
+import java.util.Map;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -10,10 +12,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.AngleUtils;
+import frc.robot.Constants;
 import frc.robot.Constants.OperatorConstants;
 
 public class SwerveCommands {
@@ -37,6 +42,44 @@ public class SwerveCommands {
 
     }
 
+    // The enum used as keys for selecting the command to run.
+    private enum ElevatorLevel {
+        T, L2, L3, L4
+    }
+
+    // An example selector method for the selectcommand. Returns the selector that
+    // will select
+    // which command to run. Can base this choice on logical conditions evaluated at
+    // runtime.
+    private ElevatorLevel selectElevatorLevel() {
+        if (driverXbox.getLeftTriggerAxis() < 0.5 && driverXbox.getRightTriggerAxis() < 0.5) {
+            return ElevatorLevel.T;
+        } else if (driverXbox.getLeftTriggerAxis() < 0.5 && driverXbox.getRightTriggerAxis() > 0.5) {
+            return ElevatorLevel.L2;
+        } else if (driverXbox.getLeftTriggerAxis() > 0.5 && driverXbox.getRightTriggerAxis() < 0.5) {
+            return ElevatorLevel.L3;
+        } else {
+            return ElevatorLevel.L4;
+        }
+    }
+
+    // An example selectcommand. Will select from the three commands based on the
+    // value returned
+    // by the selector method at runtime. Note that selectcommand works on Object(),
+    // so the
+    // selector does not have to be an enum; it could be any desired type (string,
+    // integer,
+    // boolean, double...)
+    private final Command autoScoreElevatorCommand = new SelectCommand<>(
+            // Maps selector values to commands
+            Map.ofEntries(
+                    Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
+                    Map.entry(ElevatorLevel.L2, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L2)),
+                    Map.entry(ElevatorLevel.L3, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L3)),
+                    Map.entry(ElevatorLevel.L4, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
+
+            this::selectElevatorLevel);
+
     public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
         double y = .178;
         Transform2d offset = new Transform2d(distance, isRight ? y : -y, Rotation2d.kPi);
@@ -55,7 +98,7 @@ public class SwerveCommands {
                 swerve.centerModulesCommand().withTimeout(.5),
                 new AutoAlignClosest(swerve, this, .8, isRight),
                 stopMoving(),
-                elevatorSubsystem.goToSetpoint(setpoint),
+                autoScoreElevatorCommand,
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
