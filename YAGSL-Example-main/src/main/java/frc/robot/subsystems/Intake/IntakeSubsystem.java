@@ -44,6 +44,10 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean isOut() {
+        return distMm() > 100;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.addDoubleProperty("laserCan distance", () -> distMm(), null);

@@ -22,7 +22,7 @@ public class WheelPoint extends Command {
   public WheelPoint(SwerveSubsystem swerve, double dist, Pose2d pose, Translation2d targetPosition) {
     this.swerve = swerve;
     this.dist = dist;
-    Pose2d targetPose = swerveCommands.addScoringOffset(pose, dist);
+    Pose2d targetPose = swerveCommands.addScoringOffset(pose, dist, true);
     addRequirements(swerve);
   }
 
