@@ -10,10 +10,10 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.NTHelper;
 import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
+import frc.robot.AngleUtils;
 import frc.robot.Constants.OperatorConstants;
 
 public class SwerveCommands {
@@ -21,8 +21,8 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
 
-    PIDController translationPIDX = new PIDController(3.5, .4, .3);
-    PIDController translationPIDY = new PIDController(3.5, .4, .3);
+    PIDController translationPIDX = new PIDController(3.5, 0, .3);
+    PIDController translationPIDY = new PIDController(3.5, 0, .3);
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -49,13 +49,6 @@ public class SwerveCommands {
         stopCommand.addRequirements(swerve);
         return stopCommand;
     }
-
-    // public Command autoScoralClosest(){
-    // var command = Commands.run(() -> {
-    // Pose2D pose =
-    // });
-    // return command;
-    // }
 
     public Command autoScoralClosest(double setpoint, boolean isRight) {
         var command = Commands.sequence(
@@ -123,11 +116,11 @@ public class SwerveCommands {
         }).until(() -> {
             double xDistance = Math.abs(targetPose.getX() - swerve.getPose().getX());
             double yDistance = Math.abs(targetPose.getY() - swerve.getPose().getY());
-            double angleDistance = Math
-                    .abs(targetPose.getRotation().minus(swerve.getPose().getRotation()).getDegrees());
+            boolean isAngleClose = AngleUtils.areAnglesClose(targetPose.getRotation(), swerve.getPose().getRotation(),
+                    Rotation2d.fromDegrees(5));
             return xDistance < 0.0508 &&
                     yDistance < 0.0508 &&
-                    angleDistance < 5;
+                    isAngleClose;
         });
         command.addRequirements(swerve);
         return command;

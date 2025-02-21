@@ -4,7 +4,7 @@ package frc.robot.subsystems.swervedrive;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.NTHelper;
+import frc.robot.AngleUtils;
 
 public class AutoAlignClosest extends Command {
     private Pose2d pose;
@@ -37,11 +37,10 @@ public class AutoAlignClosest extends Command {
 
         double xDistance = Math.abs(targetPose.getX() - swerve.getPose().getX());
         double yDistance = Math.abs(targetPose.getY() - swerve.getPose().getY());
-        double angleDistance = Math
-                .abs(targetPose.getRotation().minus(swerve.getPose().getRotation())
-                        .getDegrees());
+        boolean isAngleClose = AngleUtils.areAnglesClose(targetPose.getRotation(), swerve.getPose().getRotation(),
+                Rotation2d.fromDegrees(5));
         return xDistance < 0.0508 &&
                 yDistance < 0.0508 &&
-                angleDistance < 5;
+                isAngleClose;
     }
 }
