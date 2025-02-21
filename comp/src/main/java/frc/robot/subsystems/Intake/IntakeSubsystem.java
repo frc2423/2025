@@ -16,32 +16,34 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private SparkFlex motor = new SparkFlex(23, MotorType.kBrushless);
-    private LaserCan intakeDist = new LaserCan(26);
+    // private SparkFlex motor = new SparkFlex(23, MotorType.kBrushless);
+    // private LaserCan intakeDist = new LaserCan(26);
 
     public IntakeSubsystem() {
 
     }
 
     public void intake(double speed) {
-        motor.set(speed);
+        // motor.set(speed);
     }
 
     public void outtake(double speed) {
-        motor.set(speed);
+        // motor.set(speed);
     }
 
     public void stop() {
-        motor.set(0);
+        // motor.set(0);
     }
 
     public double distMm() {
-        var dist = intakeDist.getMeasurement();
-        if (dist == null) {
-            return 10000;
-        } else {
-            return dist.distance_mm;
-        }
+        // var dist = intakeDist.getMeasurement();
+        // if (dist == null) {
+        // return 10000;
+        // } else {
+        // return dist.distance_mm;
+        // }
+
+        return 0;
     }
 
     public boolean isOut() {

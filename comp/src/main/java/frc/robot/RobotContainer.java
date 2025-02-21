@@ -31,8 +31,6 @@ import swervelib.SwerveInputStream;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
-import frc.robot.subsystems.Claw.ClawSubsystem;
-import frc.robot.subsystems.Claw.ClawCommands;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -57,9 +55,7 @@ public class RobotContainer {
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
-        ClawSubsystem clawSubsystem = new ClawSubsystem();
 
-        ClawCommands clawCommands = new ClawCommands(clawSubsystem);
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -241,12 +237,7 @@ public class RobotContainer {
                 // new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                 // .whileTrue(intakeCommands.intakeStop());
 
-                new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .whileTrue(clawCommands.clawRelease());
                 // .whileTrue(swerveCommands.lookAtNearestTag());
-
-                new JoystickButton(driverXbox, XboxController.Button.kB.value)
-                                .whileTrue(clawCommands.clawStop());
 
                 new Trigger(() -> driverXbox.getPOV() == 0)
                                 .onTrue(swerveCommands.lookAtAngle(0));
