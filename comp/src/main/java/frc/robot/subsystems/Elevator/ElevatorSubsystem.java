@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.subsystems.ArmSubsystem;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = 55;
@@ -40,6 +42,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     // the mechanism root node
     private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
 
+    private ArmSubsystem arm;
+
     // private final FlywheelSim elevatorSimMotor = new
     // FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
 
@@ -50,8 +54,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     MechanismLigament2d bottom = elevator.append(
             new MechanismLigament2d("bottom", 5, 0, 6, new Color8Bit(Color.kBlanchedAlmond)));
 
-    public ElevatorSubsystem() {
-
+    public ElevatorSubsystem(ArmSubsystem arm) {
+        this.arm = arm;
         motor1.getEncoder().setPosition(0);
         motor2.getEncoder().setPosition(0);
 
@@ -91,6 +95,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         }
 
+        if (arm.getCurrentArmPose() > -5.02) {
+            calculatedPID = 0;
+        }
+
         motor1.set(calculatedPID);
         motor2.set(-calculatedPID);
     }
@@ -105,7 +113,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goDown() { // for manual control, sick
-        return goToSetpoint(lowestPoint);
+        return Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
+            setSetpoint(lowestPoint);
+        }), Commands.waitUntil(() -> {
+            return isAtSetpoint();
+        }), arm.goToSetpoint(Constants.ArmConstants.HANDOFF_POSE));
     }
 
     public Command goUp() {
@@ -128,9 +140,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goToSetpoint(double position) {
-        return runOnce(() -> {
+        return Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
             setSetpoint(position);
-        });
+        }));
     }
 
     private void setSetpoint(double position) {
