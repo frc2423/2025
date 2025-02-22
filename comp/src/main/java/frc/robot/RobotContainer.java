@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,6 +29,7 @@ import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
@@ -53,16 +55,18 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
 
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+        ArmSubsystem arm = new ArmSubsystem();
 
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+        ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
-
-        public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
         private static boolean runOnce = false;
+
+        SendableChooser<String> m_chooser = new SendableChooser<>();
 
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -138,7 +142,24 @@ public class RobotContainer {
                 NamedCommands.registerCommand("test", Commands.print("I EXIST"));
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
+                SmartDashboard.putData("autoChooser", m_chooser);
                 SmartDashboard.putData("swerveSubsystem", drivebase);
+                SmartDashboard.putData("ArmSubsystem", arm);
+
+                m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
+                m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
+                m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
+
+                NamedCommands.registerCommand("Elevator to Reef L2",
+                                elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+
+                NamedCommands.registerCommand("Elevator to Reef L3",
+                                elevator.goToSetpoint(Constants.SetpointConstants.REEF_L3));
+
+                NamedCommands.registerCommand("Elevator to Reef L4",
+                                elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
+
+                NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
@@ -239,11 +260,11 @@ public class RobotContainer {
                         return value;
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                // .onTrue(elevator.goDown());
+                new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                                .onTrue(elevator.goDown());
 
-                // new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                // .onTrue(elevator.goUp());
+                new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                                .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
                                                 : Constants.SetpointConstants.REEF_L2));
@@ -254,8 +275,7 @@ public class RobotContainer {
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
                                                 : Constants.SetpointConstants.REEF_L4));
                 new Trigger(() -> operator.getPOV() == 180)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ZERO
-                                                : Constants.SetpointConstants.ZERO));
+                                .onTrue(elevator.goDown());
 
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
@@ -279,7 +299,7 @@ public class RobotContainer {
          */
         public Command getAutonomousCommand() {
                 // An example command will be run in autonomous
-                return drivebase.getAutonomousCommand("New Auto");
+                return drivebase.getAutonomousCommand(m_chooser.getSelected());
         }
 
         public void setDriveMode() {

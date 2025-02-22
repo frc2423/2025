@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.subsystems.ArmSubsystem;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = 55;
@@ -30,8 +32,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 72;
-    private double lowestPoint = 0.05;
-    private final double MAX_VOLTAGE = 1.2;
+    private double lowestPoint = 0.00;
+    private final double MAX_VOLTAGE = 0.9;
 
     private ElevatorSim elevatorSim = new ElevatorSim();
 
@@ -39,6 +41,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     private Mechanism2d mech = new Mechanism2d(10, 100);
     // the mechanism root node
     private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
+
+    private ArmSubsystem arm;
+
+    double calculatedPID = 0;
 
     // private final FlywheelSim elevatorSimMotor = new
     // FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
@@ -50,8 +56,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     MechanismLigament2d bottom = elevator.append(
             new MechanismLigament2d("bottom", 5, 0, 6, new Color8Bit(Color.kBlanchedAlmond)));
 
-    public ElevatorSubsystem() {
-
+    public ElevatorSubsystem(ArmSubsystem arm) {
+        this.arm = arm;
         motor1.getEncoder().setPosition(0);
         motor2.getEncoder().setPosition(0);
 
@@ -65,7 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         elevatorCurrentPose = motor1.getEncoder().getPosition();
-        double calculatedPID = calculatePid(setpoint);
+        calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
             calculatedPID = MAX_VOLTAGE;
@@ -91,6 +97,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         }
 
+        if (!arm.isInSafeArea()) {
+            calculatedPID = 0;
+        }
+
         motor1.set(calculatedPID);
         motor2.set(-calculatedPID);
     }
@@ -105,7 +115,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goDown() { // for manual control, sick
-        return goToSetpoint(lowestPoint);
+        Command command = Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
+            setSetpoint(lowestPoint);
+        }), Commands.waitUntil(() -> {
+            return isAtSetpoint();
+        }), arm.goToSetpoint(Constants.ArmConstants.HANDOFF_POSE));
+        command.setName("goDown");
+        return command;
     }
 
     public Command goUp() {
@@ -128,13 +144,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goToSetpoint(double position) {
-        return runOnce(() -> {
+        return Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
             setSetpoint(position);
-        });
+        }));
     }
 
     private void setSetpoint(double position) {
-        if (position < highestPoint && position > lowestPoint) {
+        if (position <= highestPoint && position >= lowestPoint) {
             setpoint = position;
         }
     }
@@ -171,7 +187,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // This is used to add things to NetworkTables
         super.initSendable(builder);
 
-        builder.addDoubleProperty("calculatePid", () -> calculatePid(setpoint), null);
+        builder.addDoubleProperty("calculatePid", () -> calculatedPID, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("height", this::getHeight, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
