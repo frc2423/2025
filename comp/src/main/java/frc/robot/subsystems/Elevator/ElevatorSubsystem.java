@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
+//import frc.robot.subsystems.ArmSubsystem;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = 55;
@@ -32,6 +34,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double highestPoint = 72;
     private double lowestPoint = 0.05;
     private final double MAX_VOLTAGE = 1.2;
+
+    // private ArmSubsystem arm = new ArmSubsystem();
 
     private ElevatorSim elevatorSim = new ElevatorSim();
 
@@ -129,6 +133,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command goToSetpoint(double position) {
         return runOnce(() -> {
+            // if (position == Constants.SetpointConstants.ZERO)
+            // arm.goUp();
+            // else
+            // arm.goDown();
             setSetpoint(position);
         });
     }

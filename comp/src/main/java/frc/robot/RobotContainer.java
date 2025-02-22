@@ -28,6 +28,7 @@ import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
@@ -53,6 +54,8 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
 
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+
+        ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
 
@@ -205,7 +208,7 @@ public class RobotContainer {
                                                 true));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.intakeIn());
+                                .onTrue(intakeCommands.in());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(intakeCommands.intakeOut());
@@ -238,6 +241,18 @@ public class RobotContainer {
                         RobotContainer.runOnce = true;
                         return value;
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
+
+                new JoystickButton(operator, XboxController.Button.kA.value)
+                                .onTrue(climberSubsystem.climb());
+
+                new JoystickButton(operator, XboxController.Button.kB.value)
+                                .onTrue(climberSubsystem.deClimb());
+
+                new JoystickButton(operator, XboxController.Button.kY.value)
+                                .onTrue(intakeCommands.in());
+
+                new JoystickButton(operator, XboxController.Button.kX.value)
+                                .onTrue(intakeCommands.intakeOut());
 
                 // new JoystickButton(driverXbox, XboxController.Button.kA.value)
                 // .onTrue(elevator.goDown());
