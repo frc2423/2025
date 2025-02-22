@@ -63,23 +63,6 @@ public class SwerveCommands {
         }
     }
 
-    // An example selectcommand. Will select from the three commands based on the
-    // value returned
-    // by the selector method at runtime. Note that selectcommand works on Object(),
-    // so the
-    // selector does not have to be an enum; it could be any desired type (string,
-    // integer,
-    // boolean, double...)
-    private final Command autoScoreElevatorCommand = new SelectCommand<>(
-            // Maps selector values to commands
-            Map.ofEntries(
-                    Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
-                    Map.entry(ElevatorLevel.L2, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L2)),
-                    Map.entry(ElevatorLevel.L3, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L3)),
-                    Map.entry(ElevatorLevel.L4, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
-
-            this::selectElevatorLevel);
-
     public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
         double y = .178;
         Transform2d offset = new Transform2d(distance, isRight ? y : -y, Rotation2d.kPi);
@@ -94,6 +77,18 @@ public class SwerveCommands {
     }
 
     public Command autoScoralClosest(double setpoint, boolean isRight) {
+        Command autoScoreElevatorCommand = new SelectCommand<>(
+                // Maps selector values to commands
+                Map.ofEntries(
+                        Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
+                        Map.entry(ElevatorLevel.L2,
+                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L2)),
+                        Map.entry(ElevatorLevel.L3,
+                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L3)),
+                        Map.entry(ElevatorLevel.L4,
+                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
+
+                this::selectElevatorLevel);
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
                 new AutoAlignClosest(swerve, this, .8, isRight),

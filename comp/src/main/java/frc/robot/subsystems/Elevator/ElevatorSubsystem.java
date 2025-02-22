@@ -27,8 +27,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double elevatorCurrentPose = 0;
     private double setpoint = 0;
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.18, 0, 0);
-    // private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
-    // private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
+    private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
+    private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 72;
     private double lowestPoint = 0.05;
     private final double MAX_VOLTAGE = 1.2;
@@ -52,8 +52,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public ElevatorSubsystem() {
 
-        // motor1.getEncoder().setPosition(0);
-        // motor2.getEncoder().setPosition(0);
+        motor1.getEncoder().setPosition(0);
+        motor2.getEncoder().setPosition(0);
 
         // post the mechanism to the dashboard
         SmartDashboard.putData("Mech2d", mech);
@@ -64,7 +64,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // elevatorCurrentPose = motor1.getEncoder().getPosition();
+        elevatorCurrentPose = motor1.getEncoder().getPosition();
         double calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
@@ -91,8 +91,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         }
 
-        // motor1.set(calculatedPID);
-        // motor2.set(-calculatedPID); // ONE OF THEM IS NEGITIVE
+        motor1.set(calculatedPID);
+        motor2.set(-calculatedPID);
     }
 
     private double calculatePid(double position) {
@@ -146,7 +146,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getElevatorVelocity() { // for manual control, sick
-        return 0;// motor1.getEncoder().getVelocity();
+        return motor1.getEncoder().getVelocity();
     }
 
     public void resetElevatorPosition() {
