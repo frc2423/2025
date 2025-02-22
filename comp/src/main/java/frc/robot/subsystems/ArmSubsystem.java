@@ -22,9 +22,9 @@
 // MotorType.kBrushless);
 // private double scoringWheelSpeed = 0;
 // private double armCurrentPose = 0;
-// private double maximum = 1.9; //some value
-// private double minumum = -13.8; //some value
-// private double setpoint = 0;//will change varibly
+// private double maximum = 1.9; // some value
+// private double minumum = -13.8; // some value
+// private double setpoint = 0;// will change varibly
 // private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
 // private double MAX_VOLTAGE = 0.3;
 

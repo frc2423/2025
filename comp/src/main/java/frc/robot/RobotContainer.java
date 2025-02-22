@@ -32,6 +32,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
+//import frc.robot.subsystems.ArmSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -54,6 +55,8 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
 
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+
+        // ArmSubsystem armSubsystem = new ArmSubsystem();
 
         ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
@@ -142,6 +145,7 @@ public class RobotContainer {
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
                 SmartDashboard.putData("swerveSubsystem", drivebase);
+                // SmartDashboard.putData("armSubsystem", armSubsystem);
 
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
@@ -280,7 +284,8 @@ public class RobotContainer {
 
                 // .onTrue(elevator.goLittleUp(1));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+                new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));
+                new JoystickButton(operator, XboxController.Button.kLeftBumper.value).onTrue(elevator.goLittleDown(1));
                 // .whileTrue(intakeCommands.intakeStop());
 
                 // .whileTrue(swerveCommands.lookAtNearestTag());

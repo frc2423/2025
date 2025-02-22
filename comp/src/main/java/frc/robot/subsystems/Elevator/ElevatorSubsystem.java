@@ -22,8 +22,8 @@ import frc.robot.Robot;
 //import frc.robot.subsystems.ArmSubsystem;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private double maxVel = 55;
-    private double maxAccel = 60;
+    private double maxVel = 27.5; // 55
+    private double maxAccel = 30; // 60
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0,
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double elevatorCurrentPose = 0;
@@ -31,9 +31,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.18, 0, 0);
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
-    private double highestPoint = 72;
+    private double highestPoint = 65; // 72
     private double lowestPoint = 0.05;
-    private final double MAX_VOLTAGE = 1.2;
+    private final double MAX_VOLTAGE = .6; // 1.2
 
     // private ArmSubsystem arm = new ArmSubsystem();
 
