@@ -101,7 +101,7 @@ public class FunnelSubsystem extends SubsystemBase {
     }
 
     public Command stop() {
-        var command = run(() -> {
+        var command = runOnce(() -> {
             funnelStop();
         });
         command.setName("STOP");

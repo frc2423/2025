@@ -257,10 +257,10 @@ public class RobotContainer {
                                 .whileTrue(climberSubsystem.deClimb());
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
-                                .whileTrue(intakeCommands.in());
+                                .onTrue(intakeCommands.in());
 
                 new JoystickButton(operator, XboxController.Button.kX.value)
-                                .whileTrue(intakeCommands.intakeOut());
+                                .onTrue(intakeCommands.intakeOut());
 
                 // new JoystickButton(driverXbox, XboxController.Button.kA.value)
                 // .onTrue(elevator.goDown());
