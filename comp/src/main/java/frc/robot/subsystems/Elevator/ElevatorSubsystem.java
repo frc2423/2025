@@ -91,8 +91,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         }
 
-        motor1.set(calculatedPID);
-        motor2.set(-calculatedPID);
+        // motor1.set(calculatedPID);
+        // motor2.set(-calculatedPID);
     }
 
     private double calculatePid(double position) {
