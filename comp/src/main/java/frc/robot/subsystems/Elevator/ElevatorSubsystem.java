@@ -22,8 +22,8 @@ import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private double maxVel = 15;
-    private double maxAccel = 14.8976543;
+    private double maxVel = 55;
+    private double maxAccel = 60;
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0,
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double elevatorCurrentPose = 0;
@@ -32,8 +32,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 72;
-    private double lowestPoint = 0.05;
-    private final double MAX_VOLTAGE = 0.2;
+    private double lowestPoint = 0.00;
+    private final double MAX_VOLTAGE = 0.9;
 
     private ElevatorSim elevatorSim = new ElevatorSim();
 
@@ -43,6 +43,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
 
     private ArmSubsystem arm;
+
+    double calculatedPID = 0;
 
     // private final FlywheelSim elevatorSimMotor = new
     // FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
@@ -69,7 +71,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         elevatorCurrentPose = motor1.getEncoder().getPosition();
-        double calculatedPID = calculatePid(setpoint);
+        calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
             calculatedPID = MAX_VOLTAGE;
@@ -95,7 +97,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         }
 
-        if (arm.getCurrentArmPose() > -5.02) {
+        if (!arm.isInSafeArea()) {
             calculatedPID = 0;
         }
 
@@ -113,11 +115,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goDown() { // for manual control, sick
-        return Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
+        Command command = Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
             setSetpoint(lowestPoint);
         }), Commands.waitUntil(() -> {
             return isAtSetpoint();
         }), arm.goToSetpoint(Constants.ArmConstants.HANDOFF_POSE));
+        command.setName("goDown");
+        return command;
     }
 
     public Command goUp() {
@@ -146,7 +150,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     private void setSetpoint(double position) {
-        if (position < highestPoint && position > lowestPoint) {
+        if (position <= highestPoint && position >= lowestPoint) {
             setpoint = position;
         }
     }
@@ -183,7 +187,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // This is used to add things to NetworkTables
         super.initSendable(builder);
 
-        builder.addDoubleProperty("calculatePid", () -> calculatePid(setpoint), null);
+        builder.addDoubleProperty("calculatePid", () -> calculatedPID, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("height", this::getHeight, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);

@@ -96,8 +96,8 @@ public final class Constants {
         public static final double REEF_L2 = -11; // not real
         public static final double REEF_L3 = -11; // not real
         public static final double ALGAE_DESCORE_L3 = -11; // not real
-        public static final double OUTSIDE_ELEVATOR = -5.02;
-        public static final double HANDOFF_POSE = 1;
+        public static final double OUTSIDE_ELEVATOR = -6;
+        public static final double HANDOFF_POSE = 0;
 
         public static final double ZERO = -1; // not real
     }

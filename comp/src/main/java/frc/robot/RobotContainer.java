@@ -140,6 +140,7 @@ public class RobotContainer {
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
                 SmartDashboard.putData("swerveSubsystem", drivebase);
+                SmartDashboard.putData("ArmSubsystem", arm);
 
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
@@ -240,11 +241,11 @@ public class RobotContainer {
                         return value;
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                // .onTrue(elevator.goDown());
+                new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                                .onTrue(elevator.goDown());
 
-                // new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                // .onTrue(elevator.goUp());
+                new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                                .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
                                                 : Constants.SetpointConstants.REEF_L2));
@@ -255,8 +256,7 @@ public class RobotContainer {
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
                                                 : Constants.SetpointConstants.REEF_L4));
                 new Trigger(() -> operator.getPOV() == 180)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ZERO
-                                                : Constants.SetpointConstants.ZERO));
+                                .onTrue(elevator.goDown());
 
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
