@@ -62,8 +62,8 @@ public class RobotContainer {
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
 
-        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
-        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
+        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
         private static boolean runOnce = false;
 
         SendableChooser<String> m_chooser = new SendableChooser<>();
