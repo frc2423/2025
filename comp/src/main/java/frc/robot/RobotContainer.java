@@ -60,8 +60,8 @@ public class RobotContainer {
 
         public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
-        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
-        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
+        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
         private static boolean runOnce = false;
 
         /**
