@@ -364,13 +364,17 @@ public class Vision {
 
   /**
    * Camera Enum to select each camera
+   * 
+   * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#robot-drive-kinematics
+   * https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html#rotation-conventions
+   * 
    */
   enum Cameras {
     FRONT_CAM("Arducam_OV9281_USB_Camera",
-        new Rotation3d(0, Math.toRadians(0), Math.toRadians(0)),
-        new Translation3d(Units.inchesToMeters(13), // center to front
-            Units.inchesToMeters(0),
-            Units.inchesToMeters(10.1875)), // front floor
+        new Rotation3d(0, Math.toRadians(-60), Math.toRadians(0)),
+        new Translation3d(Units.inchesToMeters(10.5), // center to front
+            Units.inchesToMeters(-5),
+            Units.inchesToMeters(6)), // front floor
         VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
