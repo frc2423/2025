@@ -130,7 +130,8 @@ public class RobotContainer {
          */
         public RobotContainer() {
                 // Configure the trigger bindings
-                configureBindings();
+                configureDriverBindings();
+                configureOperatorBindings();
                 Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
                 drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
                 DriverStation.silenceJoystickConnectionWarning(true);
@@ -184,7 +185,7 @@ public class RobotContainer {
                 return driveFieldOrientedAngularVelocity; // :P
         }
 
-        private void configureBindings() {
+        private void configureDriverBindings() {
 
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
@@ -194,6 +195,49 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kStart.value)
                                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
+
+                new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
+                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                                false));
+
+                new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                                true));
+
+                new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                                .onTrue(intakeCommands.intakeIn());
+
+                new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                                .onTrue(intakeCommands.intakeOut());
+
+                new JoystickButton(driverXbox, XboxController.Button.kBack.value)
+                                .onTrue(swerveCommands.lookAtNearestTag());
+
+                new JoystickButton(driverXbox, XboxController.Button.kX.value)
+                                .onTrue(intakeCommands.intakeOut());
+
+                new Trigger(() -> driverXbox.getPOV() == 0)
+                                .onTrue(swerveCommands.lookAtAngle(0));
+                new Trigger(() -> driverXbox.getPOV() == 315)
+                                .onTrue(swerveCommands.lookAtAngle(60));
+                new Trigger(() -> driverXbox.getPOV() == 225)
+                                .onTrue(swerveCommands.lookAtAngle(120));
+                new Trigger(() -> driverXbox.getPOV() == 180)
+                                .onTrue(swerveCommands.lookAtAngle(180));
+                new Trigger(() -> driverXbox.getPOV() == 135)
+                                .onTrue(swerveCommands.lookAtAngle(240));
+                new Trigger(() -> driverXbox.getPOV() == 45)
+                                .onTrue(swerveCommands.lookAtAngle(300));
+
+        }
+
+        private void configureOperatorBindings() {
+
+                new Trigger(() -> {
+                        boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
+                        RobotContainer.runOnce = true;
+                        return value;
+                }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
                 // new JoystickButton(driverXbox, XboxController.Button.kA.value)
                 // .onTrue(elevator.goDown());
@@ -214,43 +258,17 @@ public class RobotContainer {
                                                 : Constants.SetpointConstants.ZERO));
 
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
-                new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                false));
+
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
                                 .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
-                new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                true));
+
                 // .onTrue(elevator.goLittleUp(1));
-
-                new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.intakeIn());
-
-                new JoystickButton(driverXbox, XboxController.Button.kBack.value)
-                                .onTrue(swerveCommands.lookAtNearestTag());
-
-                new JoystickButton(driverXbox, XboxController.Button.kX.value)
-                                .onTrue(intakeCommands.intakeOut());
 
                 // new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                 // .whileTrue(intakeCommands.intakeStop());
 
                 // .whileTrue(swerveCommands.lookAtNearestTag());
-
-                new Trigger(() -> driverXbox.getPOV() == 0)
-                                .onTrue(swerveCommands.lookAtAngle(0));
-                new Trigger(() -> driverXbox.getPOV() == 315)
-                                .onTrue(swerveCommands.lookAtAngle(60));
-                new Trigger(() -> driverXbox.getPOV() == 225)
-                                .onTrue(swerveCommands.lookAtAngle(120));
-                new Trigger(() -> driverXbox.getPOV() == 180)
-                                .onTrue(swerveCommands.lookAtAngle(180));
-                new Trigger(() -> driverXbox.getPOV() == 135)
-                                .onTrue(swerveCommands.lookAtAngle(240));
-                new Trigger(() -> driverXbox.getPOV() == 45)
-                                .onTrue(swerveCommands.lookAtAngle(300));
 
         }
 
@@ -265,7 +283,8 @@ public class RobotContainer {
         }
 
         public void setDriveMode() {
-                configureBindings();
+                configureDriverBindings();
+                configureOperatorBindings();
         }
 
         public void setMotorBrake(boolean brake) {
