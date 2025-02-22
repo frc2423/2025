@@ -29,6 +29,7 @@ import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
@@ -54,12 +55,12 @@ public class RobotContainer {
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
 
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+        ArmSubsystem arm = new ArmSubsystem();
 
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+        ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
-
-        public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(0.5);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(0.5);
@@ -143,6 +144,7 @@ public class RobotContainer {
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
                 SmartDashboard.putData("autoChooser", m_chooser);
                 SmartDashboard.putData("swerveSubsystem", drivebase);
+                SmartDashboard.putData("ArmSubsystem", arm);
 
                 m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
                 m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
@@ -258,11 +260,11 @@ public class RobotContainer {
                         return value;
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                // .onTrue(elevator.goDown());
+                new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                                .onTrue(elevator.goDown());
 
-                // new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                // .onTrue(elevator.goUp());
+                new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                                .onTrue(elevator.goUp());
                 new Trigger(() -> operator.getPOV() == 270)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
                                                 : Constants.SetpointConstants.REEF_L2));
@@ -273,8 +275,7 @@ public class RobotContainer {
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
                                                 : Constants.SetpointConstants.REEF_L4));
                 new Trigger(() -> operator.getPOV() == 180)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ZERO
-                                                : Constants.SetpointConstants.ZERO));
+                                .onTrue(elevator.goDown());
 
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
