@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -19,6 +20,7 @@ import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.AngleUtils;
 import frc.robot.Constants;
+import frc.robot.NTHelper;
 import frc.robot.Constants.OperatorConstants;
 
 public class SwerveCommands {
@@ -33,13 +35,14 @@ public class SwerveCommands {
     private XboxController driverXbox = new XboxController(0);
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
+    private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
             IntakeCommands intakeCommands) {
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
-
+        NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
     }
 
     // The enum used as keys for selecting the command to run.
@@ -52,6 +55,20 @@ public class SwerveCommands {
     // which command to run. Can base this choice on logical conditions evaluated at
     // runtime.
     private ElevatorLevel selectElevatorLevel() {
+        String dashboardElevatorLevel = NTHelper.getStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL)[0];
+        if (dashboardElevatorLevel.equals("L1")) {
+            return ElevatorLevel.T;
+        }
+        if (dashboardElevatorLevel.equals("L2")) {
+            return ElevatorLevel.L2;
+        }
+        if (dashboardElevatorLevel.equals("L3")) {
+            return ElevatorLevel.L3;
+        }
+        if (dashboardElevatorLevel.equals("L4")) {
+            return ElevatorLevel.L4;
+        }
+
         if (driverXbox.getLeftTriggerAxis() < 0.5 && driverXbox.getRightTriggerAxis() < 0.5) {
             return ElevatorLevel.T;
         } else if (driverXbox.getLeftTriggerAxis() < 0.5 && driverXbox.getRightTriggerAxis() > 0.5) {
@@ -262,4 +279,5 @@ public class SwerveCommands {
     // command.setName("setLookAngle");
     // return command;
     // }
+
 }
