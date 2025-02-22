@@ -29,6 +29,7 @@ import frc.robot.subsystems.swervedrive.Vision;
 import java.io.File;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.FunnelSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
@@ -60,7 +61,9 @@ public class RobotContainer {
 
         ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
-        IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+        FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
+
+        IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
 
@@ -145,6 +148,7 @@ public class RobotContainer {
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
                 SmartDashboard.putData("swerveSubsystem", drivebase);
+                SmartDashboard.putData("climbPose", climberSubsystem);
                 // SmartDashboard.putData("armSubsystem", armSubsystem);
 
                 // Logging callback for the active path, this is sent as a list of poses
@@ -247,16 +251,16 @@ public class RobotContainer {
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
                 new JoystickButton(operator, XboxController.Button.kA.value)
-                                .onTrue(climberSubsystem.climb());
+                                .whileTrue(climberSubsystem.climb());
 
                 new JoystickButton(operator, XboxController.Button.kB.value)
-                                .onTrue(climberSubsystem.deClimb());
+                                .whileTrue(climberSubsystem.deClimb());
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.in());
+                                .whileTrue(intakeCommands.in());
 
                 new JoystickButton(operator, XboxController.Button.kX.value)
-                                .onTrue(intakeCommands.intakeOut());
+                                .whileTrue(intakeCommands.intakeOut());
 
                 // new JoystickButton(driverXbox, XboxController.Button.kA.value)
                 // .onTrue(elevator.goDown());

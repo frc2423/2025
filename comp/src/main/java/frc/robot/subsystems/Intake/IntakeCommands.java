@@ -14,18 +14,20 @@ public class IntakeCommands {
     private FunnelSubsystem funnel;
     // private ArmSubsystem arm;
 
-    public IntakeCommands(IntakeSubsystem intake) {
+    public IntakeCommands(IntakeSubsystem intake, FunnelSubsystem funnel) {
         this.intake = intake;
+        this.funnel = funnel;
     }
 
-    // public Command intakeIn() {
-    // var command = Commands.sequence(
-    // arm.goUp(),
-    // in());
-    // command.setName("Intake In");
-    // command.addRequirements(intake);
-    // return command;
-    // }
+    public Command intakeIn() {
+        var command = Commands.run(() -> {
+            // arm.goUp(),
+            intake.intake(.15);
+        });
+        command.setName("Intake In");
+        command.addRequirements(intake);
+        return command;
+    }
 
     public Command intakeOut() {
         var command = Commands.run(() -> {
@@ -44,10 +46,11 @@ public class IntakeCommands {
     }
 
     public Command in() {
-        var command = Commands.run(() -> {
-            funnel.spinInBoth();
-            intake.intake(0.15);
-        }).until(() -> intake.distMm() < 100).andThen(intakeStop());
+        var command = Commands.parallel(intakeIn(), funnel.spinInBoth()).until(() -> !intake.isOut())
+                .andThen(intakeStop());
+        command.addRequirements(intake);
+        command.addRequirements(funnel);
+        command.setName("In");
         return command;
     }
 }
