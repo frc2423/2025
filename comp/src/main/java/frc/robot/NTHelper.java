@@ -140,6 +140,10 @@ public class NTHelper {
         getEntry(key).setStringArray(value);
     }
 
+    public static String[] getStringArray(String key, String[] defaultValue) {
+        return getEntry(key).getStringArray(defaultValue);
+    }
+
     /**
      * Sets the current value to network tables
      * 

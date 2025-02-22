@@ -91,6 +91,17 @@ public final class Constants {
         public static final double ZERO = 0.1;
     }
 
+    public static class ArmConstants {
+        public static final double REEF_L4 = -11; // not real
+        public static final double REEF_L2 = -11; // not real
+        public static final double REEF_L3 = -11; // not real
+        public static final double ALGAE_DESCORE_L3 = -11; // not real
+        public static final double OUTSIDE_ELEVATOR = -6;
+        public static final double HANDOFF_POSE = 0;
+
+        public static final double ZERO = -1; // not real
+    }
+
     public static class AprilTagPoses {
         public static final Rotation2d REEF_TAG_6_Rotation = new Rotation2d(Math.PI / 3);
         public static final Pose2d REEF_TAG_6 = new Pose2d(2.76, 13.786, REEF_TAG_6_Rotation);
