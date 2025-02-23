@@ -29,10 +29,13 @@ import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
+import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.FunnelSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
+//import frc.robot.subsystems.ArmSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -56,8 +59,9 @@ public class RobotContainer {
 
         IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
         ArmSubsystem arm = new ArmSubsystem();
-
-        IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+        ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+        FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
+        IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
@@ -226,7 +230,7 @@ public class RobotContainer {
                                                 true));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.intakeIn());
+                                .onTrue(intakeCommands.in());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(intakeCommands.intakeOut());
@@ -250,6 +254,14 @@ public class RobotContainer {
                 new Trigger(() -> driverXbox.getPOV() == 45)
                                 .onTrue(swerveCommands.lookAtAngle(300));
 
+                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                // .onTrue(elevator.goDown());
+                new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                                .onTrue(elevator.goDown());
+
+                new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                                .onTrue(elevator.goUp());
+
         }
 
         private void configureOperatorBindings() {
@@ -260,11 +272,18 @@ public class RobotContainer {
                         return value;
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
-                new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .onTrue(elevator.goDown());
+                new JoystickButton(operator, XboxController.Button.kA.value)
+                                .whileTrue(climberSubsystem.climb());
 
-                new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(elevator.goUp());
+                new JoystickButton(operator, XboxController.Button.kB.value)
+                                .whileTrue(climberSubsystem.deClimb());
+
+                new JoystickButton(operator, XboxController.Button.kY.value)
+                                .onTrue(intakeCommands.in());
+
+                new JoystickButton(operator, XboxController.Button.kX.value)
+                                .onTrue(intakeCommands.intakeOut());
+
                 new Trigger(() -> operator.getPOV() == 270)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
                                                 : Constants.SetpointConstants.REEF_L2));
@@ -285,7 +304,8 @@ public class RobotContainer {
 
                 // .onTrue(elevator.goLittleUp(1));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+                new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));
+                new JoystickButton(operator, XboxController.Button.kLeftBumper.value).onTrue(elevator.goLittleDown(1));
                 // .whileTrue(intakeCommands.intakeStop());
 
                 // .whileTrue(swerveCommands.lookAtNearestTag());

@@ -31,7 +31,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.18, 0, 0);
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
-    private double highestPoint = 72;
+    private double highestPoint = 63.5;
     private double lowestPoint = 0.00;
     private final double MAX_VOLTAGE = 0.9;
 
