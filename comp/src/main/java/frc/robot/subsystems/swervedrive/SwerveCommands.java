@@ -149,7 +149,7 @@ public class SwerveCommands {
         var command = Commands.run(() -> {
             int tag = swerve.vision.findClosestTagID(swerve.getPose());
             int angle = swerve.vision.iDtoAngle(tag);
-            actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
+            actuallyLookAngleButMove(Rotation2d.fromDegrees(angle).plus(Rotation2d.k180deg));
 
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);

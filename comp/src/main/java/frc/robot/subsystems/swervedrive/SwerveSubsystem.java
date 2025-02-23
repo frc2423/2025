@@ -67,7 +67,7 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private final SwerveDrive swerveDrive;
 
-  public double maximumSpeed = Units.feetToMeters(16.5);
+  public double maximumSpeed = Constants.MAX_SPEED;
   /**
    * AprilTag field layout.
    */

@@ -18,7 +18,8 @@ import frc.robot.Robot;
 public class ArmSubsystem extends SubsystemBase {
 
     private SparkMax armPivot = new SparkMax(25, MotorType.kBrushless);
-    private SparkFlex scoringWheelMotor = new SparkFlex(23, MotorType.kBrushless);
+    // private SparkFlex scoringWheelMotor = new SparkFlex(23,
+    // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double armCurrentPose = 0;
     private double maximum = 1.9; // some value
@@ -53,7 +54,7 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         armPivot.set(calculatedPID);
-        scoringWheelMotor.set(scoringWheelSpeed);
+        // scoringWheelMotor.set(scoringWheelSpeed);
 
     }
 
