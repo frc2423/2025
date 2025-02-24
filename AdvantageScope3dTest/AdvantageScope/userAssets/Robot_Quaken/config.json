@@ -1,0 +1,41 @@
+{
+    "name": "Quaken",
+    "sourceUrl": "https://cad.onshape.com/documents/d855255997cf6f19beebda70/w/f91fedea2a24ccc5a1e39d78/e/35d4d7ca5b887f2fbbeddd4d",
+    "rotations": [
+      {
+        "axis": "x",
+        "degrees": 90
+      },
+      {
+        "axis": "z",
+        "degrees": 90
+      }
+    ],
+    "position": [
+      0,
+      0,
+      -0.005
+    ],
+    "cameras": [
+      {
+        "name": "Front Camera",
+        "rotations": [
+          {
+            "axis": "y",
+            "degrees": -20
+          }
+        ],
+        "position": [
+          0.2667,
+          -0.127,
+          0.1778
+        ],
+        "resolution": [
+          960,
+          720
+        ],
+        "fov": 70
+      }
+    ],
+    "components": []
+  }
