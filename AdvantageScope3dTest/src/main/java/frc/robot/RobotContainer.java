@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.util.Units;
 
 public class RobotContainer {
 
@@ -15,6 +16,9 @@ public class RobotContainer {
     NTHelper.setDouble("/tuning/robotX", 0);
     NTHelper.setDouble("/tuning/robotY", 0);
     NTHelper.setDouble("/tuning/robotZ", 0);
+
+    Pose3d cameraPose =   new Pose3d(1, 4, Units.inchesToMeters(6), new Rotation3d(0, Math.toRadians(-25), Math.toRadians(0)));
+    NTHelper.setPose3d("/cameraPose", cameraPose);
   }
 
   public void periodic() {
