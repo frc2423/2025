@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -82,7 +83,8 @@ public class SwerveCommands {
 
     public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
         double y = .178;
-        Transform2d offset = new Transform2d(distance, isRight ? y : -y, Rotation2d.kPi);
+        double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
+        Transform2d offset = new Transform2d(distance, offsetY, Rotation2d.kPi);
         Pose2d targetPose = pose.plus(offset);
         return targetPose;
     }
@@ -115,8 +117,12 @@ public class SwerveCommands {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
                 stopMoving(),
-                new AutoAlignClosest(swerve, this, .32, isRight),
+                Commands.print("yo mama is so nice, that she bakes the best brownies whenever im feeling down"),
+
+                new AutoAlignClosest(swerve, this, .4, isRight),
+
                 stopMoving(),
+                Commands.print("brownies whenever im feeling down"),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");
