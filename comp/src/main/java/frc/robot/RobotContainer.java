@@ -308,6 +308,9 @@ public class RobotContainer {
 
                 new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));
                 new JoystickButton(operator, XboxController.Button.kLeftBumper.value).onTrue(elevator.goLittleDown(1));
+
+                new JoystickButton(operator, XboxController.Button.kStart.value)
+                                .onTrue(elevator.zeroElevator());
                 // .whileTrue(intakeCommands.intakeStop());
 
                 // .whileTrue(swerveCommands.lookAtNearestTag());

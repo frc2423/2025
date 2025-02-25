@@ -143,6 +143,16 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
+    public Command elevatorGoDown(double constant) {
+        // for manual control, sick
+        return run(() -> {
+            setpoint = elevatorCurrentPose - constant;
+            if (elevatorCurrentPose < 0) {
+                motor1.getEncoder().setPosition(lowestPoint);
+            }
+        });
+    }
+
     public Command goToSetpoint(double position) {
         return Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
             setSetpoint(position);
@@ -159,6 +169,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         return runOnce(() -> {
             setSetpoint(elevatorCurrentPose);
         });
+    }
+
+    public Command zeroElevator() {
+        return Commands
+                .sequence(elevatorGoDown(1).until(() -> Math.abs(motor2.getEncoder().getVelocity()) < 0.01 * maxVel)
+                        .withTimeout(3));
     }
 
     public double getElevatorVelocity() { // for manual control, sick
