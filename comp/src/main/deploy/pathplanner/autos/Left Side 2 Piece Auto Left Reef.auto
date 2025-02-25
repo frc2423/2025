@@ -11,9 +11,21 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "Auto Scoral Left"
+            "name": "AutoScoral Left"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
           }
         },
         {
@@ -31,7 +43,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Auto Scoral Left"
+            "name": "AutoScoral Left"
           }
         }
       ]

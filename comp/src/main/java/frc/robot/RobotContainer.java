@@ -171,6 +171,7 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("AutoScoral Left",
                                 swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, false));
+                NamedCommands.registerCommand("Intake Coral From Human Player", intakeCommands.intakeHumanPlayer());
 
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
@@ -230,11 +231,13 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
                                 .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                false));
+                                                false))
+                                .onFalse(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                                 .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                true));
+                                                true))
+                                .onFalse(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.in());
