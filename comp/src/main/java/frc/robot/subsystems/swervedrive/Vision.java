@@ -371,7 +371,7 @@ public class Vision {
    */
   enum Cameras {
     FRONT_CAM("Arducam_OV9281_USB_Camera",
-        new Rotation3d(0, Math.toRadians(-25), Math.toRadians(0)),
+        new Rotation3d(0, Math.toRadians(-20), Math.toRadians(0)),
         new Translation3d(Units.inchesToMeters(10.5), // center to front
             Units.inchesToMeters(-5),
             Units.inchesToMeters(6)), // front floor

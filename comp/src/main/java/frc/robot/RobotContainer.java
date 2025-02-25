@@ -225,11 +225,13 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
                                 .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                false));
+                                                false))
+                                .onFalse(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                                 .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                true));
+                                                true))
+                                .onFalse(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.in());

@@ -31,7 +31,7 @@ public class IntakeCommands {
 
     public Command intakeOut() {
         var command = Commands.run(() -> {
-            intake.intake(0.15);
+            intake.intake(0.3);
         }).until(() -> intake.isOut()).andThen(intakeStop());
         command.addRequirements(intake);
         command.setName("Intake Out");
