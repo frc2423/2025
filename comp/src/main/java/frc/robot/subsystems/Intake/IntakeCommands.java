@@ -63,4 +63,13 @@ public class IntakeCommands {
         command.setName("stop both funnel and intake");
         return command;
     }
+
+    public Command intakeHumanPlayer() {
+        var command = Commands.parallel(intakeIn(), funnel.spinInBoth()).until(() -> !intake.isOut())
+                .andThen(stop());
+        command.addRequirements(intake);
+        command.addRequirements(funnel);
+        command.setName("Intake Coral From Human Player");
+        return command;
+    }
 }
