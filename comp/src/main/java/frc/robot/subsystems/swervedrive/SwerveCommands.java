@@ -117,12 +117,8 @@ public class SwerveCommands {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
                 stopMoving(),
-                Commands.print("yo mama is so nice, that she bakes the best brownies whenever im feeling down"),
-
                 new AutoAlignClosest(swerve, this, .4, isRight),
-
                 stopMoving(),
-                Commands.print("brownies whenever im feeling down"),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");
