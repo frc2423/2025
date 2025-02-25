@@ -23,6 +23,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Human Player to L"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Auto Scoral Left"

@@ -153,6 +153,7 @@ public class RobotContainer {
                 m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
                 m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
                 m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
+                m_chooser.addOption("Left Side 2 Piece Auto Left Reef", "Left Side 2 Piece Auto Left Reef");
 
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
@@ -166,10 +167,10 @@ public class RobotContainer {
                 NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
                 NamedCommands.registerCommand("AutoScoral Right",
-                                swerveCommands.autoScoralClosest(true));
+                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, true));
 
                 NamedCommands.registerCommand("AutoScoral Left",
-                                swerveCommands.autoScoralClosest(false));
+                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, false));
 
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
