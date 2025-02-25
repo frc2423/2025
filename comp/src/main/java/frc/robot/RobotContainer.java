@@ -165,6 +165,12 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
+                NamedCommands.registerCommand("AutoScoral Right",
+                                swerveCommands.autoScoralClosest(true));
+
+                NamedCommands.registerCommand("AutoScoral Left",
+                                swerveCommands.autoScoralClosest(false));
+
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here

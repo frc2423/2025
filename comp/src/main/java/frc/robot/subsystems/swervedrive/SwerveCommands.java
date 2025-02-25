@@ -93,6 +93,38 @@ public class SwerveCommands {
         return stopCommand;
     }
 
+    public Command autoScoralClosest(boolean isRight) {
+        Command autoScoreElevatorCommand = new SelectCommand<>(
+                // Maps selector values to commands
+                Map.ofEntries(
+                        Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
+                        Map.entry(ElevatorLevel.L2,
+                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L2)),
+                        Map.entry(ElevatorLevel.L3,
+                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L3)),
+                        Map.entry(ElevatorLevel.L4,
+                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
+
+                this::selectElevatorLevel);
+        var command = Commands.sequence(
+                swerve.centerModulesCommand().withTimeout(.5),
+                new AutoAlignClosest(swerve, this, .8, isRight),
+                stopMoving(),
+                autoScoreElevatorCommand,
+                Commands.waitUntil(() -> {
+                    return elevatorSubsystem.isAtSetpoint();
+                }),
+                stopMoving(),
+                new AutoAlignClosest(swerve, this, .32, isRight),
+                stopMoving(),
+                intakeCommands.intakeOut());
+
+        command.setName("autoScoral");
+        // command.addRequirements(swerve, elevatorSubsystem);
+
+        return command;
+    }
+
     public Command autoScoralClosest(double setpoint, boolean isRight) {
         Command autoScoreElevatorCommand = new SelectCommand<>(
                 // Maps selector values to commands
