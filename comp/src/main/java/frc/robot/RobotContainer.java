@@ -166,11 +166,13 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
+                NamedCommands.registerCommand("Elevator Down", elevator.goDown());
+
                 NamedCommands.registerCommand("AutoScoral Right",
-                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, true));
+                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L3, true));
 
                 NamedCommands.registerCommand("AutoScoral Left",
-                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, false));
+                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L3, false));
                 NamedCommands.registerCommand("Intake Coral From Human Player", intakeCommands.intakeHumanPlayer());
 
                 // Logging callback for the active path, this is sent as a list of poses
@@ -230,12 +232,12 @@ public class RobotContainer {
                                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                .whileTrue(swerveCommands.autoScoralClosest(
                                                 false))
                                 .onFalse(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                .whileTrue(swerveCommands.autoScoralClosest(
                                                 true))
                                 .onFalse(intakeCommands.intakeStop());
 

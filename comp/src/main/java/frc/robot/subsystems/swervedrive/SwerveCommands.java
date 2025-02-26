@@ -117,7 +117,7 @@ public class SwerveCommands {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
                 stopMoving(),
-                new AutoAlignClosest(swerve, this, .32, isRight),
+                new AutoAlignClosest(swerve, this, .45, isRight),
                 stopMoving(),
                 intakeCommands.intakeOut());
 
@@ -128,32 +128,21 @@ public class SwerveCommands {
     }
 
     public Command autoScoralClosest(double setpoint, boolean isRight) {
-        Command autoScoreElevatorCommand = new SelectCommand<>(
-                // Maps selector values to commands
-                Map.ofEntries(
-                        Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
-                        Map.entry(ElevatorLevel.L2,
-                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L2)),
-                        Map.entry(ElevatorLevel.L3,
-                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L3)),
-                        Map.entry(ElevatorLevel.L4,
-                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
 
-                this::selectElevatorLevel);
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
                 new AutoAlignClosest(swerve, this, .8, isRight),
                 stopMoving(),
-                autoScoreElevatorCommand,
+                elevatorSubsystem.goToSetpoint(setpoint),
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
                 stopMoving(),
-                new AutoAlignClosest(swerve, this, .4, isRight),
+                new AutoAlignClosest(swerve, this, .45, isRight),
                 stopMoving(),
-                intakeCommands.intakeOut());
+                intakeCommands.intakeOut().withTimeout(0.5));
 
-        command.setName("autoScoral");
+        command.setName("autoScoralAuto");
         // command.addRequirements(swerve, elevatorSubsystem);
 
         return command;
