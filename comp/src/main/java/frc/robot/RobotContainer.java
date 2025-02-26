@@ -10,6 +10,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -243,7 +244,8 @@ public class RobotContainer {
                                 .onTrue(swerveCommands.lookAtNearestTag());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
-                                .onTrue(intakeCommands.intakeOut());
+                                .onTrue(swerveCommands.autoAlign(Vision.getAprilTagPose(1, new Transform2d()), 0.45,
+                                                0));
 
                 new Trigger(() -> driverXbox.getPOV() == 0)
                                 .onTrue(swerveCommands.lookAtAngle(0));

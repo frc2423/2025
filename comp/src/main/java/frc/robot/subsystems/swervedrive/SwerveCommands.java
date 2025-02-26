@@ -29,8 +29,8 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
 
-    PIDController translationPIDX = new PIDController(3.5, 0, .3);
-    PIDController translationPIDY = new PIDController(3.5, 0, .3);
+    PIDController translationPIDX = new PIDController(1.8, 0, .3);
+    PIDController translationPIDY = new PIDController(1.8, 0, .3);
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -84,6 +84,10 @@ public class SwerveCommands {
     public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
         double y = .178;
         double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
+        return addOffset(pose, distance, offsetY);
+    }
+
+    public Pose2d addOffset(Pose2d pose, double distance, double offsetY) {// robot POV
         Transform2d offset = new Transform2d(distance, offsetY, Rotation2d.kPi);
         Pose2d targetPose = pose.plus(offset);
         return targetPose;
@@ -131,13 +135,13 @@ public class SwerveCommands {
                                                                                // subsystem
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                autoAlign(pose, .8, isRight),
+                autoScoringAlign(pose, .8, isRight),
                 stopMoving(),
                 elevatorSubsystem.goToSetpoint(setpoint),
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
-                autoAlign(pose, .32, isRight),
+                autoScoringAlign(pose, .32, isRight),
                 stopMoving(),
                 intakeCommands.intakeOut());
 
@@ -166,8 +170,8 @@ public class SwerveCommands {
         return command;
     }
 
-    public Command autoAlign(Pose2d pose2d, double dist, boolean isRight) {
-        Pose2d targetPose = addScoringOffset(pose2d, dist, isRight);// .55
+    public Command autoAlign(Pose2d pose2d, double dist, double offsetY) {
+        Pose2d targetPose = addOffset(pose2d, dist, offsetY);
         var command = Commands.run(() -> {
             actuallyMoveTo(targetPose);
         }).until(() -> {
@@ -181,6 +185,12 @@ public class SwerveCommands {
         });
         command.addRequirements(swerve);
         return command;
+    }
+
+    public Command autoScoringAlign(Pose2d pose2d, double dist, boolean isRight) {
+        double y = .178;
+        double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
+        return autoAlign(pose2d, dist, offsetY);
     }
 
     public void actuallyLookAngleButMove(Rotation2d rotation2d) { // here
@@ -230,19 +240,26 @@ public class SwerveCommands {
         double xDistance = Math.abs(pose2d.getX() - swerve.getPose().getX());
         double yDistance = Math.abs(pose2d.getY() - swerve.getPose().getY());
 
+        double MAX_SPEED = 1;
+        double MIN_SPEED = .2;
+
         if (xDistance > 0.0508) {
-            x = Math.copySign(Math.max(.35, Math.abs(x)), x);
+            x = Math.copySign(Math.max(MIN_SPEED, Math.abs(x)), x);
+        } else if (xDistance > 0.308) {
+            x = Math.copySign(Math.max(MIN_SPEED + 0.1, Math.abs(x)), x);
         }
 
         if (yDistance > 0.0508) {
-            y = Math.copySign(Math.max(.35, Math.abs(y)), y);
+            y = Math.copySign(Math.max(MIN_SPEED, Math.abs(y)), y);
+        } else if (yDistance > 0.308) {
+            y = Math.copySign(Math.max(MIN_SPEED + 0.1, Math.abs(y)), y);
         }
 
-        if (Math.abs(x) > 0.6) {
-            x = Math.copySign(0.6, x);
+        if (Math.abs(x) > MAX_SPEED) {
+            x = Math.copySign(MAX_SPEED, x);
         }
         if (Math.abs(y) > 0.6) {
-            y = Math.copySign(0.6, y);
+            y = Math.copySign(MAX_SPEED, y);
         }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
