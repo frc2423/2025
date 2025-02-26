@@ -34,6 +34,7 @@ import frc.robot.subsystems.FunnelSubsystem;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.LED.KwarqsLed;
 import frc.robot.subsystems.Intake.IntakeCommands;
 //import frc.robot.subsystems.ArmSubsystem;
 
@@ -63,8 +64,11 @@ public class RobotContainer {
         FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
+        Vision visionSubsystem = new Vision(null, null);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
+
+        KwarqsLed ledKwarqs = new KwarqsLed(visionSubsystem, driverXbox);
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);

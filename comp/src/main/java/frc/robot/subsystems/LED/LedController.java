@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class LedController {
     private HashMap<String, Led> leds = new HashMap<String, Led>();
-    private AddressableLED led = new AddressableLED(1);
+    private AddressableLED led = new AddressableLED(0);
     private AddressableLEDBuffer ledBuffer;
     private String currentLed;
 

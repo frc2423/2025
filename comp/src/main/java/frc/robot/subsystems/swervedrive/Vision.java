@@ -362,11 +362,12 @@ public class Vision {
     field2d.getObject("tracked targets").setPoses(poses);
   }
 
-  public boolean seesAprilTag(Cameras camera) {
-    if (camera.getLatestResult() != null) {
-      return true;
-    }
-    return false;
+  public boolean seesFrontAprilTag() {
+    System.out.println(Cameras.FRONT_CAM.getLatestResult().toString());
+    System.out.println(Cameras.FRONT_CAM.getLatestResult().isEmpty());
+    System.out.println(Cameras.FRONT_CAM.getLatestResult().isPresent());
+    return Cameras.FRONT_CAM.getLatestResult().isPresent();
+
   }
 
   /**

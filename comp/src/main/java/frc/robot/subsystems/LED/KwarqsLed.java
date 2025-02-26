@@ -7,10 +7,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.NTHelper;
 import frc.robot.subsystems.swervedrive.Vision;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
 
 public class KwarqsLed extends SubsystemBase {
-    private final LedController ledController = new LedController(60); // 36 on each side
+    private final LedController ledController = new LedController(40); // 36 on each side
     private final Vision visionSubsystem;
     private final XboxController xboxController;
 
@@ -86,8 +85,8 @@ public class KwarqsLed extends SubsystemBase {
             ledController.set("rainbow");
         } else {
             // System.out.println("disabled");
-            if (RobotState.isDisabled() && visionSubsystem.seesAprilTag(Vision.Cameras.FRONT_CAM)) {
-                ledController.set("yellow");
+            if (RobotState.isDisabled() && visionSubsystem.seesFrontAprilTag()) {
+                ledController.set("purple");
             } else {
                 ledController.set("dark");
             }
