@@ -362,6 +362,13 @@ public class Vision {
     field2d.getObject("tracked targets").setPoses(poses);
   }
 
+  public boolean seesAprilTag(Cameras camera) {
+    if (camera.getLatestResult() != null) {
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Camera Enum to select each camera
    * 
