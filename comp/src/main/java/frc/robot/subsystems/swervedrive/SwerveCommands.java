@@ -241,18 +241,18 @@ public class SwerveCommands {
         double yDistance = Math.abs(pose2d.getY() - swerve.getPose().getY());
 
         double MAX_SPEED = 1;
-        double MIN_SPEED = .2;
+        double MIN_SPEED = .3;
 
-        if (xDistance > 0.0508) {
+        if (xDistance > 0.308) {
+            x = Math.copySign(Math.max(MIN_SPEED + 0.4, Math.abs(x)), x);
+        } else if (xDistance > 0.0508) {
             x = Math.copySign(Math.max(MIN_SPEED, Math.abs(x)), x);
-        } else if (xDistance > 0.308) {
-            x = Math.copySign(Math.max(MIN_SPEED + 0.1, Math.abs(x)), x);
         }
 
-        if (yDistance > 0.0508) {
+        if (yDistance > 0.308) {
+            y = Math.copySign(Math.max(MIN_SPEED + 0.4, Math.abs(y)), y);
+        } else if (yDistance > 0.0508) {
             y = Math.copySign(Math.max(MIN_SPEED, Math.abs(y)), y);
-        } else if (yDistance > 0.308) {
-            y = Math.copySign(Math.max(MIN_SPEED + 0.1, Math.abs(y)), y);
         }
 
         if (Math.abs(x) > MAX_SPEED) {
