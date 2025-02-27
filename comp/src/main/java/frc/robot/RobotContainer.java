@@ -9,8 +9,6 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,11 +20,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -244,8 +240,7 @@ public class RobotContainer {
                                 .onTrue(swerveCommands.lookAtNearestTag());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
-                                .onTrue(swerveCommands.autoAlign(Vision.getAprilTagPose(1, new Transform2d()), 0.45,
-                                                0));
+                                .onTrue(intakeCommands.intakeOut());
 
                 new Trigger(() -> driverXbox.getPOV() == 0)
                                 .onTrue(swerveCommands.lookAtAngle(0));
