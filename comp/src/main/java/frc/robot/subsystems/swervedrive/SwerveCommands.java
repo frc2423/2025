@@ -3,18 +3,16 @@ package frc.robot.subsystems.swervedrive;
 import java.util.Map;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
@@ -28,9 +26,6 @@ public class SwerveCommands {
 
     private SwerveSubsystem swerve;
     private IntakeCommands intakeCommands;
-
-    PIDController translationPIDX = new PIDController(1.8, 0, .3);
-    PIDController translationPIDY = new PIDController(1.8, 0, .3);
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -179,6 +174,7 @@ public class SwerveCommands {
             double yDistance = Math.abs(targetPose.getY() - swerve.getPose().getY());
             boolean isAngleClose = AngleUtils.areAnglesClose(targetPose.getRotation(), swerve.getPose().getRotation(),
                     Rotation2d.fromDegrees(5));
+
             return xDistance < 0.0508 &&
                     yDistance < 0.0508 &&
                     isAngleClose;
@@ -224,52 +220,69 @@ public class SwerveCommands {
     }
 
     public void actuallyMoveTo(Pose2d pose2d) { // here
-        final double maxRadsPerSecond = 5;
 
-        double x = translationPIDX.calculate(
-                swerve.getPose().getX(), pose2d.getX());
-        if (PoseTransformUtils.isRedAlliance()) {
-            // x *= -1;
-        }
-        double y = translationPIDY.calculate(
-                swerve.getPose().getY(), pose2d.getY());
-        if (PoseTransformUtils.isRedAlliance()) {
-            // y *= -1;
-        }
+        Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
+        Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
 
-        double xDistance = Math.abs(pose2d.getX() - swerve.getPose().getX());
-        double yDistance = Math.abs(pose2d.getY() - swerve.getPose().getY());
+        double xSign = Math.copySign(1, translationDiff.getX());
+        double ySign = Math.copySign(1, translationDiff.getY());
 
-        double MAX_SPEED = 1;
-        double MIN_SPEED = .3;
+        double xDistance = Math.abs(translationDiff.getX());
+        double yDistance = Math.abs(translationDiff.getY());
 
-        if (xDistance > 0.308) {
-            x = Math.copySign(Math.max(MIN_SPEED + 0.4, Math.abs(x)), x);
-        } else if (xDistance > 0.0508) {
-            x = Math.copySign(Math.max(MIN_SPEED, Math.abs(x)), x);
-        }
+        double distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
 
-        if (yDistance > 0.308) {
-            y = Math.copySign(Math.max(MIN_SPEED + 0.4, Math.abs(y)), y);
-        } else if (yDistance > 0.0508) {
-            y = Math.copySign(Math.max(MIN_SPEED, Math.abs(y)), y);
+        double x = 0;
+        double y = 0;
+
+        if (xDistance > .7) {
+            x = Math.copySign(1, xSign);
+        } else if (xDistance > .1) {
+            x = Math.copySign(.5, xSign);
+        } else if (xDistance > .05) {
+            x = Math.copySign(.35, xSign);
+        } else if (xDistance > .03) {
+            x = Math.copySign(.3, xSign);
+        } else {
+            x = 0;
         }
 
-        if (Math.abs(x) > MAX_SPEED) {
-            x = Math.copySign(MAX_SPEED, x);
+        if (yDistance > .7) {
+            y = Math.copySign(1, ySign);
+        } else if (yDistance > .1) {
+            y = Math.copySign(.5, ySign);
+        } else if (yDistance > .05) {
+            y = Math.copySign(.35, ySign);
+        } else if (yDistance > .03) {
+            y = Math.copySign(.3, ySign);
+        } else {
+            y = 0;
         }
-        if (Math.abs(y) > 0.6) {
-            y = Math.copySign(MAX_SPEED, y);
+
+        //
+        if (yDistance > .5) {
+            x *= .75;
+        }
+
+        if (distance < .1) {
+            if (Math.abs(x) > .508) {
+                y = 0;
+            } else if (Math.abs(y) > .508) {
+                x = 0;
+            }
         }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
                 pose2d.getRotation());
 
+        final double maxRadsPerSecond = 5;
+
         if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
-            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
+            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
+                    desiredSpeeds.omegaRadiansPerSecond);
         }
 
-        swerve.driveFieldOriented(desiredSpeeds);
+        swerve.drive(desiredSpeeds);
     }
 
     // public Command lookAtTarget(Pose2d targetAngle, Rotation2d offset) { // to
