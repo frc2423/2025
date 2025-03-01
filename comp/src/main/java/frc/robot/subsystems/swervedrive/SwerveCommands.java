@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.AngleUtils;
@@ -25,6 +26,7 @@ import frc.robot.Constants.OperatorConstants;
 public class SwerveCommands {
 
     private SwerveSubsystem swerve;
+    private ArmSubsystem armSubsystem;
     private IntakeCommands intakeCommands;
 
     private ElevatorSubsystem elevatorSubsystem;
@@ -34,10 +36,11 @@ public class SwerveCommands {
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands) {
+            IntakeCommands intakeCommands, ArmSubsystem armSubsystem) {
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
+        this.armSubsystem = armSubsystem;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
     }
 
@@ -115,6 +118,7 @@ public class SwerveCommands {
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
+                armSubsystem.goScore(),
                 // stopMoving(),
                 // new AutoAlignClosest(swerve, this, .4, isRight),
                 // stopMoving(),

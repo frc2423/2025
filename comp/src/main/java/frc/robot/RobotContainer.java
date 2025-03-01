@@ -61,7 +61,7 @@ public class RobotContainer {
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
 
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);

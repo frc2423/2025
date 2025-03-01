@@ -23,6 +23,7 @@ public class ArmSubsystem extends SubsystemBase {
     private double scoringWheelSpeed = 0;
     private double armCurrentPose = 0;
     private double maximum = 0; // some value
+    private double scorePos = -6;
     private double minumum = -13.8; // some value
     private double setpoint = 0;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
@@ -77,6 +78,10 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command goUp() { // for manual control, sick
         return goToSetpoint(maximum);
+    }
+
+    public Command goScore() {
+        return goToSetpoint(scorePos);
     }
 
     public Command goToSetpoint(double position) {
