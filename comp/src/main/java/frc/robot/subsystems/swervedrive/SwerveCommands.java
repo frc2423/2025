@@ -109,15 +109,15 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                new AutoAlignClosest(swerve, this, .8, isRight),
+                new AutoAlignClosest(swerve, this, 0.4, isRight),
                 stopMoving(),
                 autoScoreElevatorCommand,
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
                 }),
-                stopMoving(),
-                new AutoAlignClosest(swerve, this, .4, isRight),
-                stopMoving(),
+                // stopMoving(),
+                // new AutoAlignClosest(swerve, this, .4, isRight),
+                // stopMoving(),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");

@@ -22,7 +22,7 @@ public class ArmSubsystem extends SubsystemBase {
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double armCurrentPose = 0;
-    private double maximum = 1.9; // some value
+    private double maximum = 0; // some value
     private double minumum = -13.8; // some value
     private double setpoint = 0;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
@@ -114,7 +114,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isInSafeArea() {
-        if (armCurrentPose > -7 && armCurrentPose < -5.02) {
+        if (armCurrentPose < 0 && armCurrentPose > -3) {
             return true;
         } else {
             return false;
