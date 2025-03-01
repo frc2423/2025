@@ -1,6 +1,7 @@
 
 package frc.robot.subsystems.swervedrive;
 
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,8 +39,13 @@ public class AutoAlignClosest extends Command {
 
         double xDistance = Math.abs(targetPose.getX() - swerve.getPose().getX());
         double yDistance = Math.abs(targetPose.getY() - swerve.getPose().getY());
-        boolean isAngleClose = AngleUtils.areAnglesClose(targetPose.getRotation(), swerve.getPose().getRotation(),
-                Rotation2d.fromDegrees(5));
+        MedianFilter targetMedianFilter = new MedianFilter(5);
+        MedianFilter medianFilter = new MedianFilter(5);
+        double averageTargetPose = targetMedianFilter.calculate(targetPose.getRotation().getRadians());
+        double averageSwervePose = medianFilter.calculate(swerve.getPose().getRotation().getRadians());
+        boolean isAngleClose = AngleUtils.areAnglesClose(new Rotation2d(averageTargetPose),
+                new Rotation2d(averageSwervePose),
+                Rotation2d.fromDegrees(1));
 
         return xDistance < 0.0508 &&
                 yDistance < 0.0508 &&
