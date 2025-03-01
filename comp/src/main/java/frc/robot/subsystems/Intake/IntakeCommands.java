@@ -46,7 +46,7 @@ public class IntakeCommands {
     }
 
     public Command in() {
-        var command = Commands.parallel(intakeIn(), funnel.spinInBoth()).until(() -> !intake.isOut())
+        var command = Commands.parallel(intakeIn(), funnel.spinIn()).until(() -> !intake.isOut())
                 .andThen(stop());
         command.addRequirements(intake);
         command.addRequirements(funnel);
@@ -65,7 +65,7 @@ public class IntakeCommands {
     }
 
     public Command intakeHumanPlayer() {
-        var command = Commands.parallel(intakeIn(), funnel.spinInBoth()).until(() -> !intake.isOut())
+        var command = Commands.parallel(intakeIn(), funnel.spinIn()).until(() -> !intake.isOut())
                 .andThen(stop());
         command.addRequirements(intake);
         command.addRequirements(funnel);
