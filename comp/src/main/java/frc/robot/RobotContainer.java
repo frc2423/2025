@@ -150,6 +150,7 @@ public class RobotContainer {
                 m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
                 m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
                 m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
+                m_chooser.addOption("Left Side 2 Piece Auto Left Reef", "Left Side 2 Piece Auto Left Reef");
 
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
@@ -162,6 +163,13 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
+                NamedCommands.registerCommand("Elevator Down", elevator.goDown());
+
+                NamedCommands.registerCommand("AutoScoral Right",
+                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L3, true));
+
+                NamedCommands.registerCommand("AutoScoral Left",
+                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L3, false));
                 NamedCommands.registerCommand("Intake Coral From Human Player", intakeCommands.intakeHumanPlayer());
 
                 // Logging callback for the active path, this is sent as a list of poses
@@ -221,12 +229,12 @@ public class RobotContainer {
                                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                .whileTrue(swerveCommands.autoScoralClosest(
                                                 false))
                                 .onFalse(intakeCommands.intakeStop());
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                .whileTrue(swerveCommands.autoScoralClosest(
                                                 true))
                                 .onFalse(intakeCommands.intakeStop());
 
@@ -279,6 +287,9 @@ public class RobotContainer {
                 new JoystickButton(operator, XboxController.Button.kB.value)
                                 .whileTrue(climberSubsystem.deClimb());
 
+                new JoystickButton(operator, XboxController.Button.kStart.value)
+                                .whileTrue(elevator.zeroElevator());
+
                 new JoystickButton(operator, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.in());
 
@@ -300,8 +311,7 @@ public class RobotContainer {
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
                 // .onTrue(elevator.goLittleDown(1));
-                new JoystickButton(operator, XboxController.Button.kBack.value)
-                                .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
+                new JoystickButton(operator, XboxController.Button.kBack.value).onTrue(elevator.setPoseToZero());// .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
 
                 // .onTrue(elevator.goLittleUp(1));
 

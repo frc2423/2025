@@ -34,6 +34,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double highestPoint = 63.5;
     private double lowestPoint = 0.00;
     private final double MAX_VOLTAGE = 0.9;
+    private boolean zeroing = false;
 
     private ElevatorSim elevatorSim = new ElevatorSim();
 
@@ -70,6 +71,20 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        if (zeroing == true) {
+            if (motor1.getEncoder().getVelocity() > .01) {
+                motor1.set(.01);
+                motor2.set(-.01);
+            } else {
+                motor1.stopMotor();
+                motor2.stopMotor();
+                motor1.getEncoder().setPosition(0);
+                motor2.getEncoder().setPosition(0);
+                zeroing = false;
+            }
+            return;
+        }
+
         elevatorCurrentPose = motor1.getEncoder().getPosition();
         calculatedPID = calculatePid(setpoint);
 
@@ -112,6 +127,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
         return (feedforward + pid) / RobotController.getBatteryVoltage(); // +pid
+    }
+
+    public Command zeroElevator() {
+        return runOnce(() -> {
+            zeroing = true;
+        }).withName("zeroing elevator");
     }
 
     public Command goDown() { // for manual control, sick
@@ -158,6 +179,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command stopElevator() { // for manual control, sick
         return runOnce(() -> {
             setSetpoint(elevatorCurrentPose);
+        });
+    }
+
+    public Command setPoseToZero() {
+        return runOnce(() -> {
+            motor1.getEncoder().setPosition(0);
+            motor2.getEncoder().setPosition(0);
         });
     }
 
