@@ -22,7 +22,7 @@ public class ArmSubsystem extends SubsystemBase {
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double armCurrentPose = 0;
-    private double maximum = -0.35; // some value
+    private double maximum = 0; // some value
     private double minumum = -13.8; // some value
     private double setpoint = 0;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
@@ -31,6 +31,10 @@ public class ArmSubsystem extends SubsystemBase {
     double calculatedPID = 0;
 
     ProfiledPIDController arm_PID = new ProfiledPIDController(4, 0, 0, new TrapezoidProfile.Constraints(100, 100));
+
+    public ArmSubsystem() {
+        armPivot.getEncoder().setPosition(0);
+    }
 
     @Override
     public void periodic() {
@@ -104,7 +108,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     private void setSetpoint(double position) {
-        if (position < maximum && position > minumum) {
+        if (position <= maximum && position >= minumum) {
             setpoint = position;
         }
     }
