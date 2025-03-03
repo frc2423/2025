@@ -4,6 +4,7 @@ package frc.robot.subsystems.swervedrive;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.AngleUtils;
 import frc.robot.NTHelper;
@@ -15,10 +16,11 @@ public class AutoAlignClosest extends Command {
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
 
-    MedianFilter xDistanceFilter = new MedianFilter(5);
-    MedianFilter yDistanceFilter = new MedianFilter(5);
-    MedianFilter targetAngleFilter = new MedianFilter(5);
-    MedianFilter swerveAngleFilter = new MedianFilter(5);
+    private final static int FILTER_SIZE = 10;
+    MedianFilter xDistanceFilter = new MedianFilter(FILTER_SIZE);
+    MedianFilter yDistanceFilter = new MedianFilter(FILTER_SIZE);
+    MedianFilter targetAngleFilter = new MedianFilter(FILTER_SIZE);
+    MedianFilter swerveAngleFilter = new MedianFilter(FILTER_SIZE);
 
     public AutoAlignClosest(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
         this.isRight = isRight;
@@ -34,7 +36,7 @@ public class AutoAlignClosest extends Command {
         yDistanceFilter.reset();
         targetAngleFilter.reset();
         swerveAngleFilter.reset();
-        for (double i = 0; i < 5; i++) {
+        for (double i = 0; i < FILTER_SIZE; i++) {
             xDistanceFilter.calculate(100000);
             yDistanceFilter.calculate(100000);
             targetAngleFilter.calculate(100000);
@@ -59,10 +61,10 @@ public class AutoAlignClosest extends Command {
         double averageSwervePose = swerveAngleFilter.calculate(swerve.getPose().getRotation().getRadians());
         boolean isAngleClose = AngleUtils.areAnglesClose(new Rotation2d(averageTargetPose),
                 new Rotation2d(averageSwervePose),
-                Rotation2d.fromDegrees(1));
+                Rotation2d.fromDegrees(4));
 
-        return averageXDistance < 0.0508 &&
-                averageYDistance < 0.0508 &&
+        return averageXDistance < Units.inchesToMeters(2) &&
+                averageYDistance < Units.inchesToMeters(2) &&
                 isAngleClose;
     }
 }
