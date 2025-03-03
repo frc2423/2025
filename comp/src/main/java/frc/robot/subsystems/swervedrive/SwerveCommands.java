@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.AngleUtils;
@@ -25,6 +26,7 @@ import frc.robot.Constants.OperatorConstants;
 public class SwerveCommands {
 
     private SwerveSubsystem swerve;
+    private ArmSubsystem armSubsystem;
     private IntakeCommands intakeCommands;
 
     private ElevatorSubsystem elevatorSubsystem;
@@ -34,10 +36,11 @@ public class SwerveCommands {
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands) {
+            IntakeCommands intakeCommands, ArmSubsystem armSubsystem) {
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
+        this.armSubsystem = armSubsystem;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
     }
 
@@ -141,15 +144,22 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                new AutoAlignClosest(swerve, this, .8, isRight),
+                new AutoAlignClosest(swerve, this, 0.8, isRight),
                 stopMoving(),
-                autoScoreElevatorCommand,
-                Commands.waitUntil(() -> {
-                    return elevatorSubsystem.isAtSetpoint();
-                }),
-                stopMoving(),
-                new AutoAlignClosest(swerve, this, .4, isRight),
-                stopMoving(),
+                Commands.parallel(
+                        Commands.sequence(
+                                autoScoreElevatorCommand,
+                                Commands.waitUntil(() -> {
+                                    return elevatorSubsystem.isAtSetpoint();
+                                }),
+                                armSubsystem.goScore()),
+                        Commands.sequence(
+                                swerve.centerModulesCommand().withTimeout(.3),
+                                new AutoAlignClosest(swerve, this, 0.4, isRight),
+                                stopMoving())),
+                // stopMoving(),
+                // new AutoAlignClosest(swerve, this, .4, isRight),
+                // stopMoving(),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");
@@ -268,41 +278,44 @@ public class SwerveCommands {
         double y = 0;
 
         if (xDistance > .7) {
-            x = Math.copySign(1, xSign);
-        } else if (xDistance > .1) {
-            x = Math.copySign(.5, xSign);
+            x = Math.copySign(.6, xSign);
+        } else if (xDistance > .3) {
+            x = Math.copySign(.6, xSign);
         } else if (xDistance > .05) {
-            x = Math.copySign(.35, xSign);
+            x = Math.copySign(.4, xSign);
         } else if (xDistance > .03) {
-            x = Math.copySign(.3, xSign);
+            x = Math.copySign(.35, xSign);
         } else {
             x = 0;
         }
 
         if (yDistance > .7) {
-            y = Math.copySign(1, ySign);
-        } else if (yDistance > .1) {
-            y = Math.copySign(.5, ySign);
+            y = Math.copySign(.6, ySign);
+        } else if (yDistance > .3) {
+            y = Math.copySign(.6, ySign);
         } else if (yDistance > .05) {
-            y = Math.copySign(.35, ySign);
+            y = Math.copySign(.4, ySign);
         } else if (yDistance > .03) {
-            y = Math.copySign(.3, ySign);
+            y = Math.copySign(.35, ySign);
         } else {
             y = 0;
         }
 
         //
-        if (yDistance > .5) {
-            x *= .75;
-        }
+        // if (yDistance > .5) {
+        // x *= .75;
+        // }
 
-        if (distance < .1) {
-            if (Math.abs(x) > .508) {
-                y = 0;
-            } else if (Math.abs(y) > .508) {
-                x = 0;
-            }
-        }
+        // if (distance < .2) {
+        // if (xDistance > Units.inchesToMeters(2)) {
+        // y = 0;
+        // } else {
+        // x = 0;
+        // }
+        // if (yDistance < Units.inchesToMeters(2)) {
+        // y = 0;
+        // }
+        // }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
                 pose2d.getRotation());
