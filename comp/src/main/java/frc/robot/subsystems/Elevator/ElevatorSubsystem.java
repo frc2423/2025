@@ -35,37 +35,24 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double lowestPoint = 0.00;
     private final double MAX_VOLTAGE = 0.9;
 
-    private ElevatorSim elevatorSim = new ElevatorSim();
-
-    // the main mechanism object
-    private Mechanism2d mech = new Mechanism2d(10, 100);
-    // the mechanism root node
-    private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
-
+    private ElevatorSimulation elevatorSim = new ElevatorSimulation(motor1);
     private ArmSubsystem arm;
 
     double calculatedPID = 0;
-
-    // private final FlywheelSim elevatorSimMotor = new
-    // FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
-
-    // MechanismLigament2d objects represent each "section"/"stage" of the
-    // mechanism, and are based
-    // off the root node or another ligament object
-    MechanismLigament2d elevator = root.append(new MechanismLigament2d("elevator", lowestPoint, 90));
-    MechanismLigament2d bottom = elevator.append(
-            new MechanismLigament2d("bottom", 5, 0, 6, new Color8Bit(Color.kBlanchedAlmond)));
 
     public ElevatorSubsystem(ArmSubsystem arm) {
         this.arm = arm;
         motor1.getEncoder().setPosition(0);
         motor2.getEncoder().setPosition(0);
 
-        // post the mechanism to the dashboard
-        SmartDashboard.putData("Mech2d", mech);
         // elevatorSimMotor.setInput(0);
 
         elevator_PID.setTolerance(3);
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        elevatorSim.simPeriodic();
     }
 
     @Override
@@ -85,24 +72,18 @@ public class ElevatorSubsystem extends SubsystemBase {
             calculatedPID = Math.max(calculatedPID, 0);
         }
 
-        if (Robot.isSimulation()) {
-            elevatorSim.periodic();
-            elevator.setLength(50);
-            bottom.setLength(elevatorSim.getHeight());
-        }
-
         if (elevatorCurrentPose < 7) {
-
             calculatedPID = Math.max(-.1, calculatedPID);
-
         }
 
-        if (!arm.isInSafeArea()) {
+        if (!arm.isInSafeArea() && !Robot.isSimulation()) {
             calculatedPID = 0;
         }
 
         motor1.set(calculatedPID);
         motor2.set(-calculatedPID);
+
+        elevatorSim.periodic();
     }
 
     private double calculatePid(double position) {
@@ -189,7 +170,11 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         builder.addDoubleProperty("calculatePid", () -> calculatedPID, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
-        builder.addDoubleProperty("height", this::getHeight, null);
+        builder.addDoubleProperty("encoderPosition", this::getHeight, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
+
+        if (Robot.isSimulation()) {
+            elevatorSim.initSendable(builder);
+        }
     }
 }
