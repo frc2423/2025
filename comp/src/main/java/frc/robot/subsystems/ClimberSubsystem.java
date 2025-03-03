@@ -5,7 +5,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -14,18 +13,22 @@ public class ClimberSubsystem extends SubsystemBase {
     private double speed = .1;
 
     public ClimberSubsystem() {
-        motor1.getEncoder().setPosition(0);
         setDefaultCommand(climbStop());
     }
 
     public void periodic() {
-        if (Math.abs(setpoint - motor1.getEncoder().getPosition()) < .1) {
+        double position = getPosition();
+        if (Math.abs(setpoint - position) < .01) {
             motor1.set(0);
-        } else if (motor1.getEncoder().getPosition() < setpoint) {
-            motor1.set(-speed);
-        } else if (motor1.getEncoder().getPosition() > setpoint) {
+        } else if (position < setpoint) {
             motor1.set(speed);
+        } else if (position > setpoint) {
+            motor1.set(-speed);
         }
+    }
+
+    public double getPosition() {
+        return motor1.getAbsoluteEncoder().getPosition();
     }
 
     private void setSetpoint(double inputposition, double inputspeed) {
@@ -33,17 +36,9 @@ public class ClimberSubsystem extends SubsystemBase {
         speed = inputspeed;
     }
 
-    // private void go(double speed) {
-    // motor1.set(speed);
-    // }
-
-    // private void stop() { // for manual control, sick
-    // motor1.set(0);
-    // }
-
     public Command climb() {
         var command = run(() -> {
-            setSetpoint(0, .1);
+            setSetpoint(.106, 1);
         });
         command.setName("Climber going up");
         return command;
@@ -51,21 +46,21 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command deClimb() {
         var command = run(() -> {
-            setSetpoint(0, .1);
+            setSetpoint(.54, 1);
         });
         command.setName("Climber going down");
         return command;
     }
 
     public Command climbStop() {
-        var command = run(() -> setSetpoint(motor1.getEncoder().getPosition(), 0));
+        var command = run(() -> setSetpoint(getPosition(), 0));
         command.setName("Climber Stop");
         return command;
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
-        builder.addDoubleProperty("climbPose", () -> motor1.getAbsoluteEncoder().getPosition(), null);
+        builder.addDoubleProperty("climbPose", () -> getPosition(), null);
         builder.addDoubleProperty("climbSetpoint", () -> setpoint, null);
         builder.addDoubleProperty("climbSpeed", () -> speed, null);
     } // -147.353760 start /
