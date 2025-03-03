@@ -255,13 +255,11 @@ public class RobotContainer {
                 new Trigger(() -> driverXbox.getPOV() == 45)
                                 .onTrue(swerveCommands.lookAtAngle(300));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                // .onTrue(elevator.goDown());
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(elevator.goDown());
 
-                new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(elevator.goUp());
+                // new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                // .onTrue(elevator.goUp());
 
         }
 

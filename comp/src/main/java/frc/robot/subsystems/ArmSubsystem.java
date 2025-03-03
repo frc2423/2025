@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class ArmSubsystem extends SubsystemBase {
@@ -23,7 +24,6 @@ public class ArmSubsystem extends SubsystemBase {
     private double scoringWheelSpeed = 0;
     private double armCurrentPose = 0;
     private double maximum = 0; // some value
-    private double scorePos = -6;
     private double minumum = -13.8; // some value
     private double setpoint = 0;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
@@ -81,7 +81,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command goScore() {
-        return goToSetpoint(scorePos);
+        return goToSetpoint(Constants.ArmConstants.SCORING_POSITION);
     }
 
     public Command goToSetpoint(double position) {
