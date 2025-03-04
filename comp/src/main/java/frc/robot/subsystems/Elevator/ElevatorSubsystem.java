@@ -19,14 +19,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.Arm.ArmSubsystem;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = 120;
     private double maxAccel = 180;
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0,
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
-    private double elevatorCurrentPose = 0;
+    private double encoderPosition = 0;
     private double setpoint = 0;
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.015, 0, 0);
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
@@ -35,43 +35,30 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double lowestPoint = 0.00;
     private final double MAX_VOLTAGE = 1.1;
 
-    private ElevatorSim elevatorSim = new ElevatorSim();
-
-    // the main mechanism object
-    private Mechanism2d mech = new Mechanism2d(10, 100);
-    // the mechanism root node
-    private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
-
+    private ElevatorSimulation elevatorSim = new ElevatorSimulation(motor1);
     private ArmSubsystem arm;
 
     double elevatorVoltage = 0;
     double calculatedPid = 0;
-
-    // private final FlywheelSim elevatorSimMotor = new
-    // FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
-
-    // MechanismLigament2d objects represent each "section"/"stage" of the
-    // mechanism, and are based
-    // off the root node or another ligament object
-    MechanismLigament2d elevator = root.append(new MechanismLigament2d("elevator", lowestPoint, 90));
-    MechanismLigament2d bottom = elevator.append(
-            new MechanismLigament2d("bottom", 5, 0, 6, new Color8Bit(Color.kBlanchedAlmond)));
 
     public ElevatorSubsystem(ArmSubsystem arm) {
         this.arm = arm;
         motor1.getEncoder().setPosition(0);
         motor2.getEncoder().setPosition(0);
 
-        // post the mechanism to the dashboard
-        SmartDashboard.putData("Mech2d", mech);
         // elevatorSimMotor.setInput(0);
 
         elevator_PID.setTolerance(3);
     }
 
     @Override
+    public void simulationPeriodic() {
+        elevatorSim.simPeriodic();
+    }
+
+    @Override
     public void periodic() {
-        elevatorCurrentPose = motor1.getEncoder().getPosition();
+        encoderPosition = motor1.getEncoder().getPosition();
         calculatedPid = calculatePid(setpoint);
         elevatorVoltage = calculatedPid;
 
@@ -81,35 +68,29 @@ public class ElevatorSubsystem extends SubsystemBase {
             elevatorVoltage = -MAX_VOLTAGE;
         }
 
-        if (elevatorCurrentPose > highestPoint) {
+        if (encoderPosition > highestPoint) {
             elevatorVoltage = Math.min(elevatorVoltage, 0);
-        } else if (elevatorCurrentPose < lowestPoint) {
+        } else if (encoderPosition < lowestPoint) {
             elevatorVoltage = Math.max(elevatorVoltage, 0);
         }
 
-        if (Robot.isSimulation()) {
-            elevatorSim.periodic();
-            elevator.setLength(50);
-            bottom.setLength(elevatorSim.getHeight());
-        }
-
-        if (elevatorCurrentPose < 7) {
-
+        if (encoderPosition < 7) {
             elevatorVoltage = Math.max(-.1, elevatorVoltage);
-
         }
 
-        if (!arm.isInSafeArea()) {
+        if (!arm.isInSafeArea() && !Robot.isSimulation()) {
             elevatorVoltage = m_feedforward.calculate(0, 0);
         }
 
         motor1.set(elevatorVoltage);
         motor2.set(-elevatorVoltage);
+
+        elevatorSim.periodic();
     }
 
     private double calculatePid(double position) {
         // updatePivotAngle();
-        double pid = elevator_PID.calculate(elevatorCurrentPose, position);
+        double pid = elevator_PID.calculate(encoderPosition, position);
         var setpoint = elevator_PID.getSetpoint();
 
         double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
@@ -134,14 +115,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command goLittleUp(double constant) {
         // for manual control, sick
         return runOnce(() -> {
-            setSetpoint(elevatorCurrentPose + constant);
+            setSetpoint(encoderPosition + constant);
         });
     }
 
     public Command goLittleDown(double constant) {
         // for manual control, sick
         return runOnce(() -> {
-            setSetpoint(elevatorCurrentPose - constant);
+            setSetpoint(encoderPosition - constant);
         });
     }
 
@@ -159,7 +140,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command stopElevator() { // for manual control, sick
         return runOnce(() -> {
-            setSetpoint(elevatorCurrentPose);
+            setSetpoint(encoderPosition);
         });
     }
 
@@ -171,18 +152,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         setpoint = 0;
     }
 
-    public double getHeight() {
-        return elevatorCurrentPose;
+    public double getEncoderPosition() {
+        return encoderPosition;
     }
 
     public boolean isAtSetpoint() {
-        return (Math.abs(getHeight() - setpoint) < 2);
+        return (Math.abs(getEncoderPosition() - setpoint) < 2);
         // return elevator_PID.atGoal();
     }
-
-    // public double getHeightSim() {
-
-    // }
 
     @Override
     public void initSendable(SendableBuilder builder) {
@@ -192,7 +169,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         builder.addDoubleProperty("elevatorVoltage", () -> elevatorVoltage, null);
         builder.addDoubleProperty("calculatedPid", () -> calculatedPid, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
-        builder.addDoubleProperty("height", this::getHeight, null);
+        builder.addDoubleProperty("encoderPosition", this::getEncoderPosition, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
+
+        if (Robot.isSimulation()) {
+            elevatorSim.initSendable(builder);
+        }
     }
 }
