@@ -43,7 +43,6 @@ import frc.robot.subsystems.Intake.IntakeCommands;
  * trigger mappings) should be declared here.
  */
 public class RobotContainer {
-
         // Replace with CommandPS4Controller or CommandJoystick if needed
         // final CommandXboxController driverXbox = new CommandXboxController(0);
         XboxController driverXbox = new XboxController(0);

@@ -1,0 +1,116 @@
+{
+  "hubs": [
+    {
+      "x": -7,
+      "y": -7,
+      "width": 1386,
+      "height": 929,
+      "state": {
+        "sidebar": {
+          "width": 300,
+          "expanded": [
+            "/SmartDashboard/intakeSubsystewm",
+            "/robotPose",
+            "/pivotPose"
+          ]
+        },
+        "tabs": {
+          "selected": 2,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "9t7a34e0cz4ptrkk04c666d1mor8bq7v",
+              "renderer": "#/",
+              "controlsHeight": 0
+            },
+            {
+              "type": 1,
+              "title": "Line Graph",
+              "controller": {
+                "leftSources": [],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "tzvcgsscbvhdgdz5li2vh393oi1dufil",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/robotPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "model": "Quaken"
+                    }
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/pivotPose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "component",
+                    "logKey": "NT:/elevator1Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {}
+                  }
+                ],
+                "game": "Axes",
+                "origin": "blue"
+              },
+              "controllerUUID": "v86eyx3x2n50799zhm1h2wtf3khlhpol",
+              "renderer": {
+                "cameraIndex": -1,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  7.853919409348417,
+                  1.0321271601465947,
+                  -6.321286128867383
+                ],
+                "cameraTarget": [
+                  7.706170277784119,
+                  0.632026147720821,
+                  -3.751265163591262
+                ]
+              },
+              "controlsHeight": 317
+            },
+            {
+              "type": 7,
+              "title": "Video",
+              "controller": null,
+              "controllerUUID": "s322ritf6u8im1ruu75cdbogl1i2gsla",
+              "renderer": null,
+              "controlsHeight": 85
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "4.1.2"
+}
