@@ -15,7 +15,6 @@ public class RobotContainer {
   
   public RobotContainer() {
     Pose3d pose = new Pose3d(0, 0, 0, new Rotation3d());
-    Rotation3d pose45pitch = new Rotation3d(0, 45, 0);
     NTHelper.setPose3d("/robotPose", pose);
     NTHelper.setDouble("/tuning/robotX", 0);
     NTHelper.setDouble("/tuning/robotY", 0);
@@ -49,5 +48,8 @@ public class RobotContainer {
       }
     }
     NTHelper.setPose3d("/pivotPose", new Pose3d(0, 0, 0, new Rotation3d(0, Math.toRadians(currentArmPitch), 0)));
+    
+    NTHelper.setPose3d("/elevator1Pose", new Pose3d(0, 0,0, new Rotation3d()));
+    NTHelper.setPose3d("/elevator2Pose", new Pose3d(0, 0,0, new Rotation3d()));
   }
 }
