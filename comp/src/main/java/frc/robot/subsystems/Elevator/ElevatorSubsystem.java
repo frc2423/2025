@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.Constants.SetpointConstants;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = 120;
@@ -28,13 +29,15 @@ public class ElevatorSubsystem extends SubsystemBase {
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double elevatorCurrentPose = 0;
     private double setpoint = 0;
+    private static final double[] coralHeights = { SetpointConstants.REEF_L2, SetpointConstants.REEF_L3,
+            SetpointConstants.REEF_L4 };
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.015, 0, 0);
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 63.5;
     private double lowestPoint = 0.00;
     private final double MAX_VOLTAGE = 1.1;
-
+    private double offset = 0;
     private ElevatorSim elevatorSim = new ElevatorSim();
 
     // the main mechanism object
@@ -145,9 +148,28 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
+    public Command commitOffset() {
+        return runOnce(() -> {
+            double smallest_dist = highestPoint;
+            for (double levelHeight : coralHeights) {
+                double dist = getHeight() - levelHeight;
+                if (smallest_dist > dist) {
+                    smallest_dist = dist;
+                }
+            }
+            offset = smallest_dist;
+        });
+    }
+
+    public Command resetOffset() {
+        return runOnce(() -> {
+            offset = 0;
+        });
+    }
+
     public Command goToSetpoint(double position) {
         return Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
-            setSetpoint(position);
+            setSetpoint(position + offset);
         }));
     }
 
@@ -194,5 +216,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("height", this::getHeight, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
+        builder.addDoubleProperty("offset", () -> offset, null);
     }
 }

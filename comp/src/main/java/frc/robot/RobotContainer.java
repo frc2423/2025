@@ -170,6 +170,8 @@ public class RobotContainer {
                         // Do whatever you want with the poses here
                         drivebase.getSwerveDrive().field.getObject("AutoAlignPath").setPoses(poses);
                 });
+
+                SmartDashboard.putData("myAwesomeCommand", elevator.commitOffset());
         }
 
         /**
@@ -298,11 +300,12 @@ public class RobotContainer {
 
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
-                // .onTrue(elevator.goLittleDown(1));
+                new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
+                                .onTrue(elevator.goLittleDown(1));
+                new JoystickButton(operator, XboxController.Button.kRightBumper.value)
+                                .onTrue(elevator.goLittleUp(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
                                 .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
-
-                // .onTrue(elevator.goLittleUp(1));
 
                 new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));
                 new JoystickButton(operator, XboxController.Button.kLeftBumper.value).onTrue(elevator.goLittleDown(1));
