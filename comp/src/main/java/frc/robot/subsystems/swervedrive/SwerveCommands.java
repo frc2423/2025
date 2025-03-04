@@ -112,7 +112,7 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                new AutoAlignClosest(swerve, this, 0.8, isRight),
+                new Align(swerve, this, 0.8, isRight),
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
@@ -123,7 +123,7 @@ public class SwerveCommands {
                                 armSubsystem.goScore()),
                         Commands.sequence(
                                 swerve.centerModulesCommand().withTimeout(.3),
-                                new AutoAlignClosest(swerve, this, 0.4, isRight),
+                                new AutoAlignForReal(swerve, this, 0.4, isRight),
                                 stopMoving())),
                 // stopMoving(),
                 // new AutoAlignClosest(swerve, this, .4, isRight),
