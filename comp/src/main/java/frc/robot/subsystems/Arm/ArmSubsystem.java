@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Arm;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.subsystems.Arm.ArmSimulation;
+import frc.robot.subsystems.Elevator.ElevatorSimulation;
 
 public class ArmSubsystem extends SubsystemBase {
 
@@ -30,6 +32,8 @@ public class ArmSubsystem extends SubsystemBase {
     private double MAX_VOLTAGE = 0.9;
 
     double calculatedPID = 0;
+
+    private ArmSimulation armSim = new ArmSimulation(armPivot);
 
     ProfiledPIDController arm_PID = new ProfiledPIDController(4, 0, 0, new TrapezoidProfile.Constraints(100, 100));
 
@@ -54,13 +58,13 @@ public class ArmSubsystem extends SubsystemBase {
             calculatedPID = Math.max(calculatedPID, 0);
         }
 
-        if (Robot.isSimulation()) {
-
-        }
-
         armPivot.set(calculatedPID);
         // scoringWheelMotor.set(scoringWheelSpeed);
+    }
 
+    @Override
+    public void simulationPeriodic() {
+        armSim.simPeriodic();
     }
 
     private double calculatePid(double position) {
@@ -141,5 +145,8 @@ public class ArmSubsystem extends SubsystemBase {
         builder.addDoubleProperty("scoringWheelSpeed", () -> scoringWheelSpeed, null);
         builder.addBooleanProperty("isInSafeArea", () -> isInSafeArea(), null);
 
+        if (Robot.isSimulation()) {
+            armSim.initSendable(builder);
+        }
     }
 }

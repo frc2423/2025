@@ -37,7 +37,7 @@ public class ElevatorSimulation {
             0);
 
     // the main mechanism object
-    private Mechanism2d mech = new Mechanism2d(10, 100);
+    private Mechanism2d mech = new Mechanism2d(100, 100);
     // the mechanism root node
     private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
 
