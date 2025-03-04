@@ -278,50 +278,46 @@ public class SwerveCommands {
 
         double x = 0;
         double y = 0;
-        if (xDistance > 0.8999999) {
-            x = Math.copySign(1, xSign);
-        } else if (xDistance > .7) {
-            x = Math.copySign(0.7, xSign);
+
+        if (xDistance > .7) {
+            x = Math.copySign(.6, xSign);
         } else if (xDistance > .3) {
-            x = Math.copySign(.55, xSign);
-        } else if (xDistance < .3 && xDistance > 0.05) {
-            x = MathUtil.interpolate(0.45, .55, (xDistance - 0.05) / 0.25);
+            x = Math.copySign(.6, xSign);
+        } else if (xDistance > .05) {
+            x = Math.copySign(.4, xSign);
+        } else if (xDistance > .03) {
+            x = Math.copySign(.35, xSign);
         } else {
             x = 0;
         }
 
-        x = Math.copySign(x, xSign);
-
-        if (yDistance > 0.8999999) {
-            y = Math.copySign(1, ySign);
-        } else if (yDistance > .7) {
-            y = Math.copySign(0.7, ySign);
+        if (yDistance > .7) {
+            y = Math.copySign(.6, ySign);
         } else if (yDistance > .3) {
-            y = Math.copySign(.55, ySign);
-        } else if (yDistance < .3 && yDistance > 0.05) {
-            y = MathUtil.interpolate(0.45, 0.55, (yDistance - 0.05) / 0.25);
+            y = Math.copySign(.6, ySign);
+        } else if (yDistance > .05) {
+            y = Math.copySign(.4, ySign);
+        } else if (yDistance > .03) {
+            y = Math.copySign(.35, ySign);
         } else {
             y = 0;
         }
-
-        y = Math.copySign(y, ySign);
 
         //
         // if (yDistance > .5) {
         // x *= .75;
         // }
 
-        if (distance < Units.inchesToMeters(4)) {
-            if (xDistance > Units.inchesToMeters(2)) {
-                y = 0;
-            } else {
-                x = 0;
-            }
-            if (yDistance < Units.inchesToMeters(2)) {
-                y = 0;
-            }
-
-        }
+        // if (distance < .2) {
+        // if (xDistance > Units.inchesToMeters(2)) {
+        // y = 0;
+        // } else {
+        // x = 0;
+        // }
+        // if (yDistance < Units.inchesToMeters(2)) {
+        // y = 0;
+        // }
+        // }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
                 pose2d.getRotation());
