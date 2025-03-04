@@ -196,7 +196,7 @@ public class RobotContainer {
                                         double y = MathUtil.applyDeadband(
                                                         driverXbox.getLeftY(),
                                                         OperatorConstants.LEFT_Y_DEADBAND);
-                                        if (PoseTransformUtils.isRedAlliance()) {
+                                        if (!PoseTransformUtils.isRedAlliance()) {
                                                 y *= -1;
                                         }
                                         return m_yspeedLimiter.calculate(y);
@@ -205,7 +205,7 @@ public class RobotContainer {
                                         double x = MathUtil.applyDeadband(
                                                         driverXbox.getLeftX(),
                                                         OperatorConstants.LEFT_X_DEADBAND);
-                                        if (PoseTransformUtils.isRedAlliance()) {
+                                        if (!PoseTransformUtils.isRedAlliance()) {
                                                 x *= -1;
                                         }
                                         return m_xspeedLimiter.calculate(x);
