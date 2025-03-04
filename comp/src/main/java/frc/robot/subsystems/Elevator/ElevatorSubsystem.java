@@ -84,6 +84,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         motor1.set(elevatorVoltage);
         motor2.set(-elevatorVoltage);
+
+        elevatorSim.periodic();
     }
 
     private double calculatePid(double position) {
