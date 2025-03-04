@@ -61,7 +61,7 @@ public class RobotContainer {
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
 
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
@@ -146,6 +146,7 @@ public class RobotContainer {
                 SmartDashboard.putData("autoChooser", m_chooser);
                 SmartDashboard.putData("swerveSubsystem", drivebase);
                 SmartDashboard.putData("ArmSubsystem", arm);
+                SmartDashboard.putData("ClimberSubsystem", climberSubsystem);
 
                 m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
                 m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
@@ -255,13 +256,11 @@ public class RobotContainer {
                 new Trigger(() -> driverXbox.getPOV() == 45)
                                 .onTrue(swerveCommands.lookAtAngle(300));
 
-                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                // .onTrue(elevator.goDown());
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(elevator.goDown());
 
-                new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(elevator.goUp());
+                // new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                // .onTrue(elevator.goUp());
 
         }
 
