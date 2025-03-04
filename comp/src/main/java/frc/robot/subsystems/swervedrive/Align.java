@@ -15,14 +15,9 @@ public class Align extends Command {
     private double dist;
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
-    private boolean reachedY = false;
-    private boolean reachedX = false;
 
-    private final static int FILTER_SIZE = 10;
-    MedianFilter xDistanceFilter = new MedianFilter(FILTER_SIZE);
-    MedianFilter yDistanceFilter = new MedianFilter(FILTER_SIZE);
-    MedianFilter targetAngleFilter = new MedianFilter(FILTER_SIZE);
-    MedianFilter swerveAngleFilter = new MedianFilter(FILTER_SIZE);
+    private boolean reachedX = false;
+    private boolean reachedY = false;
 
     public Align(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
         this.isRight = isRight;
@@ -36,17 +31,6 @@ public class Align extends Command {
         pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
         reachedX = false;
         reachedY = false;
-        xDistanceFilter.reset();
-        yDistanceFilter.reset();
-        targetAngleFilter.reset();
-        swerveAngleFilter.reset();
-        for (double i = 0; i < FILTER_SIZE; i++) {
-            xDistanceFilter.calculate(100000);
-            yDistanceFilter.calculate(100000);
-            targetAngleFilter.calculate(100000);
-            swerveAngleFilter.calculate(100000);
-        }
-
     }
 
     @Override
@@ -67,28 +51,30 @@ public class Align extends Command {
 
         if (reachedX) {
             x = 0;
-        } else if (xDistance > .7) {
+        } else if (xDistance > .8) {
             x = Math.copySign(1, xSign);
-        } else if (xDistance > .3) {
-            x = Math.copySign(.7, xSign);
+        } else if (xDistance > .2) {
+            x = Math.copySign(.6, xSign);
         } else {
-            x = Math.copySign(.5, xSign);
+            x = Math.copySign(.4, xSign);
         }
 
         if (reachedY) {
             y = 0;
-        } else if (yDistance > .7) {
+        } else if (yDistance > .8) {
             y = Math.copySign(1, ySign);
-        } else if (yDistance > .3) {
-            y = Math.copySign(.7, ySign);
+        } else if (yDistance > .2) {
+            y = Math.copySign(.6, ySign);
         } else {
-            y = Math.copySign(.5, ySign);
+            y = Math.copySign(.4, ySign);
         }
 
-        if (yDistance < Units.inchesToMeters(2))
-            reachedY = true;
-        if (xDistance < Units.inchesToMeters(2))
+        if (xDistance < Units.inchesToMeters(2)) {
             reachedX = true;
+        }
+        if (yDistance < Units.inchesToMeters(2)) {
+            reachedY = true;
+        }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y, pose2d.getRotation());
 
@@ -105,26 +91,5 @@ public class Align extends Command {
     @Override
     public boolean isFinished() {
         return reachedX && reachedY;
-        // Pose2d targetPose = swerveCommands.addScoringOffset(pose, dist, isRight);//
-        // .55
-
-        // double averageXDistance =
-        // xDistanceFilter.calculate(Math.abs(targetPose.getX() -
-        // swerve.getPose().getX()));
-        // double averageYDistance =
-        // yDistanceFilter.calculate(Math.abs(targetPose.getY() -
-        // swerve.getPose().getY()));
-        // double averageTargetPose =
-        // targetAngleFilter.calculate(targetPose.getRotation().getRadians());
-        // double averageSwervePose =
-        // swerveAngleFilter.calculate(swerve.getPose().getRotation().getRadians());
-        // boolean isAngleClose = AngleUtils.areAnglesClose(new
-        // Rotation2d(averageTargetPose),
-        // new Rotation2d(averageSwervePose),
-        // Rotation2d.fromDegrees(4));
-
-        // return averageXDistance < Units.inchesToMeters(2) &&
-        // averageYDistance < Units.inchesToMeters(2) &&
-        // isAngleClose;
     }
 }

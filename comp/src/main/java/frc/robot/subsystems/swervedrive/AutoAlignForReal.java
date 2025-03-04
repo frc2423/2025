@@ -68,22 +68,22 @@ public class AutoAlignForReal extends Command {
         if (reachedY) {
             y = 0;
         } else if (yDistance > .7) {
-            y = Math.copySign(.6, ySign);
+            y = Math.copySign(.7, ySign);
         } else if (yDistance > .3) {
-            y = Math.copySign(.5, ySign);
+            y = Math.copySign(.65, ySign);
         } else {
-            y = Math.copySign(.4, ySign);
+            y = Math.copySign(.55, ySign);
         }
 
         if (reachedY) {
             if (reachedX) {
                 x = 0;
             } else if (xDistance > .7) {
-                x = Math.copySign(.6, xSign);
+                x = Math.copySign(.7, xSign);
             } else if (xDistance > .3) {
-                x = Math.copySign(.5, xSign);
+                x = Math.copySign(.65, xSign);
             } else {
-                x = Math.copySign(.4, xSign);
+                x = Math.copySign(.55, xSign);
             }
         }
 

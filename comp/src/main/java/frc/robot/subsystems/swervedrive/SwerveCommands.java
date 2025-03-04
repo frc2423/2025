@@ -112,7 +112,9 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                new Align(swerve, this, 0.8, isRight),
+                // new Align(swerve, this, 0.8, isRight),
+                new AutoAlignClosest(swerve, this, 0.8, isRight),
+                // autoScoringAlign(pose, .32, isRight),
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
