@@ -278,25 +278,28 @@ public class SwerveCommands {
 
         double x = 0;
         double y = 0;
-
-        if (xDistance > .7) {
-            x = Math.copySign(0.7, ySign);
+        if (xDistance > 0.8999999) {
+            x = Math.copySign(1, xSign);
+        } else if (xDistance > .7) {
+            x = Math.copySign(0.7, xSign);
         } else if (xDistance > .3) {
-            x = Math.copySign(.45, ySign);
-        } else if (xDistance > .05 && xDistance > 0) {
-            x = MathUtil.interpolate(0.3, .35, (xDistance - 0.3) / 0.35);
+            x = Math.copySign(.55, xSign);
+        } else if (xDistance < .3 && xDistance > 0.05) {
+            x = MathUtil.interpolate(0.45, .55, (xDistance - 0.05) / 0.25);
         } else {
             x = 0;
         }
 
         x = Math.copySign(x, xSign);
 
-        if (yDistance > .7) {
+        if (yDistance > 0.8999999) {
+            y = Math.copySign(1, ySign);
+        } else if (yDistance > .7) {
             y = Math.copySign(0.7, ySign);
         } else if (yDistance > .3) {
-            y = Math.copySign(.45, ySign);
-        } else if (yDistance > .05 && yDistance > 0) {
-            y = MathUtil.interpolate(0.3, 0.35, (yDistance - 0.3) / 0.35);
+            y = Math.copySign(.55, ySign);
+        } else if (yDistance < .3 && yDistance > 0.05) {
+            y = MathUtil.interpolate(0.45, 0.55, (yDistance - 0.05) / 0.25);
         } else {
             y = 0;
         }
@@ -308,16 +311,17 @@ public class SwerveCommands {
         // x *= .75;
         // }
 
-        // if (distance < .2) {
-        // if (xDistance > Units.inchesToMeters(2)) {
-        // y = 0;
-        // } else {
-        // x = 0;
-        // }
-        // if (yDistance < Units.inchesToMeters(2)) {
-        // y = 0;
-        // }
-        // }
+        if (distance < Units.inchesToMeters(4)) {
+            if (xDistance > Units.inchesToMeters(2)) {
+                y = 0;
+            } else {
+                x = 0;
+            }
+            if (yDistance < Units.inchesToMeters(2)) {
+                y = 0;
+            }
+
+        }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
                 pose2d.getRotation());

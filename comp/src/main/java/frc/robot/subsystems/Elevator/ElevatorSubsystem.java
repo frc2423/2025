@@ -23,7 +23,7 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = 120;
-    private double maxAccel = 180;
+    private double maxAccel = 120;
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0,
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double elevatorCurrentPose = 0;
