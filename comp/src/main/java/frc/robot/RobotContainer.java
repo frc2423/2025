@@ -9,6 +9,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -43,6 +44,9 @@ import frc.robot.subsystems.Intake.IntakeCommands;
  * trigger mappings) should be declared here.
  */
 public class RobotContainer {
+        double maxArmPitch = 45.0;
+        double currentArmPitch = 0;
+        boolean rising = true;
 
         // Replace with CommandPS4Controller or CommandJoystick if needed
         // final CommandXboxController driverXbox = new CommandXboxController(0);
@@ -135,6 +139,8 @@ public class RobotContainer {
          */
         public RobotContainer() {
                 // Configure the trigger bindings
+                Rotation3d pose45pitch = new Rotation3d(0, 45, 0);
+
                 configureDriverBindings();
                 configureOperatorBindings();
                 Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
