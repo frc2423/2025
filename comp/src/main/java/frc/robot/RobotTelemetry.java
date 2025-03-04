@@ -17,8 +17,8 @@ public class RobotTelemetry {
 
     public void update() {
         double height = (elevator.getEncoderPosition() / 65) * 2;
-        double angle = (arm.getEncoderPosition() / 15) * Math.PI / 2;
-        armPose = new Pose3d(0, 0, height, new Rotation3d(0, angle, 0));
+        double angle = (arm.getEncoderPosition() / -15) * Math.PI / 2;
+        armPose = new Pose3d(0, -.13, height + 0.6, new Rotation3d(0, angle, 0));
         NTHelper.setPose3d("/advantageScopeModel/armPose", armPose);
     }
 }

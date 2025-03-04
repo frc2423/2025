@@ -44,7 +44,7 @@ public class NTHelper {
     }
 
     public static void setPose3d(String key, Pose3d pose) {
-        if (!pose2dPublishers.containsKey(key)) {
+        if (!pose3dPublishers.containsKey(key)) {
             StructPublisher<Pose3d> publisher = NetworkTableInstance.getDefault()
                     .getStructTopic(key, Pose3d.struct).publish();
             pose3dPublishers.put(key, publisher);

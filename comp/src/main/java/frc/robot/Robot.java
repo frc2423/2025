@@ -4,16 +4,12 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import au.grapplerobotics.CanBridge;
 //import org.littletonrobotics.urcl;
 
 /**
@@ -84,7 +80,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods. This must be called from the
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
-    NTHelper.setPose3d("/robotPose", new Pose3d());
     CommandScheduler.getInstance().run();
     m_robotContainer.updateTelemetry();
   }
