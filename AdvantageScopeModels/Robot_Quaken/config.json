@@ -32,21 +32,28 @@
         { "axis": "x", "degrees": 90 },
         { "axis": "z", "degrees": 90 }
       ],
-      "zeroedPosition": [-0.19, 0.13, -0.22]
+      "zeroedPosition": [0, 0.13, -0.6]
     },
     {
       "zeroedRotations": [
         { "axis": "x", "degrees": 90 },
         { "axis": "z", "degrees": 90 }
       ],
-      "zeroedPosition": [-0.08, 0, -0.62]
+      "zeroedPosition": [-0.08, 0, -0.6]
     },
     {
       "zeroedRotations": [
         { "axis": "x", "degrees": 90 },
         { "axis": "z", "degrees": 90 }
       ],
-      "zeroedPosition": [0, 0, 0]
+      "zeroedPosition": [1, 0, -1]
+    },
+    {
+      "zeroedRotations": [
+        { "axis": "x", "degrees": 90 },
+        { "axis": "z", "degrees": 90 }
+      ],
+      "zeroedPosition": [1, 0, -1]
     }
   ]
 }
