@@ -21,8 +21,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.swervedrive.AutoAlign;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -164,12 +166,26 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
+                NamedCommands.registerCommand("AutoScoral 11 Right", swerveCommands
+                                .autoScoral(Vision.getAprilTagPose(11), Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 11 Left", swerveCommands
+                                .autoScoral(Vision.getAprilTagPose(11), Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 6 Right", swerveCommands.autoScoral(Vision.getAprilTagPose(6),
+                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Left", swerveCommands.autoScoral(Vision.getAprilTagPose(6),
+                                Constants.SetpointConstants.REEF_L4, false));
+
                 NamedCommands.registerCommand("AutoScoral Right",
                                 swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, true));
 
                 NamedCommands.registerCommand("AutoScoral Left",
                                 swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, false));
                 NamedCommands.registerCommand("Intake Coral From Human Player", intakeCommands.intakeHumanPlayer());
+
+                NamedCommands.registerCommand("Elevator Down", elevator.goDown());
 
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
@@ -198,7 +214,7 @@ public class RobotContainer {
                                         double y = MathUtil.applyDeadband(
                                                         driverXbox.getLeftY(),
                                                         OperatorConstants.LEFT_Y_DEADBAND);
-                                        if (PoseTransformUtils.isRedAlliance()) {
+                                        if (!PoseTransformUtils.isRedAlliance()) {
                                                 y *= -1;
                                         }
                                         return m_yspeedLimiter.calculate(y);
@@ -207,7 +223,7 @@ public class RobotContainer {
                                         double x = MathUtil.applyDeadband(
                                                         driverXbox.getLeftX(),
                                                         OperatorConstants.LEFT_X_DEADBAND);
-                                        if (PoseTransformUtils.isRedAlliance()) {
+                                        if (!PoseTransformUtils.isRedAlliance()) {
                                                 x *= -1;
                                         }
                                         return m_xspeedLimiter.calculate(x);

@@ -157,9 +157,6 @@ public class SwerveCommands {
                                 swerve.centerModulesCommand().withTimeout(.3),
                                 new AutoAlignClosest(swerve, this, 0.4, isRight),
                                 stopMoving())),
-                // stopMoving(),
-                // new AutoAlignClosest(swerve, this, .4, isRight),
-                // stopMoving(),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");
@@ -172,14 +169,19 @@ public class SwerveCommands {
                                                                                // subsystem
         var command = Commands.sequence(
                 swerve.centerModulesCommand().withTimeout(.5),
-                autoScoringAlign(pose, .8, isRight),
+                new AutoAlign(swerve, this, 0.8, isRight, pose),
                 stopMoving(),
-                elevatorSubsystem.goToSetpoint(setpoint),
-                Commands.waitUntil(() -> {
-                    return elevatorSubsystem.isAtSetpoint();
-                }),
-                autoScoringAlign(pose, .32, isRight),
-                stopMoving(),
+                Commands.parallel(
+                        Commands.sequence(
+                                elevatorSubsystem.goToSetpoint(setpoint),
+                                Commands.waitUntil(() -> {
+                                    return elevatorSubsystem.isAtSetpoint();
+                                }),
+                                armSubsystem.goScore()),
+                        Commands.sequence(
+                                swerve.centerModulesCommand().withTimeout(.3),
+                                new AutoAlign(swerve, this, 0.4, isRight, pose),
+                                stopMoving())),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");
@@ -278,28 +280,28 @@ public class SwerveCommands {
         double y = 0;
 
         if (xDistance > .7) {
-            x = Math.copySign(.6, xSign);
+            x = Math.copySign(0.7, ySign);
         } else if (xDistance > .3) {
-            x = Math.copySign(.6, xSign);
-        } else if (xDistance > .05) {
-            x = Math.copySign(.4, xSign);
-        } else if (xDistance > .03) {
-            x = Math.copySign(.35, xSign);
+            x = Math.copySign(.45, ySign);
+        } else if (xDistance > .05 && xDistance > 0) {
+            x = MathUtil.interpolate(0.3, .35, (xDistance - 0.3) / 0.35);
         } else {
             x = 0;
         }
 
+        x = Math.copySign(x, xSign);
+
         if (yDistance > .7) {
-            y = Math.copySign(.6, ySign);
+            y = Math.copySign(0.7, ySign);
         } else if (yDistance > .3) {
-            y = Math.copySign(.6, ySign);
-        } else if (yDistance > .05) {
-            y = Math.copySign(.4, ySign);
-        } else if (yDistance > .03) {
-            y = Math.copySign(.35, ySign);
+            y = Math.copySign(.45, ySign);
+        } else if (yDistance > .05 && yDistance > 0) {
+            y = MathUtil.interpolate(0.3, 0.35, (yDistance - 0.3) / 0.35);
         } else {
             y = 0;
         }
+
+        y = Math.copySign(y, ySign);
 
         //
         // if (yDistance > .5) {

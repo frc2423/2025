@@ -83,7 +83,7 @@ public final class Constants {
     }
 
     public static class SetpointConstants {
-        public static final double REEF_L4 = 62.6569420;// 69.56; // noice
+        public static final double REEF_L4 = 60.1569420;// 69.56; // noice
         public static final double REEF_L3 = 34.8;
         public static final double REEF_L2 = 17.5;
         public static final double ALGAE_DESCORE_L3 = 25;
