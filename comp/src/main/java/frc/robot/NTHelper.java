@@ -14,8 +14,8 @@ import edu.wpi.first.networktables.NetworkTableEvent;
 
 public class NTHelper {
 
-    private static Map<String, StructPublisher<Pose2d>> pose2dPublishers = new HashMap<String, StructPublisher<Pose2d>>();
-    private static Map<String, StructPublisher<Pose3d>> pose3dPublishers = new HashMap<String, StructPublisher<Pose3d>>();
+    private static Map<String, StructPublisher<Pose2d>> pose2dPublishers = new HashMap<>();
+    private static Map<String, StructPublisher<Pose3d>> pose3dPublishers = new HashMap<>();
 
     public static void setPersistent(String key) {
         getEntry(key).setPersistent();
@@ -42,15 +42,6 @@ public class NTHelper {
         }
         pose2dPublishers.get(key).set(pose);
     }
-
-    /**
-     * Adds an entry listener to network tables
-     * 
-     * @param key
-     *            String for network tables key
-     * @param listener
-     *            Function to be called when value changes
-     */
 
     public static void setPose3d(String key, Pose3d pose) {
         if (!pose2dPublishers.containsKey(key)) {

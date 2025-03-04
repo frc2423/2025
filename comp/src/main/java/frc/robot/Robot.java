@@ -86,6 +86,7 @@ public class Robot extends TimedRobot {
     // block in order for anything in the Command-based framework to work.
     NTHelper.setPose3d("/robotPose", new Pose3d());
     CommandScheduler.getInstance().run();
+    m_robotContainer.updateTelemetry();
   }
 
   /**

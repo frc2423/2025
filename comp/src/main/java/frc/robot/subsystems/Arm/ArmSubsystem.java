@@ -1,11 +1,9 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.Arm;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -22,7 +20,7 @@ public class ArmSubsystem extends SubsystemBase {
     // private SparkFlex scoringWheelMotor = new SparkFlex(23,
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
-    private double armCurrentPose = 0;
+    private double encoderPosition = 0;
     private double maximum = 0; // some value
     private double minumum = -13.8; // some value
     private double setpoint = 0;// will change varibly
@@ -30,6 +28,8 @@ public class ArmSubsystem extends SubsystemBase {
     private double MAX_VOLTAGE = 0.9;
 
     double calculatedPID = 0;
+
+    private ArmSimulation armSim = new ArmSimulation(armPivot);
 
     ProfiledPIDController arm_PID = new ProfiledPIDController(4, 0, 0, new TrapezoidProfile.Constraints(100, 100));
 
@@ -39,7 +39,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        armCurrentPose = armPivot.getEncoder().getPosition();
+        encoderPosition = armPivot.getEncoder().getPosition();
         calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
@@ -48,24 +48,24 @@ public class ArmSubsystem extends SubsystemBase {
             calculatedPID = -MAX_VOLTAGE;
         }
 
-        if (armCurrentPose > maximum) {
+        if (encoderPosition > maximum) {
             calculatedPID = Math.min(calculatedPID, 0);
-        } else if (armCurrentPose < minumum) {
+        } else if (encoderPosition < minumum) {
             calculatedPID = Math.max(calculatedPID, 0);
-        }
-
-        if (Robot.isSimulation()) {
-
         }
 
         armPivot.set(calculatedPID);
         // scoringWheelMotor.set(scoringWheelSpeed);
+    }
 
+    @Override
+    public void simulationPeriodic() {
+        armSim.simPeriodic();
     }
 
     private double calculatePid(double position) {
         // updatePivotAngle();
-        double pid = arm_PID.calculate(armCurrentPose, position);
+        double pid = arm_PID.calculate(encoderPosition, position);
         var setpoint = arm_PID.getSetpoint();
 
         double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
@@ -92,7 +92,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command stopElevator() {
         Command command = runOnce(() -> {
-            setSetpoint(armCurrentPose);
+            setSetpoint(encoderPosition);
         });
         command.setName("stop elevator");
         return command;
@@ -118,12 +118,12 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
-    public double getCurrentArmPose() {
-        return armCurrentPose;
+    public double getEncoderPosition() {
+        return encoderPosition;
     }
 
     public boolean isInSafeArea() {
-        if (armCurrentPose < -1.9 && armCurrentPose > -5.3) {
+        if (encoderPosition < -1.9 && encoderPosition > -5.3) {
             return true;
         } else {
             return false;
@@ -136,10 +136,13 @@ public class ArmSubsystem extends SubsystemBase {
         super.initSendable(builder);
 
         builder.addDoubleProperty("calculatePid", () -> calculatedPID, null);
-        builder.addDoubleProperty("currentPose", () -> armCurrentPose, null);
+        builder.addDoubleProperty("encoderPosition", () -> encoderPosition, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("scoringWheelSpeed", () -> scoringWheelSpeed, null);
         builder.addBooleanProperty("isInSafeArea", () -> isInSafeArea(), null);
 
+        if (Robot.isSimulation()) {
+            armSim.initSendable(builder);
+        }
     }
 }

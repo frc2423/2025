@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.AngleUtils;
