@@ -60,6 +60,7 @@ public class RobotContainer {
         FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
+        RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
 
@@ -170,6 +171,10 @@ public class RobotContainer {
                         // Do whatever you want with the poses here
                         drivebase.getSwerveDrive().field.getObject("AutoAlignPath").setPoses(poses);
                 });
+        }
+
+        public void updateTelemetry() {
+                robotTelemetry.update();
         }
 
         /**

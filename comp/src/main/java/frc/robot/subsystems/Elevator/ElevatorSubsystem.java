@@ -26,7 +26,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double maxAccel = 180;
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0,
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
-    private double elevatorCurrentPose = 0;
+    private double encoderPosition = 0;
     private double setpoint = 0;
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.015, 0, 0);
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
@@ -58,7 +58,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        elevatorCurrentPose = motor1.getEncoder().getPosition();
+        encoderPosition = motor1.getEncoder().getPosition();
         calculatedPid = calculatePid(setpoint);
         elevatorVoltage = calculatedPid;
 
@@ -68,13 +68,13 @@ public class ElevatorSubsystem extends SubsystemBase {
             elevatorVoltage = -MAX_VOLTAGE;
         }
 
-        if (elevatorCurrentPose > highestPoint) {
+        if (encoderPosition > highestPoint) {
             elevatorVoltage = Math.min(elevatorVoltage, 0);
-        } else if (elevatorCurrentPose < lowestPoint) {
+        } else if (encoderPosition < lowestPoint) {
             elevatorVoltage = Math.max(elevatorVoltage, 0);
         }
 
-        if (elevatorCurrentPose < 7) {
+        if (encoderPosition < 7) {
             elevatorVoltage = Math.max(-.1, elevatorVoltage);
         }
 
@@ -90,7 +90,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private double calculatePid(double position) {
         // updatePivotAngle();
-        double pid = elevator_PID.calculate(elevatorCurrentPose, position);
+        double pid = elevator_PID.calculate(encoderPosition, position);
         var setpoint = elevator_PID.getSetpoint();
 
         double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
@@ -115,14 +115,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command goLittleUp(double constant) {
         // for manual control, sick
         return runOnce(() -> {
-            setSetpoint(elevatorCurrentPose + constant);
+            setSetpoint(encoderPosition + constant);
         });
     }
 
     public Command goLittleDown(double constant) {
         // for manual control, sick
         return runOnce(() -> {
-            setSetpoint(elevatorCurrentPose - constant);
+            setSetpoint(encoderPosition - constant);
         });
     }
 
@@ -140,7 +140,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command stopElevator() { // for manual control, sick
         return runOnce(() -> {
-            setSetpoint(elevatorCurrentPose);
+            setSetpoint(encoderPosition);
         });
     }
 
@@ -152,18 +152,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         setpoint = 0;
     }
 
-    public double getHeight() {
-        return elevatorCurrentPose;
+    public double getEncoderPosition() {
+        return encoderPosition;
     }
 
     public boolean isAtSetpoint() {
-        return (Math.abs(getHeight() - setpoint) < 2);
+        return (Math.abs(getEncoderPosition() - setpoint) < 2);
         // return elevator_PID.atGoal();
     }
-
-    // public double getHeightSim() {
-
-    // }
 
     @Override
     public void initSendable(SendableBuilder builder) {
@@ -173,7 +169,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         builder.addDoubleProperty("elevatorVoltage", () -> elevatorVoltage, null);
         builder.addDoubleProperty("calculatedPid", () -> calculatedPid, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
-        builder.addDoubleProperty("encoderPosition", this::getHeight, null);
+        builder.addDoubleProperty("encoderPosition", this::getEncoderPosition, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
 
         if (Robot.isSimulation()) {
