@@ -58,7 +58,7 @@ public class RobotContainer {
         ClimberSubsystem climberSubsystem = new ClimberSubsystem();
         FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
-        ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
+        ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
         RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
@@ -291,15 +291,20 @@ public class RobotContainer {
                 new Trigger(() -> operator.getPOV() == 270)
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
                                                 : Constants.SetpointConstants.REEF_L2));
-                new Trigger(() -> operator.getPOV() == 0)
+                new Trigger(() -> operator.getPOV() == 0 && !(operator.getLeftTriggerAxis() > 0.1))
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
                                                 : Constants.SetpointConstants.REEF_L3));
-                new Trigger(() -> operator.getPOV() == 90)
+                new Trigger(() -> operator.getPOV() == 90 && !(operator.getLeftTriggerAxis() > 0.1))
                                 .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
                                                 : Constants.SetpointConstants.REEF_L4));
                 new Trigger(() -> operator.getPOV() == 180)
                                 .onTrue(elevator.goDown());
 
+                new Trigger(() -> (operator.getPOV() == 270 && operator.getLeftTriggerAxis() > 0.1))
+                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L2));
+
+                new Trigger(() -> (operator.getPOV() == 0 && operator.getLeftTriggerAxis() > 0.1))
+                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3));
                 // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
                 // .onTrue(elevator.goLittleDown(1));
