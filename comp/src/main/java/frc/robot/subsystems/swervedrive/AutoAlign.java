@@ -1,20 +1,22 @@
 
 package frc.robot.subsystems.swervedrive;
 
+import java.util.Optional;
+
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.AngleUtils;
-import frc.robot.NTHelper;
 
-public class AutoAlignClosest extends Command {
+public class AutoAlign extends Command {
     private Pose2d pose;
     private boolean isRight;
     private double dist;
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
+    private Optional<Integer> tagNumber = Optional.empty();
 
     private final static int FILTER_SIZE = 10;
     MedianFilter xDistanceFilter = new MedianFilter(FILTER_SIZE);
@@ -22,16 +24,29 @@ public class AutoAlignClosest extends Command {
     MedianFilter targetAngleFilter = new MedianFilter(FILTER_SIZE);
     MedianFilter swerveAngleFilter = new MedianFilter(FILTER_SIZE);
 
-    public AutoAlignClosest(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
+    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
         this.isRight = isRight;
         this.dist = dist;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
     }
 
+    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight,
+            int tagNumber) {
+        this.isRight = isRight;
+        this.dist = dist;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.tagNumber = Optional.of(tagNumber);
+    }
+
     @Override
     public void initialize() {
-        pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
+        if (tagNumber.isPresent()) {
+            pose = Vision.getTagPose(tagNumber.get());
+        } else {
+            pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
+        }
         xDistanceFilter.reset();
         yDistanceFilter.reset();
         targetAngleFilter.reset();

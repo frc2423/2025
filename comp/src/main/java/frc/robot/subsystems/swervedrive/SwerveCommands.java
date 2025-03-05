@@ -18,7 +18,6 @@ import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
-import frc.robot.AngleUtils;
 import frc.robot.Constants;
 import frc.robot.NTHelper;
 import frc.robot.Constants.OperatorConstants;
@@ -97,8 +96,8 @@ public class SwerveCommands {
         return stopCommand;
     }
 
-    public Command autoScoralClosest(double setpoint, boolean isRight) {
-        Command autoScoreElevatorCommand = new SelectCommand<>(
+    public Command getElevatorLevelCommand() {
+        return new SelectCommand<>(
                 // Maps selector values to commands
                 Map.ofEntries(
                         Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
@@ -110,50 +109,47 @@ public class SwerveCommands {
                                 elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
 
                 this::selectElevatorLevel);
+    }
+
+    public Command autoScoralClosest(double setpoint, boolean isRight) {
         var command = Commands.sequence(
-                swerve.centerModulesCommand().withTimeout(.5),
-                // new Align(swerve, this, 0.8, isRight),
-                new AutoAlignClosest(swerve, this, 0.8, isRight),
-                // autoScoringAlign(pose, .32, isRight),
+                new AutoAlign(swerve, this, 0.8, isRight),
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
-                                autoScoreElevatorCommand,
+                                getElevatorLevelCommand(),
                                 Commands.waitUntil(() -> {
                                     return elevatorSubsystem.isAtSetpoint();
                                 }),
                                 armSubsystem.goScore()),
                         Commands.sequence(
-                                swerve.centerModulesCommand().withTimeout(.3),
-                                new AutoAlignForReal(swerve, this, 0.4, isRight),
+                                new AutoAlignNear(swerve, this, 0.44, isRight).withTimeout(2),
                                 stopMoving())),
-                // stopMoving(),
-                // new AutoAlignClosest(swerve, this, .4, isRight),
-                // stopMoving(),
                 intakeCommands.intakeOut());
 
-        command.setName("autoScoral");
-        // command.addRequirements(swerve, elevatorSubsystem);
+        command.setName("autoScoralClosest");
 
         return command;
     }
 
-    public Command autoScoral(Pose2d pose, double setpoint, boolean isRight) { // put in desired pose and elevator
-                                                                               // subsystem
+    public Command autoScoral(int tagNumber, double setpoint, boolean isRight) { // put in desired pose and elevator
+                                                                                 // subsystem
         var command = Commands.sequence(
-                swerve.centerModulesCommand().withTimeout(.5),
-                autoScoringAlign(pose, .8, isRight),
+                new AutoAlign(swerve, this, 0.8, isRight, tagNumber),
                 stopMoving(),
-                elevatorSubsystem.goToSetpoint(setpoint),
-                Commands.waitUntil(() -> {
-                    return elevatorSubsystem.isAtSetpoint();
-                }),
-                autoScoringAlign(pose, .32, isRight),
-                stopMoving(),
+                Commands.parallel(
+                        Commands.sequence(
+                                elevatorSubsystem.goToSetpoint(setpoint),
+                                Commands.waitUntil(() -> {
+                                    return elevatorSubsystem.isAtSetpoint();
+                                }),
+                                armSubsystem.goScore()),
+                        Commands.sequence(
+                                new AutoAlignNear(swerve, this, 0.44, isRight, tagNumber).withTimeout(2),
+                                stopMoving())),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoral");
-        // command.addRequirements(swerve, elevatorSubsystem);
 
         return command;
     }
@@ -175,30 +171,6 @@ public class SwerveCommands {
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);
         return command;
-    }
-
-    public Command autoAlign(Pose2d pose2d, double dist, double offsetY) {
-        Pose2d targetPose = addOffset(pose2d, dist, offsetY);
-        var command = Commands.run(() -> {
-            actuallyMoveTo(targetPose);
-        }).until(() -> {
-            double xDistance = Math.abs(targetPose.getX() - swerve.getPose().getX());
-            double yDistance = Math.abs(targetPose.getY() - swerve.getPose().getY());
-            boolean isAngleClose = AngleUtils.areAnglesClose(targetPose.getRotation(), swerve.getPose().getRotation(),
-                    Rotation2d.fromDegrees(5));
-
-            return xDistance < 0.0508 &&
-                    yDistance < 0.0508 &&
-                    isAngleClose;
-        });
-        command.addRequirements(swerve);
-        return command;
-    }
-
-    public Command autoScoringAlign(Pose2d pose2d, double dist, boolean isRight) {
-        double y = .178;
-        double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
-        return autoAlign(pose2d, dist, offsetY);
     }
 
     public void actuallyLookAngleButMove(Rotation2d rotation2d) { // here
@@ -231,7 +203,11 @@ public class SwerveCommands {
         swerve.driveFieldOriented(desiredSpeeds);
     }
 
-    public void actuallyMoveTo(Pose2d pose2d) { // here
+    public void actuallyMoveTo(Pose2d pose2d) {
+        actuallyMoveTo(pose2d, true, true);
+    }
+
+    public void actuallyMoveTo(Pose2d pose2d, boolean enableX, boolean enableY) {
 
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
         Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
@@ -242,50 +218,36 @@ public class SwerveCommands {
         double xDistance = Math.abs(translationDiff.getX());
         double yDistance = Math.abs(translationDiff.getY());
 
-        double distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-
         double x = 0;
         double y = 0;
 
-        if (xDistance > .7) {
+        if (!enableX) {
+            x = 0;
+        } else if (xDistance > .7) {
+            x = Math.copySign(.8, xSign);
+        } else if (xDistance > .4) {
             x = Math.copySign(.6, xSign);
-        } else if (xDistance > .3) {
-            x = Math.copySign(.6, xSign);
-        } else if (xDistance > .05) {
-            x = Math.copySign(.4, xSign);
+        } else if (xDistance > .2) {
+            x = Math.copySign(.42, xSign);
         } else if (xDistance > .03) {
-            x = Math.copySign(.35, xSign);
+            x = Math.copySign(.38, xSign);
         } else {
             x = 0;
         }
 
-        if (yDistance > .7) {
+        if (!enableY) {
+            y = 0;
+        } else if (yDistance > .7) {
+            y = Math.copySign(.8, ySign);
+        } else if (yDistance > .4) {
             y = Math.copySign(.6, ySign);
-        } else if (yDistance > .3) {
-            y = Math.copySign(.6, ySign);
-        } else if (yDistance > .05) {
-            y = Math.copySign(.4, ySign);
+        } else if (yDistance > .2) {
+            y = Math.copySign(.42, ySign);
         } else if (yDistance > .03) {
-            y = Math.copySign(.35, ySign);
+            y = Math.copySign(.38, ySign);
         } else {
             y = 0;
         }
-
-        //
-        // if (yDistance > .5) {
-        // x *= .75;
-        // }
-
-        // if (distance < .2) {
-        // if (xDistance > Units.inchesToMeters(2)) {
-        // y = 0;
-        // } else {
-        // x = 0;
-        // }
-        // if (yDistance < Units.inchesToMeters(2)) {
-        // y = 0;
-        // }
-        // }
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
                 pose2d.getRotation());
@@ -299,32 +261,4 @@ public class SwerveCommands {
 
         swerve.drive(desiredSpeeds);
     }
-
-    // public Command lookAtTarget(Pose2d targetAngle, Rotation2d offset) { // to
-    // var command = Commands.sequence(
-    // Commands.runOnce(currentAngleFilter::reset),
-    // Commands.run(() -> {
-    // Pose2d transformedPose = PoseTransformUtils.transformXRedPose(targetAngle);
-    // specialAngle = swerve.getLookAngle(transformedPose).plus(offset);
-    // swerve.actuallyLookAngle(specialAngle);
-    // }, swerve).until(() -> {
-    // double desiredAngle = normalizedAngle(specialAngle.getDegrees());
-    // double currentAngle = currentAngleFilter
-    // .calculate(normalizedAngle(swerve.getHeading().getDegrees()));
-    // double angleDiff = getNormalizedAngleDiff(desiredAngle, currentAngle);
-    // return angleDiff < 3;
-    // }),
-    // Commands.run(() -> {
-    // Pose2d transformedPose = PoseTransformUtils.transformXRedPose(targetAngle);
-    // specialAngle = swerve.getLookAngle(transformedPose).plus(offset);
-    // swerve.actuallyLookAngle(specialAngle);
-    // }, swerve).withTimeout(.5),
-    // Commands.runOnce(() -> {
-    // swerve.stop();
-    // }));
-
-    // command.setName("setLookAngle");
-    // return command;
-    // }
-
 }
