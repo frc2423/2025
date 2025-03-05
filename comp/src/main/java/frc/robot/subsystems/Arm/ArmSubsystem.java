@@ -80,6 +80,10 @@ public class ArmSubsystem extends SubsystemBase {
         return goToSetpoint(maximum);
     }
 
+    public Command goScoreL4() {
+        return goToSetpoint(Constants.ArmConstants.L4_SCORING_POSITION);
+    }
+
     public Command goScore() {
         return goToSetpoint(Constants.ArmConstants.SCORING_POSITION);
     }

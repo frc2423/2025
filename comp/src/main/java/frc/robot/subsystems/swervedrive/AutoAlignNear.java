@@ -68,10 +68,10 @@ public class AutoAlignNear extends Command {
         double xDistance = Math.abs(translationDiff.getX());
         double yDistance = Math.abs(translationDiff.getY());
 
-        if (yDistance < Units.inchesToMeters(1.5)) {
+        if (yDistance < Units.inchesToMeters(.8)) {
             reachedY = true;
         }
-        if (xDistance < Units.inchesToMeters(1.5)) {
+        if (xDistance < Units.inchesToMeters(.8)) {
             reachedX = true;
         }
 
@@ -86,7 +86,7 @@ public class AutoAlignNear extends Command {
         double averageSwervePose = swerveAngleFilter.calculate(swerve.getPose().getRotation().getRadians());
         boolean isAngleClose = AngleUtils.areAnglesClose(new Rotation2d(averageTargetPose),
                 new Rotation2d(averageSwervePose),
-                Rotation2d.fromDegrees(4));
+                Rotation2d.fromDegrees(3));
 
         return reachedY && reachedX && isAngleClose;
     }

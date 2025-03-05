@@ -114,8 +114,14 @@ public class SwerveCommands {
     }
 
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
+        Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
+                () -> elevatorSubsystem.getSetpoint() > 50);
+        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
+                new AutoAlignNear(swerve, this, 0.43, isRight, tagNumber),
+                () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
+
         var command = Commands.sequence(
-                new AutoAlign(swerve, this, 0.8, isRight, tagNumber),
+                new AutoAlign(swerve, this, 1, isRight, tagNumber),
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
@@ -123,9 +129,10 @@ public class SwerveCommands {
                                 Commands.waitUntil(() -> {
                                     return elevatorSubsystem.isAtSetpoint();
                                 }),
-                                armSubsystem.goScore()),
+                                goScoreCommand),
                         Commands.sequence(
-                                new AutoAlignNear(swerve, this, 0.44, isRight, tagNumber).withTimeout(2),
+                                Commands.waitSeconds(.3),
+                                autoAlignNearCommand,
                                 stopMoving())),
                 intakeCommands.intakeOut());
 
@@ -220,9 +227,13 @@ public class SwerveCommands {
         } else if (xDistance > .4) {
             x = .6;
         } else if (xDistance > .2) {
-            x = .42;
+            x = .47;
         } else if (xDistance > .03) {
-            x = .38;
+            x = .42;
+        } else if (xDistance > .02) {
+            x = .35;
+        } else if (xDistance > .015) {
+            x = .3;
         } else {
             x = 0;
         }
@@ -234,12 +245,21 @@ public class SwerveCommands {
         } else if (yDistance > .4) {
             y = .6;
         } else if (yDistance > .2) {
-            y = .42;
+            y = .47;
         } else if (yDistance > .03) {
-            y = .38;
+            y = .42;
+        } else if (yDistance > .02) {
+            y = .35;
+        } else if (yDistance > .015) {
+            y = .3;
         } else {
             y = 0;
         }
+
+        NTHelper.setDouble("/actuallyMoveTo/xDistance", xDistance * xSign);
+        NTHelper.setDouble("/actuallyMoveTo/x", x * xSign);
+        NTHelper.setDouble("/actuallyMoveTo/yDistance", yDistance * ySign);
+        NTHelper.setDouble("/actuallyMoveTo/y", y * ySign);
 
         x *= xSign;
         y *= ySign;
@@ -250,7 +270,7 @@ public class SwerveCommands {
         final double maxRadsPerSecond = 5;
 
         if (isAngleClose) {
-            desiredSpeeds.omegaRadiansPerSecond = 0;
+            // desiredSpeeds.omegaRadiansPerSecond = 0;
         } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
             desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
                     desiredSpeeds.omegaRadiansPerSecond);
