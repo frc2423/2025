@@ -148,7 +148,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command descoreAlgae(double setpoint) {
-        return Commands.sequence(goToSetpoint(setpoint), arm.goToSetpoint(Constants.ArmConstants.SCORING_POSITION),
+        return Commands.sequence(goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORE),
                 intake.intakeJustOut());
     }
 
