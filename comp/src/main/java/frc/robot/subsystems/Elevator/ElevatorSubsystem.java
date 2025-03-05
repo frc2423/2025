@@ -156,6 +156,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         return encoderPosition;
     }
 
+    public double getSetpoint() {
+        return setpoint;
+    }
+
     public boolean isAtSetpoint() {
         return (Math.abs(getEncoderPosition() - setpoint) < 2);
         // return elevator_PID.atGoal();
