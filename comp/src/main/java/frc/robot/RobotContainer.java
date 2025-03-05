@@ -27,6 +27,8 @@ import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
+import java.util.Optional;
+
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.FunnelSubsystem;
@@ -170,64 +172,64 @@ public class RobotContainer {
                 NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
                 NamedCommands.registerCommand("AutoScoral 11 Right", swerveCommands
-                                .autoScoral(Vision.getAprilTagPose(11), Constants.SetpointConstants.REEF_L4, true));
+                                .autoScoral(Optional.of(11), Constants.SetpointConstants.REEF_L4, true));
 
                 NamedCommands.registerCommand("AutoScoral 11 Left", swerveCommands
-                                .autoScoral(Vision.getAprilTagPose(11), Constants.SetpointConstants.REEF_L4, false));
+                                .autoScoral(Optional.of(11), Constants.SetpointConstants.REEF_L4, false));
 
                 NamedCommands.registerCommand("AutoScoral Left", Commands.either(swerveCommands
-                                .autoScoral(Vision.getAprilTagPose(11), Constants.SetpointConstants.REEF_L4, false),
+                                .autoScoral(Optional.of(11), Constants.SetpointConstants.REEF_L4, false),
                                 Commands.none(),
                                 () -> PoseTransformUtils.isRedAlliance()));
 
-                NamedCommands.registerCommand("AutoScoral 6 Right", swerveCommands.autoScoral(Vision.getAprilTagPose(6),
+                NamedCommands.registerCommand("AutoScoral 6 Right", swerveCommands.autoScoral(Optional.of(6),
                                 Constants.SetpointConstants.REEF_L4, true));
 
-                NamedCommands.registerCommand("AutoScoral 6 Left", swerveCommands.autoScoral(Vision.getAprilTagPose(6),
+                NamedCommands.registerCommand("AutoScoral 6 Left", swerveCommands.autoScoral(Optional.of(6),
                                 Constants.SetpointConstants.REEF_L4, false));
 
-                NamedCommands.registerCommand("AutoScoral 9 Left", swerveCommands.autoScoral(Vision.getAprilTagPose(9),
+                NamedCommands.registerCommand("AutoScoral 9 Left", swerveCommands.autoScoral(Optional.of(9),
                                 Constants.SetpointConstants.REEF_L4, false));
 
-                NamedCommands.registerCommand("AutoScoral 9 Right", swerveCommands.autoScoral(Vision.getAprilTagPose(9),
+                NamedCommands.registerCommand("AutoScoral 9 Right", swerveCommands.autoScoral(Optional.of(9),
                                 Constants.SetpointConstants.REEF_L4, true));
 
-                NamedCommands.registerCommand("AutoScoral 8 Right", swerveCommands.autoScoral(Vision.getAprilTagPose(8),
+                NamedCommands.registerCommand("AutoScoral 8 Right", swerveCommands.autoScoral(Optional.of(8),
                                 Constants.SetpointConstants.REEF_L4, true));
 
-                NamedCommands.registerCommand("AutoScoral 8 Left", swerveCommands.autoScoral(Vision.getAprilTagPose(8),
+                NamedCommands.registerCommand("AutoScoral 8 Left", swerveCommands.autoScoral(Optional.of(8),
                                 Constants.SetpointConstants.REEF_L4, false));
 
                 NamedCommands.registerCommand("AutoScoral 22 Left",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(22),
+                                swerveCommands.autoScoral(Optional.of(22),
                                                 Constants.SetpointConstants.REEF_L4, false));
 
                 NamedCommands.registerCommand("AutoScoral 22 Right",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(22),
+                                swerveCommands.autoScoral(Optional.of(22),
                                                 Constants.SetpointConstants.REEF_L4, true));
 
                 NamedCommands.registerCommand("AutoScoral 17 Right",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(17),
+                                swerveCommands.autoScoral(Optional.of(17),
                                                 Constants.SetpointConstants.REEF_L4, true));
 
                 NamedCommands.registerCommand("AutoScoral 17 Left",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(17),
+                                swerveCommands.autoScoral(Optional.of(17),
                                                 Constants.SetpointConstants.REEF_L4, false));
 
                 NamedCommands.registerCommand("AutoScoral 20 Left",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(20),
+                                swerveCommands.autoScoral(Optional.of(20),
                                                 Constants.SetpointConstants.REEF_L4, false));
 
                 NamedCommands.registerCommand("AutoScoral 20 Right",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(20),
+                                swerveCommands.autoScoral(Optional.of(20),
                                                 Constants.SetpointConstants.REEF_L4, true));
 
                 NamedCommands.registerCommand("AutoScoral 19 Right",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(19),
+                                swerveCommands.autoScoral(Optional.of(19),
                                                 Constants.SetpointConstants.REEF_L4, true));
 
                 NamedCommands.registerCommand("AutoScoral 19 Left",
-                                swerveCommands.autoScoral(Vision.getAprilTagPose(19),
+                                swerveCommands.autoScoral(Optional.of(19),
                                                 Constants.SetpointConstants.REEF_L4, false));
 
                 addAutoScoreCommand("AutoScoral left near", 11, 20, false);
@@ -254,9 +256,9 @@ public class RobotContainer {
 
         public void addAutoScoreCommand(String name, int redTag, int blueTag, boolean isRight) {
 
-                Command redCommand = swerveCommands.autoScoral(Vision.getAprilTagPose(redTag),
+                Command redCommand = swerveCommands.autoScoral(Optional.of(redTag),
                                 Constants.SetpointConstants.REEF_L4, isRight);
-                Command blueCommand = swerveCommands.autoScoral(Vision.getAprilTagPose(blueTag),
+                Command blueCommand = swerveCommands.autoScoral(Optional.of(blueTag),
                                 Constants.SetpointConstants.REEF_L4, isRight);
 
                 NamedCommands.registerCommand(name,

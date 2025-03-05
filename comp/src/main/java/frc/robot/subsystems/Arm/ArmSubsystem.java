@@ -31,7 +31,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private ArmSimulation armSim = new ArmSimulation(armPivot);
 
-    ProfiledPIDController arm_PID = new ProfiledPIDController(4, 0, 0, new TrapezoidProfile.Constraints(100, 100));
+    ProfiledPIDController arm_PID = new ProfiledPIDController(3.5, 0, 0, new TrapezoidProfile.Constraints(100, 100));
 
     public ArmSubsystem() {
         armPivot.getEncoder().setPosition(0);
@@ -78,6 +78,10 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command goUp() { // for manual control, sick
         return goToSetpoint(maximum);
+    }
+
+    public Command goScoreL4() {
+        return goToSetpoint(Constants.ArmConstants.L4_SCORING_POSITION);
     }
 
     public Command goScore() {
