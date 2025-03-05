@@ -61,7 +61,7 @@ public class AutoAlign extends Command {
         double averageSwervePose = swerveAngleFilter.calculate(swerve.getPose().getRotation().getRadians());
         boolean isAngleClose = AngleUtils.areAnglesClose(new Rotation2d(averageTargetPose),
                 new Rotation2d(averageSwervePose),
-                Rotation2d.fromDegrees(4));
+                Rotation2d.fromDegrees(5));
 
         return averageXDistance < Units.inchesToMeters(2) &&
                 averageYDistance < Units.inchesToMeters(2) &&

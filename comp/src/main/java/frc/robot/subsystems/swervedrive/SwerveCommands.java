@@ -286,7 +286,7 @@ public class SwerveCommands {
         } else if (xDistance > .05) {
             x = Math.copySign(.4, xSign);
         } else if (xDistance > .03) {
-            x = Math.copySign(.35, xSign);
+            x = Math.copySign(.4, xSign);
         } else {
             x = 0;
         }
@@ -298,7 +298,7 @@ public class SwerveCommands {
         } else if (yDistance > .05) {
             y = Math.copySign(.4, ySign);
         } else if (yDistance > .03) {
-            y = Math.copySign(.35, ySign);
+            y = Math.copySign(.4, ySign);
         } else {
             y = 0;
         }

@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoScoral 11 Right"
+            "name": "AutoScoral 9 Left"
           }
         },
         {
@@ -17,26 +17,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "I Human Player"
+                  "pathName": "FE Human Player"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "Elevator Down"
-                      }
-                    }
-                  ]
+                  "name": "Elevator Down"
                 }
               }
             ]
@@ -51,7 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoScoral 6 Right"
+            "name": "AutoScoral 8 Right"
           }
         }
       ]
