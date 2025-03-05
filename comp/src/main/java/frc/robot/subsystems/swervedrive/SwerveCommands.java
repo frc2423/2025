@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import java.util.Map;
+import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -97,8 +98,8 @@ public class SwerveCommands {
         return stopCommand;
     }
 
-    public Command autoScoralClosest(double setpoint, boolean isRight) {
-        Command autoScoreElevatorCommand = new SelectCommand<>(
+    public Command getElevatorLevelCommand() {
+        return new SelectCommand<>(
                 // Maps selector values to commands
                 Map.ofEntries(
                         Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
@@ -110,50 +111,42 @@ public class SwerveCommands {
                                 elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
 
                 this::selectElevatorLevel);
+    }
+
+    public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
+        Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
+                () -> elevatorSubsystem.getSetpoint() > 50);
+        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
+                new AutoAlignNear(swerve, this, 0.43, isRight, tagNumber),
+                () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
+
         var command = Commands.sequence(
-                swerve.centerModulesCommand().withTimeout(.5),
-                new AutoAlignClosest(swerve, this, 0.8, isRight),
+                new AutoAlign(swerve, this, 1, isRight, tagNumber),
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
-                                autoScoreElevatorCommand,
+                                getElevatorLevelCommand(),
                                 Commands.waitUntil(() -> {
                                     return elevatorSubsystem.isAtSetpoint();
                                 }),
-                                armSubsystem.goScore()),
+                                goScoreCommand),
                         Commands.sequence(
-                                swerve.centerModulesCommand().withTimeout(.3),
-                                new AutoAlignClosest(swerve, this, 0.4, isRight),
+                                Commands.waitSeconds(.3),
+                                autoAlignNearCommand,
                                 stopMoving())),
-                // stopMoving(),
-                // new AutoAlignClosest(swerve, this, .4, isRight),
-                // stopMoving(),
                 intakeCommands.intakeOut());
 
-        command.setName("autoScoral");
-        // command.addRequirements(swerve, elevatorSubsystem);
+        command.setName("autoScoralClosest");
 
         return command;
     }
 
-    public Command autoScoral(Pose2d pose, double setpoint, boolean isRight) { // put in desired pose and elevator
-                                                                               // subsystem
-        var command = Commands.sequence(
-                swerve.centerModulesCommand().withTimeout(.5),
-                autoScoringAlign(pose, .8, isRight),
-                stopMoving(),
-                elevatorSubsystem.goToSetpoint(setpoint),
-                Commands.waitUntil(() -> {
-                    return elevatorSubsystem.isAtSetpoint();
-                }),
-                autoScoringAlign(pose, .32, isRight),
-                stopMoving(),
-                intakeCommands.intakeOut());
+    public Command autoScoralClosest(boolean isRight) {
+        return autoScoral(Optional.empty(), getElevatorLevelCommand(), isRight);
+    }
 
-        command.setName("autoScoral");
-        // command.addRequirements(swerve, elevatorSubsystem);
-
-        return command;
+    public Command autoScoralClosest(double setpoint, boolean isRight) {
+        return autoScoral(Optional.empty(), elevatorSubsystem.goToSetpoint(setpoint), isRight);
     }
 
     public Command lookAtNearestTag() {
@@ -173,30 +166,6 @@ public class SwerveCommands {
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);
         return command;
-    }
-
-    public Command autoAlign(Pose2d pose2d, double dist, double offsetY) {
-        Pose2d targetPose = addOffset(pose2d, dist, offsetY);
-        var command = Commands.run(() -> {
-            actuallyMoveTo(targetPose);
-        }).until(() -> {
-            double xDistance = Math.abs(targetPose.getX() - swerve.getPose().getX());
-            double yDistance = Math.abs(targetPose.getY() - swerve.getPose().getY());
-            boolean isAngleClose = AngleUtils.areAnglesClose(targetPose.getRotation(), swerve.getPose().getRotation(),
-                    Rotation2d.fromDegrees(5));
-
-            return xDistance < 0.0508 &&
-                    yDistance < 0.0508 &&
-                    isAngleClose;
-        });
-        command.addRequirements(swerve);
-        return command;
-    }
-
-    public Command autoScoringAlign(Pose2d pose2d, double dist, boolean isRight) {
-        double y = .178;
-        double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
-        return autoAlign(pose2d, dist, offsetY);
     }
 
     public void actuallyLookAngleButMove(Rotation2d rotation2d) { // here
@@ -229,10 +198,18 @@ public class SwerveCommands {
         swerve.driveFieldOriented(desiredSpeeds);
     }
 
-    public void actuallyMoveTo(Pose2d pose2d) { // here
+    public void actuallyMoveTo(Pose2d pose2d) {
+        actuallyMoveTo(pose2d, true, true);
+    }
+
+    public void actuallyMoveTo(Pose2d pose2d, boolean enableX, boolean enableY) {
 
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
         Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
+
+        boolean isAngleClose = AngleUtils.areAnglesClose(pose2d.getRotation(),
+                swerve.getPose().getRotation(),
+                Rotation2d.fromDegrees(1));
 
         double xSign = Math.copySign(1, translationDiff.getX());
         double ySign = Math.copySign(1, translationDiff.getY());
@@ -240,89 +217,60 @@ public class SwerveCommands {
         double xDistance = Math.abs(translationDiff.getX());
         double yDistance = Math.abs(translationDiff.getY());
 
-        double distance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-
         double x = 0;
         double y = 0;
 
-        if (xDistance > .7) {
-            x = Math.copySign(.6, xSign);
-        } else if (xDistance > .3) {
-            x = Math.copySign(.6, xSign);
-        } else if (xDistance > .05) {
-            x = Math.copySign(.4, xSign);
+        if (!enableX) {
+            x = 0;
+        } else if (xDistance > .7) {
+            x = .8;
+        } else if (xDistance > .4) {
+            x = .6;
+        } else if (xDistance > .2) {
+            x = .47;
         } else if (xDistance > .03) {
-            x = Math.copySign(.35, xSign);
+            x = .42;
+        } else if (xDistance > .02) {
+            x = .35;
+        } else if (xDistance > .015) {
+            x = .3;
         } else {
             x = 0;
         }
 
-        if (yDistance > .7) {
-            y = Math.copySign(.6, ySign);
-        } else if (yDistance > .3) {
-            y = Math.copySign(.6, ySign);
-        } else if (yDistance > .05) {
-            y = Math.copySign(.4, ySign);
+        if (!enableY) {
+            y = 0;
+        } else if (yDistance > .7) {
+            y = .8;
+        } else if (yDistance > .4) {
+            y = .6;
+        } else if (yDistance > .2) {
+            y = .47;
         } else if (yDistance > .03) {
-            y = Math.copySign(.35, ySign);
+            y = .42;
+        } else if (yDistance > .02) {
+            y = .35;
+        } else if (yDistance > .015) {
+            y = .3;
         } else {
             y = 0;
         }
 
-        //
-        // if (yDistance > .5) {
-        // x *= .75;
-        // }
-
-        // if (distance < .2) {
-        // if (xDistance > Units.inchesToMeters(2)) {
-        // y = 0;
-        // } else {
-        // x = 0;
-        // }
-        // if (yDistance < Units.inchesToMeters(2)) {
-        // y = 0;
-        // }
-        // }
+        x *= xSign;
+        y *= ySign;
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
                 pose2d.getRotation());
 
         final double maxRadsPerSecond = 5;
 
-        if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+        if (isAngleClose) {
+            // desiredSpeeds.omegaRadiansPerSecond = 0;
+        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
             desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
                     desiredSpeeds.omegaRadiansPerSecond);
         }
 
         swerve.drive(desiredSpeeds);
     }
-
-    // public Command lookAtTarget(Pose2d targetAngle, Rotation2d offset) { // to
-    // var command = Commands.sequence(
-    // Commands.runOnce(currentAngleFilter::reset),
-    // Commands.run(() -> {
-    // Pose2d transformedPose = PoseTransformUtils.transformXRedPose(targetAngle);
-    // specialAngle = swerve.getLookAngle(transformedPose).plus(offset);
-    // swerve.actuallyLookAngle(specialAngle);
-    // }, swerve).until(() -> {
-    // double desiredAngle = normalizedAngle(specialAngle.getDegrees());
-    // double currentAngle = currentAngleFilter
-    // .calculate(normalizedAngle(swerve.getHeading().getDegrees()));
-    // double angleDiff = getNormalizedAngleDiff(desiredAngle, currentAngle);
-    // return angleDiff < 3;
-    // }),
-    // Commands.run(() -> {
-    // Pose2d transformedPose = PoseTransformUtils.transformXRedPose(targetAngle);
-    // specialAngle = swerve.getLookAngle(transformedPose).plus(offset);
-    // swerve.actuallyLookAngle(specialAngle);
-    // }, swerve).withTimeout(.5),
-    // Commands.runOnce(() -> {
-    // swerve.stop();
-    // }));
-
-    // command.setName("setLookAngle");
-    // return command;
-    // }
-
 }
