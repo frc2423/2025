@@ -26,12 +26,12 @@ public class AutoAlignFar extends Command {
     }
 
     public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight,
-            int tagNumber) {
+            Optional<Integer> tagNumber) {
         this.isRight = isRight;
         this.dist = dist;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
-        this.tagNumber = Optional.of(tagNumber);
+        this.tagNumber = tagNumber;
     }
 
     @Override

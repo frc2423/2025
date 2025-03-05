@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import java.util.Map;
+import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -18,6 +19,7 @@ import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
+import frc.robot.AngleUtils;
 import frc.robot.Constants;
 import frc.robot.NTHelper;
 import frc.robot.Constants.OperatorConstants;
@@ -111,9 +113,9 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
     }
 
-    public Command autoScoralClosest(double setpoint, boolean isRight) {
+    public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         var command = Commands.sequence(
-                new AutoAlign(swerve, this, 0.8, isRight),
+                new AutoAlign(swerve, this, 0.8, isRight, tagNumber),
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
@@ -123,7 +125,7 @@ public class SwerveCommands {
                                 }),
                                 armSubsystem.goScore()),
                         Commands.sequence(
-                                new AutoAlignNear(swerve, this, 0.44, isRight).withTimeout(2),
+                                new AutoAlignNear(swerve, this, 0.44, isRight, tagNumber).withTimeout(2),
                                 stopMoving())),
                 intakeCommands.intakeOut());
 
@@ -132,26 +134,12 @@ public class SwerveCommands {
         return command;
     }
 
-    public Command autoScoral(int tagNumber, double setpoint, boolean isRight) { // put in desired pose and elevator
-                                                                                 // subsystem
-        var command = Commands.sequence(
-                new AutoAlign(swerve, this, 0.8, isRight, tagNumber),
-                stopMoving(),
-                Commands.parallel(
-                        Commands.sequence(
-                                elevatorSubsystem.goToSetpoint(setpoint),
-                                Commands.waitUntil(() -> {
-                                    return elevatorSubsystem.isAtSetpoint();
-                                }),
-                                armSubsystem.goScore()),
-                        Commands.sequence(
-                                new AutoAlignNear(swerve, this, 0.44, isRight, tagNumber).withTimeout(2),
-                                stopMoving())),
-                intakeCommands.intakeOut());
+    public Command autoScoralClosest(boolean isRight) {
+        return autoScoral(Optional.empty(), getElevatorLevelCommand(), isRight);
+    }
 
-        command.setName("autoScoral");
-
-        return command;
+    public Command autoScoralClosest(double setpoint, boolean isRight) {
+        return autoScoral(Optional.empty(), elevatorSubsystem.goToSetpoint(setpoint), isRight);
     }
 
     public Command lookAtNearestTag() {
@@ -212,6 +200,10 @@ public class SwerveCommands {
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
         Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
 
+        boolean isAngleClose = AngleUtils.areAnglesClose(pose2d.getRotation(),
+                swerve.getPose().getRotation(),
+                Rotation2d.fromDegrees(1));
+
         double xSign = Math.copySign(1, translationDiff.getX());
         double ySign = Math.copySign(1, translationDiff.getY());
 
@@ -224,13 +216,13 @@ public class SwerveCommands {
         if (!enableX) {
             x = 0;
         } else if (xDistance > .7) {
-            x = Math.copySign(.8, xSign);
+            x = .8;
         } else if (xDistance > .4) {
-            x = Math.copySign(.6, xSign);
+            x = .6;
         } else if (xDistance > .2) {
-            x = Math.copySign(.42, xSign);
+            x = .42;
         } else if (xDistance > .03) {
-            x = Math.copySign(.38, xSign);
+            x = .38;
         } else {
             x = 0;
         }
@@ -238,23 +230,28 @@ public class SwerveCommands {
         if (!enableY) {
             y = 0;
         } else if (yDistance > .7) {
-            y = Math.copySign(.8, ySign);
+            y = .8;
         } else if (yDistance > .4) {
-            y = Math.copySign(.6, ySign);
+            y = .6;
         } else if (yDistance > .2) {
-            y = Math.copySign(.42, ySign);
+            y = .42;
         } else if (yDistance > .03) {
-            y = Math.copySign(.38, ySign);
+            y = .38;
         } else {
             y = 0;
         }
+
+        x *= xSign;
+        y *= ySign;
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
                 pose2d.getRotation());
 
         final double maxRadsPerSecond = 5;
 
-        if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+        if (isAngleClose) {
+            desiredSpeeds.omegaRadiansPerSecond = 0;
+        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
             desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
                     desiredSpeeds.omegaRadiansPerSecond);
         }
