@@ -256,11 +256,6 @@ public class SwerveCommands {
             y = 0;
         }
 
-        NTHelper.setDouble("/actuallyMoveTo/xDistance", xDistance * xSign);
-        NTHelper.setDouble("/actuallyMoveTo/x", x * xSign);
-        NTHelper.setDouble("/actuallyMoveTo/yDistance", yDistance * ySign);
-        NTHelper.setDouble("/actuallyMoveTo/y", y * ySign);
-
         x *= xSign;
         y *= ySign;
 
