@@ -64,11 +64,10 @@ public class RobotContainer {
         FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
-        Vision visionSubsystem = new Vision(null, null);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands);
 
-        KwarqsLed ledKwarqs = new KwarqsLed(visionSubsystem, driverXbox);
+        KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);

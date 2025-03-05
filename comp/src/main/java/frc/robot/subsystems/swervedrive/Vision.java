@@ -363,11 +363,7 @@ public class Vision {
   }
 
   public boolean seesFrontAprilTag() {
-    System.out.println(Cameras.FRONT_CAM.getLatestResult().toString());
-    System.out.println(Cameras.FRONT_CAM.getLatestResult().isEmpty());
-    System.out.println(Cameras.FRONT_CAM.getLatestResult().isPresent());
     return Cameras.FRONT_CAM.getLatestResult().isPresent();
-
   }
 
   /**
