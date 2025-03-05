@@ -39,7 +39,7 @@ public class IntakeCommands {
     }
 
     public Command intakeJustOut() {
-        var command = Commands.run(() -> {
+        var command = Commands.runOnce(() -> {
             intake.intake(0.3);
         });
         command.addRequirements(intake);

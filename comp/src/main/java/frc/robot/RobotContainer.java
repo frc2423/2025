@@ -301,11 +301,13 @@ public class RobotContainer {
                                 .onTrue(elevator.goDown());
 
                 new Trigger(() -> (operator.getPOV() == 270 && operator.getLeftTriggerAxis() > 0.1))
-                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L2));
+                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L2))
+                                .onFalse(intakeCommands.intakeStop());
 
                 new Trigger(() -> (operator.getPOV() == 0 && operator.getLeftTriggerAxis() > 0.1))
-                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3));
-                // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
+                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
+                                .onFalse(intakeCommands.intakeStop());
+                new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
