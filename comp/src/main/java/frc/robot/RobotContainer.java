@@ -21,10 +21,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.swervedrive.AutoAlign;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.Vision;
 
 import java.io.File;
+import java.util.Optional;
+
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.FunnelSubsystem;
@@ -154,6 +158,10 @@ public class RobotContainer {
                 m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
                 m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
                 m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
+                m_chooser.addOption("Left Side 2 Piece RED I & K", "Left Side 2 Piece RED I & K");
+                m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
+                m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE E & C");
+                m_chooser.addOption("Left 2 Piece I & L BLUE", "Left 2 Piece I & L BLUE");
 
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
@@ -166,13 +174,98 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("Outtake Reef", intakeCommands.intakeOut());
 
+                NamedCommands.registerCommand("AutoScoral 11 Right", swerveCommands
+                                .autoScoral(Optional.of(11), Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 11 Left", swerveCommands
+                                .autoScoral(Optional.of(11), Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral Left", Commands.either(swerveCommands
+                                .autoScoral(Optional.of(11), Constants.SetpointConstants.REEF_L4, false),
+                                Commands.none(),
+                                () -> PoseTransformUtils.isRedAlliance()));
+
+                NamedCommands.registerCommand("AutoScoral 6 Right", swerveCommands.autoScoral(Optional.of(6),
+                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Left", swerveCommands.autoScoral(Optional.of(6),
+                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 9 Left", swerveCommands.autoScoral(Optional.of(9),
+                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 9 Right", swerveCommands.autoScoral(Optional.of(9),
+                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 8 Right", swerveCommands.autoScoral(Optional.of(8),
+                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 8 Left", swerveCommands.autoScoral(Optional.of(8),
+                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 22 Left",
+                                swerveCommands.autoScoral(Optional.of(22),
+                                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 22 Right",
+                                swerveCommands.autoScoral(Optional.of(22),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 17 Right",
+                                swerveCommands.autoScoral(Optional.of(17),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 17 Left",
+                                swerveCommands.autoScoral(Optional.of(17),
+                                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 20 Left",
+                                swerveCommands.autoScoral(Optional.of(20),
+                                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 20 Right",
+                                swerveCommands.autoScoral(Optional.of(20),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 19 Right",
+                                swerveCommands.autoScoral(Optional.of(19),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 19 Left",
+                                swerveCommands.autoScoral(Optional.of(19),
+                                                Constants.SetpointConstants.REEF_L4, false));
+
+                addAutoScoreCommand("AutoScoral left near", 11, 20, false);
+                addAutoScoreCommand("AutoScoral left far", 6, 19, true);
+                addAutoScoreCommand("AutoScoral right near", 9, 22, false);
+                addAutoScoreCommand("AutoScoral right far", 8, 17, true);
+                // Command autoScore11Left
+                // NamedCommands.registerCommand("AutoScoral Right",
+                // swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, true));
+
+                // NamedCommands.registerCommand("AutoScoral Left",
+                // swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                // false));
                 NamedCommands.registerCommand("Intake Coral From Human Player", intakeCommands.intakeHumanPlayer());
+
+                NamedCommands.registerCommand("Elevator Down", elevator.goDown());
 
                 // Logging callback for the active path, this is sent as a list of poses
                 PathPlannerLogging.setLogActivePathCallback((poses) -> {
                         // Do whatever you want with the poses here
                         drivebase.getSwerveDrive().field.getObject("AutoAlignPath").setPoses(poses);
                 });
+        }
+
+        public void addAutoScoreCommand(String name, int redTag, int blueTag, boolean isRight) {
+
+                Command redCommand = swerveCommands.autoScoral(Optional.of(redTag),
+                                Constants.SetpointConstants.REEF_L4, isRight);
+                Command blueCommand = swerveCommands.autoScoral(Optional.of(blueTag),
+                                Constants.SetpointConstants.REEF_L4, isRight);
+
+                NamedCommands.registerCommand(name,
+                                Commands.either(redCommand, blueCommand, () -> PoseTransformUtils.isRedAlliance()));
         }
 
         public void updateTelemetry() {

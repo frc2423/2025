@@ -159,6 +159,10 @@ public class SwerveCommands {
         return command;
     }
 
+    public Command autoScoral(Optional<Integer> tagNumber,  double setpoint, boolean isRight) {
+        return autoScoral(Optional.empty(), elevatorSubsystem.goToSetpoint(setpoint), isRight);
+    }
+
     public Command autoScoralClosest(boolean isRight) {
         return autoScoral(Optional.empty(), getElevatorLevelCommand(), isRight);
     }

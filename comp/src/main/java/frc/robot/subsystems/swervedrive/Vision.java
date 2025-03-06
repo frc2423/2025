@@ -131,7 +131,10 @@ public class Vision {
     } else {
       throw new RuntimeException("Cannot get AprilTag " + aprilTag + " from field " + fieldLayout.toString());
     }
+  }
 
+  public static Pose2d getAprilTagPose(int aprilTag) {
+    return getAprilTagPose(aprilTag, new Transform2d());
   }
 
   /**

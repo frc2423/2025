@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Move Off Line"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoScoral Right"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "I Human Player"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoScoral Right"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
