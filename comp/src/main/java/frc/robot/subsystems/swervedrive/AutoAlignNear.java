@@ -30,6 +30,7 @@ public class AutoAlignNear extends Command {
         this.dist = dist;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
+        this.addRequirements(swerve);
     }
 
     public AutoAlignNear(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight,
@@ -39,6 +40,7 @@ public class AutoAlignNear extends Command {
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
         this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
     }
 
     @Override

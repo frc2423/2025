@@ -23,6 +23,7 @@ public class AutoAlignFar extends Command {
         this.dist = dist;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
+        this.addRequirements(swerve);
     }
 
     public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight,
@@ -32,6 +33,7 @@ public class AutoAlignFar extends Command {
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
         this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
     }
 
     @Override

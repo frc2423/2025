@@ -301,12 +301,12 @@ public class RobotContainer {
                                 .onTrue(elevator.goDown());
 
                 new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
-                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L2))
+                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L2))
                                 .onFalse(Commands.sequence(intakeCommands.intakeStop(),
                                                 arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
 
                 new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
-                                .whileTrue(elevator.descoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
+                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
                                 .onFalse(Commands.sequence(intakeCommands.intakeStop(),
                                                 arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
 

@@ -80,6 +80,12 @@ public class SwerveCommands {
         }
     }
 
+    public double getScoringOffset(boolean isRight) {
+        double y = .178;
+        double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
+        return offsetY;
+    }
+
     public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
         double y = .178;
         double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
@@ -114,12 +120,10 @@ public class SwerveCommands {
     }
 
     public Command autoDescorAlgae(double setpoint) {
-        var command = Commands.sequence(
-        /*
-         * do autoalign but w/ out offset
-         * then have elevatore do descore
-         */
-        );
+        var command = Commands.parallel(
+                elevatorSubsystem.descoreAlgae(setpoint),
+                new AutoAlign(swerve, this, .45, Optional.empty()));
+        command.setName("autoDescorAlgae");
         return command;
     }
 

@@ -17,6 +17,7 @@ public class AutoAlign extends Command {
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
     private Optional<Integer> tagNumber = Optional.empty();
+    private double offsetY = 0;
 
     private final static int FILTER_SIZE = 10;
     MedianFilter xDistanceFilter = new MedianFilter(FILTER_SIZE);
@@ -25,19 +26,31 @@ public class AutoAlign extends Command {
     MedianFilter swerveAngleFilter = new MedianFilter(FILTER_SIZE);
 
     public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
+        this.offsetY = swerveCommands.getScoringOffset(isRight);
         this.isRight = isRight;
         this.dist = dist;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
+        this.addRequirements(swerve);
     }
 
     public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight,
             Optional<Integer> tagNumber) {
-        this.isRight = isRight;
+        this.offsetY = swerveCommands.getScoringOffset(isRight);
         this.dist = dist;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
         this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
+    }
+
+    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, Optional<Integer> tagNumber) {
+        this.offsetY = 0;
+        this.dist = dist;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
     }
 
     @Override
@@ -62,7 +75,7 @@ public class AutoAlign extends Command {
 
     @Override
     public void execute() {
-        Pose2d targetPose = swerveCommands.addScoringOffset(pose, dist, isRight);// .55
+        Pose2d targetPose = swerveCommands.addOffset(pose, dist, offsetY);// .55
         swerveCommands.actuallyMoveTo(targetPose);
     }
 
