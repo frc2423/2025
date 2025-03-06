@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoScoral 9 Left"
+            "name": "AutoScoral right near"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoScoral 8 Right"
+            "name": "AutoScoral right far"
           }
         }
       ]
