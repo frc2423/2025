@@ -113,6 +113,16 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
     }
 
+    public Command autoDescorAlgae(double setpoint) {
+        var command = Commands.sequence(
+        /*
+         * do autoalign but w/ out offset
+         * then have elevatore do descore
+         */
+        );
+        return command;
+    }
+
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
