@@ -322,14 +322,20 @@ public class RobotContainer {
                                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                false))
-                                .onFalse(intakeCommands.intakeStop());
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                                                false),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.parallel(intakeCommands.intakeStop(),
+                                                ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
-                                .whileTrue(swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                true))
-                                .onFalse(intakeCommands.intakeStop());
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
+                                                                true),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.parallel(intakeCommands.intakeStop(),
+                                                ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.in());
@@ -397,16 +403,18 @@ public class RobotContainer {
                                 .onTrue(elevator.goDown());
 
                 new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
-                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L2))
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoDescorAlgae(
+                                                                Constants.SetpointConstants.ALGAE_DESCORE_L2),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
+                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
+                                                ledKwarqs.isAutoScoring(false)));
 
                 new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
                                 .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
                                 .onFalse(Commands.sequence(intakeCommands.intakeStop(),
                                                 arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
-
-                new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)

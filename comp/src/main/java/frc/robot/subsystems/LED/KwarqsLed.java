@@ -13,6 +13,8 @@ public class KwarqsLed extends SubsystemBase {
     private final Vision visionSubsystem;
     private final XboxController xboxController;
 
+    private boolean isAutoScoring = false;
+
     public KwarqsLed(Vision visionSubsystem, XboxController xboxController) {
         this.xboxController = xboxController;
         this.visionSubsystem = visionSubsystem;
@@ -75,6 +77,14 @@ public class KwarqsLed extends SubsystemBase {
         return command;
     }
 
+    public Command isAutoScoring(boolean flag) {
+        var command = Commands.run(() -> {
+            isAutoScoring = flag;
+        });
+        command.addRequirements(this);
+        return command;
+    }
+
     @Override
     public void periodic() {
         if (RobotState.isTeleop() && !RobotState.isDisabled()) {
@@ -91,6 +101,11 @@ public class KwarqsLed extends SubsystemBase {
                 ledController.set("dark");
             }
         }
+
+        if (isAutoScoring) {
+            ledController.set("rainbow");
+        }
+
         ledController.run();
 
     }

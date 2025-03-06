@@ -91,7 +91,7 @@ public class AutoAlign extends Command {
 
     @Override
     public boolean isFinished() {
-        Pose2d targetPose = swerveCommands.addScoringOffset(pose, dist, isRight);// .55
+        Pose2d targetPose = swerveCommands.addOffset(pose, dist, offsetY);// .55
 
         double averageXDistance = xDistanceFilter.calculate(Math.abs(targetPose.getX() - swerve.getPose().getX()));
         double averageYDistance = yDistanceFilter.calculate(Math.abs(targetPose.getY() - swerve.getPose().getY()));

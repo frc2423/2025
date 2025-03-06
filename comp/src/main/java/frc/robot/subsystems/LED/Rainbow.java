@@ -11,7 +11,7 @@ public class Rainbow implements Led {
     public void run(AddressableLEDBuffer buffer, int length) {
         for (int i = 0; i < buffer.getLength(); i++) {
             int hue = (huePosition + i) % 360; // Calculate the hue (note: hue can go from 0 to 360)
-            buffer.setHSV(i, hue, 255, 32); // Assuming setHSV(index, hue, saturation, value) is available
+            buffer.setHSV(i, hue, 255, 255); // Assuming setHSV(index, hue, saturation, value) is available
         }
         huePosition = (huePosition + 2) % 360; // Move the rainbow
     }

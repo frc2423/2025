@@ -125,6 +125,7 @@ public class SwerveCommands {
 
     public Command autoDescorAlgae(double setpoint) {
         var command = Commands.parallel(
+
                 elevatorSubsystem.descoreAlgae(setpoint),
                 new AutoAlign(swerve, this, .4, Optional.empty(), -.1));
         command.setName("autoDescorAlgae");
@@ -159,7 +160,7 @@ public class SwerveCommands {
         return command;
     }
 
-    public Command autoScoral(Optional<Integer> tagNumber,  double setpoint, boolean isRight) {
+    public Command autoScoral(Optional<Integer> tagNumber, double setpoint, boolean isRight) {
         return autoScoral(Optional.empty(), elevatorSubsystem.goToSetpoint(setpoint), isRight);
     }
 
@@ -249,13 +250,13 @@ public class SwerveCommands {
         } else if (xDistance > .4) {
             x = .6;
         } else if (xDistance > .2) {
-            x = .47;
+            x = .55;
         } else if (xDistance > .03) {
-            x = .42;
+            x = .53;
         } else if (xDistance > .02) {
-            x = .35;
+            x = .5;
         } else if (xDistance > .015) {
-            x = .3;
+            x = .45;
         } else {
             x = 0;
         }
