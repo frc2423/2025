@@ -126,7 +126,7 @@ public class SwerveCommands {
     public Command autoDescorAlgae(double setpoint) {
         var command = Commands.parallel(
                 elevatorSubsystem.descoreAlgae(setpoint),
-                new AutoAlign(swerve, this, .45, Optional.empty()));
+                new AutoAlign(swerve, this, .4, Optional.empty(), -.1));
         command.setName("autoDescorAlgae");
         return command;
     }
