@@ -45,6 +45,10 @@ public class SwerveCommands {
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
     }
 
+    public Vision getVisionFromSwerve() {
+        return swerve.vision;
+    }
+
     // The enum used as keys for selecting the command to run.
     private enum ElevatorLevel {
         T, L2, L3, L4

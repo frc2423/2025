@@ -362,6 +362,15 @@ public class Vision {
     field2d.getObject("tracked targets").setPoses(poses);
   }
 
+  /*
+   * Check whether the front camera sees an April Tag
+   * 
+   * @return True when an april tag is discovered.
+   */
+  public boolean seesFrontAprilTag() {
+    return Cameras.FRONT_CAM.hasTarget();
+  }
+
   /**
    * Camera Enum to select each camera
    * 
@@ -423,6 +432,8 @@ public class Vision {
      * Last read from the camera timestamp to prevent lag due to slow data fetches.
      */
     private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+
+    private boolean isTargetPresent = false;
 
     /**
      * Construct a Photon Camera class with help. Standard deviations are fake
@@ -516,6 +527,16 @@ public class Vision {
       return Optional.of(bestResult);
     }
 
+    /*
+     * Check whether there was a recently discovered target
+     * in the latest photon vision pipelne.
+     * 
+     * @return True when the target exists. False otherwise.
+     */
+    public boolean hasTarget() {
+      return isTargetPresent;
+    }
+
     /**
      * Get the latest result from the current cache.
      *
@@ -557,6 +578,9 @@ public class Vision {
           return a.getTimestampSeconds() >= b.getTimestampSeconds() ? 1 : -1;
         });
         if (!resultsList.isEmpty()) {
+          // Set the boolean when target is present
+          isTargetPresent = resultsList.get(0).hasTargets();
+
           updateEstimatedGlobalPose();
         }
       }

@@ -31,6 +31,7 @@ import frc.robot.subsystems.FunnelSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.LED.KwarqsLed;
 import frc.robot.subsystems.Intake.IntakeCommands;
 //import frc.robot.subsystems.ArmSubsystem;
 
@@ -62,6 +63,8 @@ public class RobotContainer {
         RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
+
+        KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 
         private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
         private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
