@@ -53,6 +53,16 @@ public class AutoAlign extends Command {
         this.addRequirements(swerve);
     }
 
+    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, Optional<Integer> tagNumber,
+            double offsetY) {
+        this.offsetY = offsetY;
+        this.dist = dist;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
+    }
+
     @Override
     public void initialize() {
         if (tagNumber.isPresent()) {
