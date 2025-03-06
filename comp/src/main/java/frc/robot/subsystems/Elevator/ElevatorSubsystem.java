@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.Arm.ArmSubsystem;
+import frc.robot.subsystems.Intake.IntakeCommands;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = 120;
@@ -37,12 +38,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private ElevatorSimulation elevatorSim = new ElevatorSimulation(motor1);
     private ArmSubsystem arm;
+    private IntakeCommands intake;
 
     double elevatorVoltage = 0;
     double calculatedPid = 0;
 
-    public ElevatorSubsystem(ArmSubsystem arm) {
+    public ElevatorSubsystem(ArmSubsystem arm, IntakeCommands intake) {
         this.arm = arm;
+        this.intake = intake;
         motor1.getEncoder().setPosition(0);
         motor2.getEncoder().setPosition(0);
 
@@ -142,6 +145,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         return runOnce(() -> {
             setSetpoint(encoderPosition);
         });
+    }
+
+    public Command descoreAlgae(double setpoint) {
+        return Commands.sequence(goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORE),
+                intake.intakeJustOut());
     }
 
     public double getElevatorVelocity() { // for manual control, sick

@@ -38,6 +38,15 @@ public class IntakeCommands {
         return command;
     }
 
+    public Command intakeJustOut() {
+        var command = Commands.runOnce(() -> {
+            intake.intake(0.3);
+        });
+        command.addRequirements(intake);
+        command.setName("Just Out");
+        return command;
+    }
+
     public Command intakeStop() {
         var command = Commands.runOnce(() -> intake.stop());
         command.addRequirements(intake);

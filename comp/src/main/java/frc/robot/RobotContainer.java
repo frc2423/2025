@@ -58,7 +58,7 @@ public class RobotContainer {
         ClimberSubsystem climberSubsystem = new ClimberSubsystem();
         FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
-        ElevatorSubsystem elevator = new ElevatorSubsystem(arm);
+        ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
         RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
@@ -300,7 +300,17 @@ public class RobotContainer {
                 new Trigger(() -> operator.getPOV() == 180)
                                 .onTrue(elevator.goDown());
 
-                // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
+                new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
+                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L2))
+                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
+                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
+
+                new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
+                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
+                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
+                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
+
+                new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
