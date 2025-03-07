@@ -240,7 +240,7 @@ public class RobotContainer {
                 addAutoScoreCommand("AutoScoral left near", 11, 20, false);
                 addAutoScoreCommand("AutoScoral left far", 6, 19, true);
                 addAutoScoreCommand("AutoScoral right near", 9, 22, false);
-                addAutoScoreCommand("AutoScoral right far", 8, 17, true);
+                addAutoScoreCommand("AutoScoral right far", 8, 17, false);
                 // Command autoScore11Left
                 // NamedCommands.registerCommand("AutoScoral Right",
                 // swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, true));
@@ -325,16 +325,14 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
                                 .whileTrue(Commands.parallel(
-                                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                                false),
+                                                swerveCommands.autoScoralClosest(false),
                                                 ledKwarqs.isAutoScoring(true)))
                                 .onFalse(Commands.parallel(intakeCommands.intakeStop(),
                                                 ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                                 .whileTrue(Commands.parallel(
-                                                swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2,
-                                                                true),
+                                                swerveCommands.autoScoralClosest(true),
                                                 ledKwarqs.isAutoScoring(true)))
                                 .onFalse(Commands.parallel(intakeCommands.intakeStop(),
                                                 ledKwarqs.isAutoScoring(false)));
