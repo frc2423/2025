@@ -47,6 +47,10 @@ public class IntakeCommands {
         return command;
     }
 
+    // public Command eject() {jkj
+    // var command = Commands.parallel(in);
+    // }
+
     public Command intakeStop() {
         var command = Commands.runOnce(() -> intake.stop());
         command.addRequirements(intake);

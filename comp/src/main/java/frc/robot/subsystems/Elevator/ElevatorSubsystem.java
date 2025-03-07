@@ -110,6 +110,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         return command;
     }
 
+    public Command goDownAndIntake() {
+        Command command = Commands.sequence(goDown(), intake.in());
+        command.setName("goDownAndIntake");
+        return command;
+    }
+
     public Command goUp() {
         // for manual control, sick
         return goToSetpoint(highestPoint);

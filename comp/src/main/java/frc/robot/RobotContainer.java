@@ -340,7 +340,7 @@ public class RobotContainer {
                                                 ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.in());
+                                .onTrue(elevator.goDownAndIntake());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(intakeCommands.intakeOut());
