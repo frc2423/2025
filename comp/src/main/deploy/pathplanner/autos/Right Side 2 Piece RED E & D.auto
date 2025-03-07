@@ -40,6 +40,31 @@
           "data": {
             "name": "AutoScoral right far"
           }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "FE Human Player"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Elevator Down"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Coral From Human Player"
+          }
         }
       ]
     }
