@@ -418,7 +418,7 @@ public class RobotContainer {
 
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
-                                .onTrue(elevator.goToSetpoint(Constants.SetpointConstants.ALGAE_DESCORE_L3));
+                                .onTrue(intakeCommands.eject());
 
                 // .onTrue(elevator.goLittleUp(1));
 

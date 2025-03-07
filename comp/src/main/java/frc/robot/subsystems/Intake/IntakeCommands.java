@@ -47,9 +47,15 @@ public class IntakeCommands {
         return command;
     }
 
-    // public Command eject() {jkj
-    // var command = Commands.parallel(in);
-    // }
+    public Command eject() {
+        Command intakeOut = Commands.runOnce(() -> {
+            intake.backwards(.03);
+        });
+        var command = Commands.parallel(intakeOut, funnel.spinOutOnce());
+        command.addRequirements(intake, funnel);
+        command.setName("Eject");
+        return command;
+    }
 
     public Command intakeStop() {
         var command = Commands.runOnce(() -> intake.stop());
