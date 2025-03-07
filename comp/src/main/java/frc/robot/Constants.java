@@ -88,7 +88,7 @@ public final class Constants {
         public static final double REEF_L2 = 18.2;
 
         public static final double ALGAE_DESCORE_L3 = 26;
-        public static final double ALGAE_DESCORE_L2 = 10;
+        public static final double ALGAE_DESCORE_L2 = 9;
 
         public static final double ZERO = 0.1;
     }

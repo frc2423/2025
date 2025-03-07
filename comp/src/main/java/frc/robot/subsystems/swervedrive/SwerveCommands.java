@@ -268,13 +268,13 @@ public class SwerveCommands {
         } else if (yDistance > .4) {
             y = .6;
         } else if (yDistance > .2) {
-            y = .47;
-        } else if (yDistance > .03) {
             y = .42;
+        } else if (yDistance > .03) {
+            y = .37;
         } else if (yDistance > .02) {
-            y = .35;
+            y = .30;
         } else if (yDistance > .015) {
-            y = .3;
+            y = .25;
         } else {
             y = 0;
         }
