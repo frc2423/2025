@@ -138,6 +138,9 @@ public class SwerveCommands {
         Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 new AutoAlignNear(swerve, this, 0.43, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
+        Command autoAlignNearCommand2 = Commands.either(new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
+                new AutoAlignNear(swerve, this, 0.43, isRight, tagNumber),
+                () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
         var command = Commands.sequence(
                 new AutoAlign(swerve, this, 1, isRight, tagNumber),
@@ -152,6 +155,7 @@ public class SwerveCommands {
                         Commands.sequence(
                                 Commands.waitSeconds(.3),
                                 autoAlignNearCommand,
+                                autoAlignNearCommand2,
                                 stopMoving())),
                 intakeCommands.intakeOut());
 
