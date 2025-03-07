@@ -1,32 +1,33 @@
 package frc.robot.subsystems.LED;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 
 public class AutoDown implements Led {
+    private static final int DURATION = 15; // Total seconds before LEDs turn off
+    private int timeElapsed = 0; // Tracks seconds elapsed
+
     public void start(AddressableLEDBuffer buffer, int length) {
+        setBrightness(buffer, 255); // Start with full brightness
     }
 
-    private Timer timer = new Timer();
-
-    
-
     public void run(AddressableLEDBuffer buffer, int length) {
-        for (var i = 0; i < buffer.getLength(); i++) {
-            buffer.setRGB(i, 0, 255, 0);
-        }
+        // Calculate new brightness based on elapsed time
+        int brightness = Math.max(0, 255 - (timeElapsed * (255 / DURATION)));
 
-        for(int i = buffer.getLength(); i > 0; i -= 2) {
-            buffer.setRGB(i, 0, 0, 0);
-            
-            // Thread.sleep(1000);
-        }
+        setBrightness(buffer, brightness);
 
-        // yellow 250, 90, 0 (but divide)
+        if (timeElapsed < DURATION) {
+            timeElapsed++; // Increment each second
+        }
     }
 
     public void end(AddressableLEDBuffer buffer, int length) {
+        setBrightness(buffer, 0); // Ensure LEDs are off when ending
+    }
 
+    private void setBrightness(AddressableLEDBuffer buffer, int brightness) {
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.setHSV(i, 120, 255, brightness); // 120 is green hue
+        }
     }
 }
