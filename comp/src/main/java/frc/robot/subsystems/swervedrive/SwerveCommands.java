@@ -144,7 +144,7 @@ public class SwerveCommands {
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
-                                getElevatorLevelCommand(),
+                                elevatorLevelCommand,
                                 Commands.waitUntil(() -> {
                                     return elevatorSubsystem.isAtSetpoint();
                                 }),
