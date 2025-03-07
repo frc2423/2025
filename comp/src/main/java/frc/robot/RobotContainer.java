@@ -155,13 +155,15 @@ public class RobotContainer {
                 SmartDashboard.putData("ArmSubsystem", arm);
                 SmartDashboard.putData("ClimberSubsystem", climberSubsystem);
 
-                m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
-                m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
-                m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
+                // m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
+                // m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
+                // m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
                 m_chooser.addOption("Left Side 2 Piece RED I & K", "Left Side 2 Piece RED I & K");
                 m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
-                m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE E & C");
-                m_chooser.addOption("Left 2 Piece I & L BLUE", "Left 2 Piece I & L BLUE");
+                // m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE
+                // E & C"); //BAD DONT USE
+                // m_chooser.addOption("Left 2 Piece I & L BLUE", "Left 2 Piece I & L BLUE");
+                // //BAD DONT USE
 
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
