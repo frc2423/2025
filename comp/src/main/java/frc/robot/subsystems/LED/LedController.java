@@ -29,9 +29,16 @@ public class LedController {
         if (currentLed != null) {
             leds.get(currentLed).end(ledBuffer, ledBuffer.getLength());
         }
+        if (name.equals(currentLed)) {
+            return;
+        }
         leds.get(name).start(ledBuffer, ledBuffer.getLength());
         currentLed = name;
         led.setData(ledBuffer);
+    }
+
+    public String getCurrentLed() {
+        return currentLed;
     }
 
     public void run() {

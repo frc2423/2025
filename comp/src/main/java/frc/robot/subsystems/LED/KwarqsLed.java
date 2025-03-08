@@ -1,5 +1,8 @@
 package frc.robot.subsystems.LED;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -15,6 +18,14 @@ public class KwarqsLed extends SubsystemBase {
 
     private boolean isAutoScoring = false;
 
+    public static boolean isRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+        if (alliance.isEmpty()) {
+            return false;
+        }
+        return Alliance.Red.equals(DriverStation.getAlliance().get());
+    }
+
     public KwarqsLed(Vision visionSubsystem, XboxController xboxController) {
         this.xboxController = xboxController;
         this.visionSubsystem = visionSubsystem;
@@ -24,6 +35,12 @@ public class KwarqsLed extends SubsystemBase {
         ledController.add("green", new Green());
         ledController.add("rainbow", new Rainbow());
         ledController.add("dark", new Dark());
+        ledController.add("GreenCycle", new GreenCycle());
+        ledController.add("RedCycle", new RedCycle());
+        ledController.add("BlueCycle", new BlueCycle());
+
+        ledController.add("AutoDown", new AutoDown());
+        ledController.set("dark");
 
         // setDefaultCommand(disable());
     }
@@ -88,15 +105,21 @@ public class KwarqsLed extends SubsystemBase {
     @Override
     public void periodic() {
         if (RobotState.isTeleop() && !RobotState.isDisabled()) {
-            {
+
+            if (isRedAlliance()) {
+                ledController.set("RedCycle");
+            } else if (!isRedAlliance()) {
+                ledController.set("BlueCycle");
+            } else {
                 ledController.set("dark");
             }
+
         } else if (RobotState.isAutonomous() && !RobotState.isDisabled()) {
-            ledController.set("rainbow");
+            ledController.set("AutoDown");
         } else {
             // System.out.println("disabled");
             if (RobotState.isDisabled() && visionSubsystem.seesFrontAprilTag()) {
-                ledController.set("purple");
+                ledController.set("GreenCycle");
             } else {
                 ledController.set("dark");
             }
@@ -108,6 +131,11 @@ public class KwarqsLed extends SubsystemBase {
 
         ledController.run();
 
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addStringProperty("led", () -> ledController.getCurrentLed(), null);
     }
 
 }

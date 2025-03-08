@@ -154,6 +154,7 @@ public class RobotContainer {
                 SmartDashboard.putData("swerveSubsystem", drivebase);
                 SmartDashboard.putData("ArmSubsystem", arm);
                 SmartDashboard.putData("ClimberSubsystem", climberSubsystem);
+                SmartDashboard.putData("ledSubsystem", ledKwarqs);
 
                 // m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
                 // m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
