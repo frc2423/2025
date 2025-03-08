@@ -161,6 +161,9 @@ public class RobotContainer {
                 // m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
                 m_chooser.addOption("Left Side 2 Piece RED I & K", "Left Side 2 Piece RED I & K");
                 m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
+                m_chooser.addOption("Back Right Single (Robot Oriented)", "Back Right Single (Robot Oriented)");
+                m_chooser.addOption("Back Left Single (robot oriented)", "Back Left Single (robot oriented)");
+
                 // m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE
                 // E & C"); //BAD DONT USE
                 // m_chooser.addOption("Left 2 Piece I & L BLUE", "Left 2 Piece I & L BLUE");
@@ -242,6 +245,9 @@ public class RobotContainer {
                 addAutoScoreCommand("AutoScoral left far", 6, 19, true);
                 addAutoScoreCommand("AutoScoral right near", 9, 22, false);
                 addAutoScoreCommand("AutoScoral right far", 8, 17, false);
+                addAutoScoreCommand("AutoScoral back right (robot oriented)", 10, 21, true);
+                addAutoScoreCommand("AutoScoral back left (robot oriented)", 10, 21, false);
+
                 // Command autoScore11Left
                 // NamedCommands.registerCommand("AutoScoral Right",
                 // swerveCommands.autoScoralClosest(Constants.SetpointConstants.REEF_L2, true));
