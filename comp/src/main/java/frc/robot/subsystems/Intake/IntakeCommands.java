@@ -49,7 +49,7 @@ public class IntakeCommands {
 
     public Command eject() {
         Command intakeOut = Commands.runOnce(() -> {
-            intake.backwards(.03);
+            intake.backwards(.3);
         });
         var command = Commands.parallel(intakeOut, funnel.spinOutOnce());
         command.addRequirements(intake, funnel);

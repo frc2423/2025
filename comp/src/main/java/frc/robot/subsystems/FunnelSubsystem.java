@@ -46,8 +46,8 @@ public class FunnelSubsystem extends SubsystemBase {
     }
 
     public Command spinOutOnce() {
-        var command = runOnce(() -> {
-            spinOut(0.1);
+        var command = run(() -> {
+            spinOut(0.3);
         });
         command.setName("Spin OUT (funnel) but run once");
         return command;
