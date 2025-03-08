@@ -1,5 +1,6 @@
 package frc.robot.subsystems.LED;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotState;
@@ -39,6 +40,7 @@ public class KwarqsLed extends SubsystemBase {
         ledController.add("BlueCycle", new BlueCycle());
 
         ledController.add("AutoDown", new AutoDown());
+        ledController.set("dark");
 
         // setDefaultCommand(disable());
     }
@@ -129,6 +131,11 @@ public class KwarqsLed extends SubsystemBase {
 
         ledController.run();
 
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addStringProperty("led", () -> ledController.getCurrentLed(), null);
     }
 
 }

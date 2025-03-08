@@ -1,33 +1,50 @@
 package frc.robot.subsystems.LED;
 
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 
 public class AutoDown implements Led {
-    private static final int DURATION = 15; // Total seconds before LEDs turn off
-    private int timeElapsed = 0; // Tracks seconds elapsed
+    private static final double DURATION = 32.0; // Total seconds before LEDs turn off
+    private final Timer timer = new Timer();
+
+    public AutoDown() {
+
+    }
 
     public void start(AddressableLEDBuffer buffer, int length) {
-        setBrightness(buffer, 255); // Start with full brightness
+        timer.reset();
+        timer.start();
+        // Start all LEDs at full brightness
+        for (int i = 0; i < buffer.getLength(); i++) {
+            buffer.setHSV(i, 240, 255, 255);
+        }
     }
 
     public void run(AddressableLEDBuffer buffer, int length) {
-        // Calculate new brightness based on elapsed time
-        int brightness = Math.max(0, 255 - (timeElapsed * (255 / DURATION)));
+        double timeElapsed = timer.get();
+        // if (timeElapsed > DURATION) {
+        // return;
+        // }
 
-        setBrightness(buffer, brightness);
+        // Calculate how many LEDs should be off based on time
+        int ledsToTurnOff = (int) ((timeElapsed / DURATION) * buffer.getLength());
 
-        if (timeElapsed < DURATION) {
-            timeElapsed++; // Increment each second
+        // Turn off LEDs one by one from the start
+        for (int i = 0; i < buffer.getLength(); i++) {
+            if (i < ledsToTurnOff) {
+                // LED should be off
+                buffer.setHSV(i, 240, 255, 0);
+            } else {
+                // LED should still be on
+                buffer.setHSV(i, 240, 255, 255);
+            }
         }
     }
 
     public void end(AddressableLEDBuffer buffer, int length) {
-        setBrightness(buffer, 0); // Ensure LEDs are off when ending
-    }
-
-    private void setBrightness(AddressableLEDBuffer buffer, int brightness) {
+        // timer.stop();
         for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.setHSV(i, 120, 255, brightness); // 120 is green hue
+            buffer.setHSV(i, 240, 255, 0);
         }
     }
 }
