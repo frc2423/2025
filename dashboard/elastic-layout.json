@@ -17,7 +17,13 @@
             "properties": {
               "topic": "/CameraPublisher/USB Camera 0",
               "period": 0.06,
-              "rotation_turns": 0
+              "rotation_turns": 0,
+              "compression": 16,
+              "fps": 10,
+              "resolution": [
+                400.0,
+                200.0
+              ]
             }
           },
           {
