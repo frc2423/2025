@@ -153,7 +153,7 @@ public class SwerveCommands {
                                 }),
                                 goScoreCommand),
                         Commands.sequence(
-                                Commands.waitSeconds(.3),
+                                Commands.waitSeconds(.6),
                                 autoAlignNearCommand,
                                 autoAlignNearCommand2,
                                 stopMoving())),

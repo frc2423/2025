@@ -33,6 +33,8 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,6 +78,8 @@ public class SwerveSubsystem extends SubsystemBase {
    * Enable vision odometry updates while driving.
    */
   private final boolean visionDriveTest = true;
+
+  private PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
   /**
    * PhotonVision class to keep an accurate odometry.
    */
@@ -142,6 +146,8 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.stopOdometryThread();
     }
     setupPathPlanner();
+
+    pdh.setSwitchableChannel(true);
   }
 
   /**
@@ -800,7 +806,9 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return The heading as a {@link Rotation2d} angle
    */
   public Rotation2d getPitch() {
+
     return swerveDrive.getPitch();
+
   }
 
   /**
@@ -827,6 +835,9 @@ public class SwerveSubsystem extends SubsystemBase {
     builder.addDoubleProperty("PoseX", () -> getPose().getX(), null);
     builder.addDoubleProperty("PoseY", () -> getPose().getY(), null);
     builder.addDoubleProperty("PoseHeading", () -> getPose().getRotation().getDegrees(), null);
+    builder.addBooleanProperty("isLEDRing", () -> pdh.getSwitchableChannel(),
+        (value) -> pdh.setSwitchableChannel(value));
+
   }
 
 }
