@@ -354,23 +354,30 @@ public class RobotContainer {
                                 .onTrue(swerveCommands.lookAtNearestTag());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
-                                .onTrue(intakeCommands.intakeOut());
+                                .whileTrue(intakeCommands.eject())
+                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
+                                                funnelSubsystem.stop()));
 
+                new Trigger(() -> driverXbox.getPOV() == 270)
+                                .whileTrue(climberSubsystem.climb());
                 new Trigger(() -> driverXbox.getPOV() == 0)
-                                .onTrue(swerveCommands.lookAtAngle(0));
-                new Trigger(() -> driverXbox.getPOV() == 315)
-                                .onTrue(swerveCommands.lookAtAngle(60));
-                new Trigger(() -> driverXbox.getPOV() == 225)
-                                .onTrue(swerveCommands.lookAtAngle(120));
+                                .whileTrue(climberSubsystem.deClimb());
+                new Trigger(() -> driverXbox.getPOV() == 90)
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoDescorAlgae(
+                                                                Constants.SetpointConstants.ALGAE_DESCORE_L2),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
+                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
+                                                ledKwarqs.isAutoScoring(false)));
                 new Trigger(() -> driverXbox.getPOV() == 180)
-                                .onTrue(swerveCommands.lookAtAngle(180));
-                new Trigger(() -> driverXbox.getPOV() == 135)
-                                .onTrue(swerveCommands.lookAtAngle(240));
-                new Trigger(() -> driverXbox.getPOV() == 45)
-                                .onTrue(swerveCommands.lookAtAngle(300));
-
-                new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .onTrue(elevator.goDown());
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoDescorAlgae(
+                                                                Constants.SetpointConstants.ALGAE_DESCORE_L3),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
+                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
+                                                ledKwarqs.isAutoScoring(false)));
 
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
@@ -385,49 +392,7 @@ public class RobotContainer {
                         return value;
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
-                new JoystickButton(operator, XboxController.Button.kA.value)
-                                .whileTrue(climberSubsystem.climb());
-
-                new JoystickButton(operator, XboxController.Button.kB.value)
-                                .whileTrue(climberSubsystem.deClimb());
-
-                new JoystickButton(operator, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.in());
-
-                new JoystickButton(operator, XboxController.Button.kX.value)
-                                .onTrue(intakeCommands.intakeOut());
-
-                new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
-                                                : Constants.SetpointConstants.REEF_L2));
-                new Trigger(() -> operator.getPOV() == 0)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
-                                                : Constants.SetpointConstants.REEF_L3));
-                new Trigger(() -> operator.getPOV() == 90)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
-                                                : Constants.SetpointConstants.REEF_L4));
-                new Trigger(() -> operator.getPOV() == 180)
-                                .onTrue(elevator.goDown());
-
-                new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
-                                .whileTrue(Commands.parallel(
-                                                swerveCommands.autoDescorAlgae(
-                                                                Constants.SetpointConstants.ALGAE_DESCORE_L2),
-                                                ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
-                                                ledKwarqs.isAutoScoring(false)));
-
-                new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
-                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
-
                 // .onTrue(elevator.goLittleDown(1));
-                new JoystickButton(operator, XboxController.Button.kBack.value)
-                                .whileTrue(intakeCommands.eject())
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                funnelSubsystem.stop()));
 
                 // .onTrue(elevator.goLittleUp(1));
 
