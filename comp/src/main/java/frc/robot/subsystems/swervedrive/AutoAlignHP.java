@@ -10,14 +10,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.AngleUtils;
+import frc.robot.PoseTransformUtils;
 
-public class AutoAlign extends Command {
+public class AutoAlignHP extends Command {
     private Pose2d pose;
-    private boolean isRight;
     private double dist;
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
-    private Optional<Integer> tagNumber = Optional.empty();
+    private Optional<Boolean> isRight = Optional.empty();
     private double offsetY = 0;
 
     private final static int FILTER_SIZE = 10;
@@ -26,48 +26,34 @@ public class AutoAlign extends Command {
     MedianFilter targetAngleFilter = new MedianFilter(FILTER_SIZE);
     MedianFilter swerveAngleFilter = new MedianFilter(FILTER_SIZE);
 
-    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
-        this.offsetY = swerveCommands.getScoringOffset(isRight);
+    public AutoAlignHP(SwerveSubsystem swerve, SwerveCommands swerveCommands, Optional <Boolean> isRight) {
         this.isRight = isRight;
-        this.dist = dist;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
         this.addRequirements(swerve);
     }
 
-    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight,
-            Optional<Integer> tagNumber) {
-        this.offsetY = swerveCommands.getScoringOffset(isRight);
-        this.dist = dist;
+    public AutoAlignHP(SwerveSubsystem swerve, SwerveCommands swerveCommands) {
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
-        this.tagNumber = tagNumber;
         this.addRequirements(swerve);
     }
 
-    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, Optional<Integer> tagNumber) {
-        this.offsetY = 0;
-        this.dist = dist;
-        this.swerve = swerve;
-        this.swerveCommands = swerveCommands;
-        this.tagNumber = tagNumber;
-        this.addRequirements(swerve);
-    }
-
-    public AutoAlign(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, Optional<Integer> tagNumber,
-            double offsetY) {
-        this.offsetY = offsetY;
-        this.dist = dist;
-        this.swerve = swerve;
-        this.swerveCommands = swerveCommands;
-        this.tagNumber = tagNumber;
-        this.addRequirements(swerve);
+    public int isItRight(){
+        if(isRight.isPresent()){
+            if(isRight.get() == true){
+                if(PoseTransformUtils.isRedAlliance()){
+                    return 2;
+            }
+            }
+        }
+        return 12;
     }
 
     @Override
     public void initialize() {
         if (tagNumber.isPresent()) {
-            pose = Vision.getTagPose(tagNumber.get());
+            pose = Vision.getTagPose(isItRight());
         } else {
             pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
         }
