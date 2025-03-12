@@ -164,6 +164,11 @@ public class SwerveCommands {
         return command;
     }
 
+    public Command autoHPIntake(Optional<Boolean> isRight) {
+        Command autoAlignHPCommand = new AutoAlignHP(swerve, this, isRight);
+        return autoAlignHPCommand;
+    }
+
     public Command autoScoral(Optional<Integer> tagNumber, double setpoint, boolean isRight) {
         return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint), isRight);
     }

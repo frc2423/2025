@@ -26,7 +26,7 @@ public class AutoAlignHP extends Command {
     MedianFilter targetAngleFilter = new MedianFilter(FILTER_SIZE);
     MedianFilter swerveAngleFilter = new MedianFilter(FILTER_SIZE);
 
-    public AutoAlignHP(SwerveSubsystem swerve, SwerveCommands swerveCommands, Optional <Boolean> isRight) {
+    public AutoAlignHP(SwerveSubsystem swerve, SwerveCommands swerveCommands, Optional<Boolean> isRight) {
         this.isRight = isRight;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
@@ -39,20 +39,28 @@ public class AutoAlignHP extends Command {
         this.addRequirements(swerve);
     }
 
-    public int isItRight(){
-        if(isRight.isPresent()){
-            if(isRight.get() == true){
-                if(PoseTransformUtils.isRedAlliance()){
+    public int isItRight() {
+        if (isRight.isPresent()) {
+            if (isRight.get() == true) {
+                if (PoseTransformUtils.isRedAlliance()) {
                     return 2;
-            }
+                } else {
+                    return 12;
+                }
+            } else {
+                if (PoseTransformUtils.isRedAlliance()) {
+                    return 1;
+                } else {
+                    return 13;
+                }
             }
         }
-        return 12;
+        return 0;
     }
 
     @Override
     public void initialize() {
-        if (tagNumber.isPresent()) {
+        if (isRight.isPresent()) {
             pose = Vision.getTagPose(isItRight());
         } else {
             pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
