@@ -11,6 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -449,7 +450,11 @@ public class RobotContainer {
                 return drivebase.getAutonomousCommand(m_chooser.getSelected());
         }
 
-        public void setDriveMode() {
+        public void configureBindings() {
+                new Trigger(() -> RobotController.getUserButton()).onTrue(Commands.runOnce(() -> {
+                        drivebase.toggleLedRing();
+                }).ignoringDisable(true));
+
                 configureDriverBindings();
                 configureOperatorBindings();
         }

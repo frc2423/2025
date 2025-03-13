@@ -150,6 +150,10 @@ public class SwerveSubsystem extends SubsystemBase {
     pdh.setSwitchableChannel(true);
   }
 
+  public void toggleLedRing() {
+    pdh.setSwitchableChannel(!pdh.getSwitchableChannel());
+  }
+
   /**
    * Construct the swerve drive.
    *

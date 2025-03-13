@@ -61,6 +61,8 @@ public class Robot extends TimedRobot {
 
     DataLogManager.start();
     // URCL.start();
+
+    m_robotContainer.configureBindings();
   }
 
   /**
@@ -138,7 +140,6 @@ public class Robot extends TimedRobot {
     } else {
       CommandScheduler.getInstance().cancelAll();
     }
-    m_robotContainer.setDriveMode();
   }
 
   /**
@@ -152,7 +153,6 @@ public class Robot extends TimedRobot {
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-    m_robotContainer.setDriveMode();
   }
 
   /**
