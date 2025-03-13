@@ -38,8 +38,9 @@ public class KwarqsLed extends SubsystemBase {
         ledController.add("GreenCycle", new GreenCycle());
         ledController.add("RedCycle", new RedCycle());
         ledController.add("BlueCycle", new BlueCycle());
-
+        ledController.add("EndGameCounter", new EndGameCounter());
         ledController.add("AutoDown", new AutoDown());
+        ledController.add("FRCcolors", new FRCcolors());
         ledController.set("dark");
 
         // setDefaultCommand(disable());
@@ -106,12 +107,16 @@ public class KwarqsLed extends SubsystemBase {
     public void periodic() {
         if (RobotState.isTeleop() && !RobotState.isDisabled()) {
 
-            if (isRedAlliance()) {
+            if (isRedAlliance() && DriverStation.getMatchTime() > 30) {
                 ledController.set("RedCycle");
             } else if (!isRedAlliance()) {
                 ledController.set("BlueCycle");
             } else {
                 ledController.set("dark");
+            }
+
+            if (DriverStation.getMatchTime() < 30) {
+                ledController.set("EndGameCounter");
             }
 
         } else if (RobotState.isAutonomous() && !RobotState.isDisabled()) {
@@ -120,6 +125,10 @@ public class KwarqsLed extends SubsystemBase {
             // System.out.println("disabled");
             if (RobotState.isDisabled() && visionSubsystem.seesFrontAprilTag()) {
                 ledController.set("GreenCycle");
+
+            } else if (DriverStation.isFMSAttached() && !visionSubsystem.seesFrontAprilTag()
+                    && RobotState.isDisabled()) { // this may never happen
+                ledController.set("FRCcolors");
             } else {
                 ledController.set("dark");
             }
