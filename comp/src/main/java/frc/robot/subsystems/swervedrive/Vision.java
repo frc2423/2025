@@ -169,6 +169,11 @@ public class Vision {
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
             pose.timestampSeconds,
             camera.curStdDevs);
+
+        var stdDev = camera.curStdDevs;
+        NTHelper.setDouble("/swerveSubsystem/vision/stdDevX", stdDev.get(0, 0));
+        NTHelper.setDouble("/swerveSubsystem/vision/stdDevY", stdDev.get(1, 0));
+        NTHelper.setDouble("/swerveSubsystem/vision/stdDevAngle", stdDev.get(2, 0));
       }
     }
 
@@ -186,6 +191,10 @@ public class Vision {
    */
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
     Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
+    NTHelper.setBoolean("/swerveSubsystem/vision/poseIsGood", filterPose(poseEst));
+    if (!filterPose(poseEst)) {
+      return Optional.empty();
+    }
     if (Robot.isSimulation()) {
       Field2d debugField = visionSim.getDebugField();
       // Uncomment to enable outputting of vision targets in sim.
@@ -210,7 +219,7 @@ public class Vision {
    * @return Could be empty if there isn't a good reading.
    */
   @Deprecated(since = "2024", forRemoval = true)
-  private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
+  private boolean filterPose(Optional<EstimatedRobotPose> pose) {
     if (pose.isPresent()) {
       double bestTargetAmbiguity = 1; // 1 is max ambiguity
       for (PhotonTrackedTarget target : pose.get().targetsUsed) {
@@ -219,9 +228,25 @@ public class Vision {
           bestTargetAmbiguity = ambiguity;
         }
       }
+
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/bestTargetAmbiguity", bestTargetAmbiguity);
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/x", pose.get().estimatedPose.getX());
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/y", pose.get().estimatedPose.getY());
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/z", pose.get().estimatedPose.getZ());
+
       // ambiguity to high dont use estimate
       if (bestTargetAmbiguity > maximumAmbiguity) {
-        return Optional.empty();
+        return false;
+      }
+
+      if (pose.get().estimatedPose.getX() < 0 || pose.get().estimatedPose.getX() > fieldLayout.getFieldLength()) {
+        return false;
+      }
+      if (pose.get().estimatedPose.getY() < 0 || pose.get().estimatedPose.getY() > fieldLayout.getFieldWidth()) {
+        return false;
+      }
+      if (Math.abs(pose.get().estimatedPose.getZ()) > 0.32) {
+        return false;
       }
 
       // est pose is very far from recorded robot pose
@@ -231,14 +256,14 @@ public class Vision {
         // if it calculates that were 10 meter away for more than 10 times in a row its
         // probably right
         if (longDistangePoseEstimationCount < 10) {
-          return Optional.empty();
+          return false;
         }
       } else {
         longDistangePoseEstimationCount = 0;
       }
-      return pose;
+      return true;
     }
-    return Optional.empty();
+    return false;
   }
 
   /**
@@ -387,7 +412,7 @@ public class Vision {
         new Translation3d(Units.inchesToMeters(10.5), // center to front
             Units.inchesToMeters(-5),
             Units.inchesToMeters(6)), // front floor
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+        VecBuilder.fill(2, 2, 8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
      * Latency alert to use when high latency is detected.
@@ -628,47 +653,48 @@ public class Vision {
       if (estimatedPose.isEmpty()) {
         // No pose input. Default to single-tag std devs
         curStdDevs = singleTagStdDevs;
-
-      } else {
-        // Pose present. Start running Heuristic
-        var estStdDevs = singleTagStdDevs;
-        int numTags = 0;
-        double avgDist = 0;
-
-        // Precalculation - see how many tags we found, and calculate an
-        // average-distance metric
-        for (var tgt : targets) {
-          var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-          if (tagPose.isEmpty()) {
-            continue;
-          }
-          numTags++;
-          avgDist += tagPose
-              .get()
-              .toPose2d()
-              .getTranslation()
-              .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-        }
-
-        if (numTags == 0) {
-          // No tags visible. Default to single-tag std devs
-          curStdDevs = singleTagStdDevs;
-        } else {
-          // One or more tags visible, run the full heuristic.
-          avgDist /= numTags;
-          // Decrease std devs if multiple targets are visible
-          if (numTags > 1) {
-            estStdDevs = multiTagStdDevs;
-          }
-          // Increase std devs based on (average) distance
-          if (numTags == 1 && avgDist > 4) {
-            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-          } else {
-            estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-          }
-          curStdDevs = estStdDevs;
-        }
+        return;
       }
+
+      // Pose present. Start running Heuristic
+      var estStdDevs = singleTagStdDevs;
+      int numTags = 0;
+      double avgDist = 0;
+
+      // Precalculation - see how many tags we found, and calculate an
+      // average-distance metric
+      for (var tgt : targets) {
+        var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+        if (tagPose.isEmpty()) {
+          continue;
+        }
+        numTags++;
+        avgDist += tagPose
+            .get()
+            .toPose2d()
+            .getTranslation()
+            .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      }
+
+      if (numTags == 0) {
+        // No tags visible. Default to single-tag std devs
+        curStdDevs = singleTagStdDevs;
+      } else {
+        // One or more tags visible, run the full heuristic.
+        avgDist /= numTags;
+        // Decrease std devs if multiple targets are visible
+        if (numTags > 1) {
+          estStdDevs = multiTagStdDevs;
+        }
+        // Increase std devs based on (average) distance
+        if (numTags == 1 && avgDist > 4) {
+          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        } else {
+          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+        }
+        curStdDevs = estStdDevs;
+      }
+
     }
 
   }
