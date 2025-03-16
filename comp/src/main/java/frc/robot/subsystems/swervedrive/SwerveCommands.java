@@ -29,6 +29,7 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private ArmSubsystem armSubsystem;
     private IntakeCommands intakeCommands;
+    private Vision vision;
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -37,11 +38,12 @@ public class SwerveCommands {
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands, ArmSubsystem armSubsystem) {
+            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, Vision vision) {
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
         this.armSubsystem = armSubsystem;
+        this.vision = vision;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
     }
 
@@ -125,7 +127,6 @@ public class SwerveCommands {
 
     public Command autoDescorAlgae(double setpoint) {
         var command = Commands.parallel(
-
                 elevatorSubsystem.descoreAlgae(setpoint),
                 new AutoAlign(swerve, this, .4, Optional.empty(), -.1));
         command.setName("autoDescorAlgae");
@@ -144,7 +145,7 @@ public class SwerveCommands {
 
         var command = Commands.sequence(
                 new AutoAlign(swerve, this, 1, isRight, tagNumber),
-                stopMoving(),
+                stopMoving().until(() -> vision.hasTarget() && curStdDevs < 10),
                 Commands.parallel(
                         Commands.sequence(
                                 elevatorLevelCommand,
