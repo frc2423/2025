@@ -135,11 +135,11 @@ public class SwerveCommands {
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
-        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
-                new AutoAlignNear(swerve, this, 0.43, isRight, tagNumber),
+        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.51, isRight, tagNumber),
+                new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
-        Command autoAlignNearCommand2 = Commands.either(new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
-                new AutoAlignNear(swerve, this, 0.43, isRight, tagNumber),
+        Command autoAlignNearCommand2 = Commands.either(new AutoAlignNear(swerve, this, 0.51, isRight, tagNumber),
+                new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
         var command = Commands.sequence(
