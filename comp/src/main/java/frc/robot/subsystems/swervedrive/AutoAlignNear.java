@@ -14,6 +14,7 @@ import frc.robot.AngleUtils;
 public class AutoAlignNear extends Command {
     private Pose2d pose;
     private boolean isRight;
+    private boolean isAlgae;
     private double dist;
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
