@@ -31,7 +31,7 @@ public class FunnelSubsystem extends SubsystemBase {
 
     public Command spinIn() {
         var command = run(() -> {
-            spinIn(-0.5);
+            spinIn(-1.0);
         });
         command.setName("Spin IN (funnel)");
         return command;

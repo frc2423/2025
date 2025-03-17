@@ -335,15 +335,15 @@ public class RobotContainer {
                                 .whileTrue(Commands.parallel(
                                                 swerveCommands.autoScoralClosest(false),
                                                 ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.parallel(intakeCommands.intakeStop(),
-                                                ledKwarqs.isAutoScoring(false)));
+                                .onFalse(Commands.sequence(Commands.parallel(intakeCommands.intakeStop(),
+                                                ledKwarqs.isAutoScoring(false)), swerveCommands.lookAtNearestTag()));
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                                 .whileTrue(Commands.parallel(
                                                 swerveCommands.autoScoralClosest(true),
                                                 ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.parallel(intakeCommands.intakeStop(),
-                                                ledKwarqs.isAutoScoring(false)));
+                                .onFalse(Commands.sequence(Commands.parallel(intakeCommands.intakeStop(),
+                                                ledKwarqs.isAutoScoring(false)), swerveCommands.lookAtNearestTag()));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(elevator.goDownAndIntake());
@@ -371,7 +371,7 @@ public class RobotContainer {
                                 .onTrue(swerveCommands.lookAtAngle(300));
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .onTrue(elevator.goDown());
+                                .onTrue(Commands.sequence(elevator.goDown(), swerveCommands.lookAtNearestTag()));
 
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
