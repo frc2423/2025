@@ -352,7 +352,7 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
-                                .onTrue(swerveCommands.lookAtNearestTag());
+                                .onTrue(swerveCommands.orbitReefCenter());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());

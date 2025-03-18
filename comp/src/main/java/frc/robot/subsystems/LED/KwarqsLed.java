@@ -95,7 +95,7 @@ public class KwarqsLed extends SubsystemBase {
     }
 
     public Command isAutoScoring(boolean flag) {
-        var command = Commands.run(() -> {
+        var command = Commands.runOnce(() -> {
             isAutoScoring = flag;
         });
         command.addRequirements(this);
