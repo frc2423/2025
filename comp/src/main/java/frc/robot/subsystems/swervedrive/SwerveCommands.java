@@ -210,15 +210,10 @@ public class SwerveCommands {
 
     static Pose2d reefCenter = new Pose2d(new Translation2d(13.055, 4.007), Rotation2d.fromDegrees(0));
 
-    public Command lookAtNearestTag() {
+    public Command orbitReefCenter() {
         var command = Commands.run(() -> {
-            // int tag = swerve.vision.findClosestTagID(swerve.getPose());
             Rotation2d angle = getLookAngle(reefCenter);
-            // int angle = swerve.getPose().getTranslation().getDistance(new
-            // Translation2d(13.055, 4.007))
             actuallyLookAngleButMove(angle);
-            // actuallyLookAngleButMove(Rotation2d.fromDegrees(angle).plus(Rotation2d.k180deg));
-
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);
         return command;

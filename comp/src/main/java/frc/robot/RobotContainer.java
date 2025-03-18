@@ -335,15 +335,15 @@ public class RobotContainer {
                                 .whileTrue(Commands.parallel(
                                                 swerveCommands.autoScoralClosest(false),
                                                 ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.sequence(Commands.parallel(intakeCommands.intakeStop(),
-                                                ledKwarqs.isAutoScoring(false)), swerveCommands.lookAtNearestTag()));
+                                .onFalse(Commands.parallel(intakeCommands.intakeStop(),
+                                                ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
                                 .whileTrue(Commands.parallel(
                                                 swerveCommands.autoScoralClosest(true),
                                                 ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.sequence(Commands.parallel(intakeCommands.intakeStop(),
-                                                ledKwarqs.isAutoScoring(false)), swerveCommands.lookAtNearestTag()));
+                                .onFalse(Commands.parallel(intakeCommands.intakeStop(),
+                                                ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(elevator.goDownAndIntake());
@@ -352,7 +352,7 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
-                                .onTrue(swerveCommands.lookAtNearestTag());
+                                .onTrue(swerveCommands.orbitReefCenter());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
@@ -371,7 +371,7 @@ public class RobotContainer {
                                 .onTrue(swerveCommands.lookAtAngle(300));
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .onTrue(Commands.sequence(elevator.goDown(), swerveCommands.lookAtNearestTag()));
+                                .onTrue(elevator.goDown());
 
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
