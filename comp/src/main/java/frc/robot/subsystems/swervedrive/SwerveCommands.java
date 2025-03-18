@@ -148,6 +148,22 @@ public class SwerveCommands {
         return command;
     }
 
+    public Command autoAlignAndIntakeAlgae(double setpoint) {
+        Command intakeAlgaeCommand = elevatorSubsystem.intakeAlgae(setpoint);
+        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), -.3); // offsets are made up
+        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), -.3); // offsets are made up
+        var command = Commands.sequence(
+                autoAlignCommand1,
+                Commands.sequence(
+                        intakeAlgaeCommand,
+                        Commands.waitUntil(() -> {
+                            return elevatorSubsystem.isAtSetpoint();
+                        }),
+                        autoAlignCommand2));
+        command.setName("autoIntakeAlgae");
+        return command;
+    }
+
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
