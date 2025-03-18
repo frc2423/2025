@@ -123,12 +123,28 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
     }
 
-    public Command autoDescorAlgae(double setpoint) {
+    public Command autoDescoreAlgae(double setpoint) {
         var command = Commands.parallel(
-
                 elevatorSubsystem.descoreAlgae(setpoint),
+                new AutoAlign(swerve, this, 1, Optional.empty(), -.1),
                 new AutoAlign(swerve, this, .4, Optional.empty(), -.1));
         command.setName("autoDescorAlgae");
+        return command;
+    }
+
+    public Command autoAlignAndDescoreAlgae(double setpoint) {
+        Command descoreCommand = elevatorSubsystem.descoreAlgae(setpoint);
+        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), -.1);
+        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), -.1);
+        var command = Commands.sequence(
+                autoAlignCommand1,
+                Commands.sequence(
+                        descoreCommand,
+                        Commands.waitUntil(() -> {
+                            return elevatorSubsystem.isAtSetpoint();
+                        }),
+                        autoAlignCommand2));
+        command.setName("autoDescorAlgaeButBetter");
         return command;
     }
 
