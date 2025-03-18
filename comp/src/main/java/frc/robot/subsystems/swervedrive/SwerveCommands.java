@@ -192,12 +192,28 @@ public class SwerveCommands {
         return autoScoral(Optional.empty(), elevatorSubsystem.goToSetpoint(setpoint), isRight);
     }
 
-    public Command lookAtNearestTag() {
-        var command = Commands.run(() -> {
-            int tag = swerve.vision.findClosestTagID(swerve.getPose());
-            int angle = swerve.vision.iDtoAngle(tag);
-            actuallyLookAngleButMove(Rotation2d.fromDegrees(angle).plus(Rotation2d.k180deg));
+    public double getDistanceBetweenPoses(Pose2d a, Pose2d b) {
+        double y = a.getY() - b.getY();
+        double x = a.getX() - b.getX();
+        return Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
+    }
 
+    public Rotation2d getLookAngle(Pose2d targetPose) {
+        Pose2d currentPose = swerve.getPose();
+        double distance = getDistanceBetweenPoses(currentPose, targetPose);
+        if (distance < Units.inchesToMeters(8)) {
+            return currentPose.getRotation();
+        }
+        double angleRads = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+        return new Rotation2d(angleRads);
+    }
+
+    static Pose2d reefCenter = new Pose2d(new Translation2d(13.055, 4.007), Rotation2d.fromDegrees(0));
+
+    public Command orbitReefCenter() {
+        var command = Commands.run(() -> {
+            Rotation2d angle = getLookAngle(reefCenter);
+            actuallyLookAngleButMove(angle);
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);
         return command;
@@ -217,7 +233,7 @@ public class SwerveCommands {
         double x = MathUtil.applyDeadband(
                 driverXbox.getLeftX(),
                 OperatorConstants.LEFT_X_DEADBAND);
-        if (PoseTransformUtils.isRedAlliance()) {
+        if (!PoseTransformUtils.isRedAlliance()) {
             x *= -1;
         }
         double ySpeedTarget = m_xspeedLimiter.calculate(x);
@@ -225,7 +241,7 @@ public class SwerveCommands {
         double y = MathUtil.applyDeadband(
                 driverXbox.getLeftY(),
                 OperatorConstants.LEFT_Y_DEADBAND);
-        if (PoseTransformUtils.isRedAlliance()) {
+        if (!PoseTransformUtils.isRedAlliance()) {
             y *= -1;
         }
 
