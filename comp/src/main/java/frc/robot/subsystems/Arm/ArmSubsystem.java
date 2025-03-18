@@ -122,6 +122,10 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean isAtSetpoint() {
+        return (Math.abs(getEncoderPosition() - setpoint) < 2);
+    }
+
     public double getEncoderPosition() {
         return encoderPosition;
     }

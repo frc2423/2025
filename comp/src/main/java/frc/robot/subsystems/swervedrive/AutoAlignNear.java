@@ -71,10 +71,10 @@ public class AutoAlignNear extends Command {
         double xDistance = Math.abs(translationDiff.getX());
         double yDistance = Math.abs(translationDiff.getY());
 
-        if (yDistance < Units.inchesToMeters(.8)) {
+        if (yDistance < Units.inchesToMeters(.45)) {
             reachedY = true;
         }
-        if (xDistance < Units.inchesToMeters(.8)) {
+        if (xDistance < Units.inchesToMeters(.45)) {
             reachedX = true;
         }
 
