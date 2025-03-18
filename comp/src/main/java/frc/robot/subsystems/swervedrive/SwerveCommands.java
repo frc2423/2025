@@ -92,7 +92,7 @@ public class SwerveCommands {
 
     public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
         double y = .178;
-        double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
+        double offsetY = (isRight ? .178 : -.148) - Units.inchesToMeters(5);
         return addOffset(pose, distance, offsetY);
     }
 
@@ -159,7 +159,7 @@ public class SwerveCommands {
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
         var command = Commands.sequence(
-                new AutoAlign(swerve, this, 1, isRight, tagNumber),
+                new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
                 stopMoving(),
                 Commands.parallel(
                         Commands.sequence(
@@ -167,9 +167,12 @@ public class SwerveCommands {
                                 Commands.waitUntil(() -> {
                                     return elevatorSubsystem.isAtSetpoint();
                                 }),
-                                goScoreCommand),
+                                goScoreCommand,
+                                Commands.waitUntil(() -> {
+                                    return armSubsystem.isAtSetpoint();
+                                })),
                         Commands.sequence(
-                                Commands.waitSeconds(.6),
+                                Commands.waitSeconds(.3),
                                 autoAlignNearCommand,
                                 autoAlignNearCommand2,
                                 stopMoving())),
