@@ -5,6 +5,7 @@ import java.util.Optional;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class AutoAlignFar extends Command {
@@ -17,6 +18,7 @@ public class AutoAlignFar extends Command {
     private boolean reachedX = false;
     private boolean reachedY = false;
     private Optional<Integer> tagNumber = Optional.empty();
+    private Timer timerY = new Timer();
 
     public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
         this.isRight = isRight;
@@ -49,6 +51,7 @@ public class AutoAlignFar extends Command {
 
     @Override
     public void execute() {
+        timerY.reset();
         Pose2d pose2d = swerveCommands.addScoringOffset(pose, dist, isRight);
 
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
@@ -61,10 +64,11 @@ public class AutoAlignFar extends Command {
             reachedX = true;
         }
         if (yDistance < Units.inchesToMeters(2)) {
+            timerY.start();
             reachedY = true;
         }
 
-        swerveCommands.actuallyMoveTo(pose2d, !reachedX, !reachedY);
+        swerveCommands.actuallyMoveToFar(pose2d, !reachedX, timerY.get() <= 0.5);
     }
 
     @Override

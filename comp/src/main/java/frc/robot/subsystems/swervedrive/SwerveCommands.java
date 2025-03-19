@@ -4,13 +4,19 @@ import java.util.Map;
 import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -35,6 +41,8 @@ public class SwerveCommands {
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
+
+    ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
             IntakeCommands intakeCommands, ArmSubsystem armSubsystem) {
@@ -159,10 +167,16 @@ public class SwerveCommands {
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
         var command = Commands.sequence(
-                new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
-                stopMoving(),
                 Commands.parallel(
+
                         Commands.sequence(
+                                new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
+                                stopMoving()),
+
+                        Commands.sequence(
+                                Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
+                                        (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
+                                                : new Translation2d(4.507, 4.031)) < 2),
                                 elevatorLevelCommand,
                                 Commands.waitUntil(() -> {
                                     return elevatorSubsystem.isAtSetpoint();
@@ -170,12 +184,16 @@ public class SwerveCommands {
                                 goScoreCommand,
                                 Commands.waitUntil(() -> {
                                     return armSubsystem.isAtSetpoint();
-                                })),
-                        Commands.sequence(
-                                Commands.waitSeconds(.3),
-                                autoAlignNearCommand,
-                                autoAlignNearCommand2,
-                                stopMoving())),
+                                }))
+
+                ),
+
+                Commands.sequence(
+                        Commands.waitSeconds(.3),
+                        autoAlignNearCommand,
+                        autoAlignNearCommand2,
+                        stopMoving()),
+
                 intakeCommands.intakeOut());
 
         command.setName("autoScoralClosest");
@@ -284,39 +302,98 @@ public class SwerveCommands {
 
         if (!enableX) {
             x = 0;
-        } else if (xDistance > .7) {
-            x = .8;
-        } else if (xDistance > .4) {
-            x = .6;
-        } else if (xDistance > .2) {
-            x = .55;
-        } else if (xDistance > .03) {
-            x = .53;
-        } else if (xDistance > .02) {
-            x = .47;
-        } else if (xDistance > .015) {
-            x = .43;
         } else {
-            x = 0;
+            x = MathUtil.interpolate(0.5, 0.7, (xDistance - 0.5) / (0.7 - 0.5));
+
         }
 
         if (!enableY) {
             y = 0;
-        } else if (yDistance > .7) {
-            y = .8;
-        } else if (yDistance > .4) {
-            y = .6;
-        } else if (yDistance > .2) {
-            y = .47;
-        } else if (yDistance > .03) {
-            y = .42;
-        } else if (yDistance > .02) {
-            y = .35;
-        } else if (yDistance > .015) {
-            y = .3;
         } else {
-            y = 0;
+            y = MathUtil.interpolate(0.5, 0.7, (yDistance - 0.5) / (0.7 - 0.5));
+
         }
+        x *= xSign;
+        y *= ySign;
+
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
+                pose2d.getRotation());
+
+        final double maxRadsPerSecond = 5;
+
+        if (isAngleClose) {
+            // desiredSpeeds.omegaRadiansPerSecond = 0;
+        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
+                    desiredSpeeds.omegaRadiansPerSecond);
+        }
+
+        swerve.drive(desiredSpeeds);
+    }
+
+    public void actuallyMoveToFar(Pose2d pose2d, boolean enableX, boolean enableY) {
+
+        Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
+        Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
+
+        boolean isAngleClose = AngleUtils.areAnglesClose(pose2d.getRotation(),
+                swerve.getPose().getRotation(),
+                Rotation2d.fromDegrees(1));
+
+        double xSign = Math.copySign(1, translationDiff.getX());
+        double ySign = Math.copySign(1, translationDiff.getY());
+
+        double xDistance = Math.abs(translationDiff.getX());
+        double yDistance = Math.abs(translationDiff.getY());
+
+        double x = 0;
+        double y = 0;
+
+        if (!enableX) {
+            x = 0;
+        } else {
+            x = MathUtil.interpolate(0.5, 0.8, (xDistance - 0.5) / (0.8 - 0.5));
+
+        }
+
+        // else if (xDistance > .7) {}
+        // x = .6;
+        // } else if (xDistance > .4) {
+        // x = .6;
+        // } else if (xDistance > .2) {
+        // x = .55;
+        // } else if (xDistance > .03) {
+        // x = .55;
+        // } else if (xDistance > .02) {
+        // x = .55;
+        // } else if (xDistance > .015) {
+        // x = .5;
+        // } else {
+        // x = 0;
+        // }
+
+        if (!enableY) {
+            y = 0;
+        } else {
+            y = MathUtil.interpolate(0.5, 0.8, (yDistance - 0.5) / (0.8 - 0.5));
+
+        }
+
+        // } else if (yDistance > .7) {
+        // y = .6;
+        // } else if (yDistance > .4) {
+        // y = .6;
+        // } else if (yDistance > .2) {
+        // y = .55;
+        // } else if (yDistance > .03) {
+        // y = .55;
+        // } else if (yDistance > .02) {
+        // y = .55;
+        // } else if (yDistance > .015) {
+        // y = .5;
+        // } else {
+        // y = 0;
+        // }
 
         x *= xSign;
         y *= ySign;
