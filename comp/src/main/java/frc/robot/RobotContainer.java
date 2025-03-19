@@ -164,6 +164,8 @@ public class RobotContainer {
                 m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
                 m_chooser.addOption("Back Right Single (Robot Oriented)", "Back Right Single (Robot Oriented)");
                 m_chooser.addOption("Back Left Single (robot oriented)", "Back Left Single (robot oriented)");
+                m_chooser.addOption("Left Side 2 3/4", "Left Side 3 Piece BLUE E & C & D");
+                m_chooser.addOption("Right Side 2 3/4", "Right Side 3 Piece BLUE E & C & D");
 
                 // m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE
                 // E & C"); //BAD DONT USE
