@@ -351,24 +351,26 @@ public class RobotContainer {
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(intakeCommands.intakeOut());
 
+                new JoystickButton(driverXbox, XboxController.Button.kB.value)
+                                .onTrue(intakeCommands.intakeJustIn());
+
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
                                 .onTrue(swerveCommands.orbitReefCenter());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
 
+                new Trigger(() -> driverXbox.getPOV() == 270)
+                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
+                                                : Constants.SetpointConstants.REEF_L2));
                 new Trigger(() -> driverXbox.getPOV() == 0)
-                                .onTrue(swerveCommands.lookAtAngle(0));
-                new Trigger(() -> driverXbox.getPOV() == 315)
-                                .onTrue(swerveCommands.lookAtAngle(60));
-                new Trigger(() -> driverXbox.getPOV() == 225)
-                                .onTrue(swerveCommands.lookAtAngle(120));
+                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
+                                                : Constants.SetpointConstants.REEF_L3));
+                new Trigger(() -> driverXbox.getPOV() == 90)
+                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
+                                                : Constants.SetpointConstants.REEF_L4));
                 new Trigger(() -> driverXbox.getPOV() == 180)
-                                .onTrue(swerveCommands.lookAtAngle(180));
-                new Trigger(() -> driverXbox.getPOV() == 135)
-                                .onTrue(swerveCommands.lookAtAngle(240));
-                new Trigger(() -> driverXbox.getPOV() == 45)
-                                .onTrue(swerveCommands.lookAtAngle(300));
+                                .onTrue(elevator.goDown());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(elevator.goDown());
@@ -399,16 +401,23 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
-                                                : Constants.SetpointConstants.REEF_L2));
+                                .whileTrue(swerveCommands
+                                                .autoAlignAndIntakeAlgae(Constants.SetpointConstants.ALGAE_INTAKE_L2,
+                                                                Constants.SetpointConstants.ALGAE_DUNK_L2))
+                                .onFalse(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));
                 new Trigger(() -> operator.getPOV() == 0)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
-                                                : Constants.SetpointConstants.REEF_L3));
-                new Trigger(() -> operator.getPOV() == 90)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
-                                                : Constants.SetpointConstants.REEF_L4));
+                                .whileTrue(swerveCommands.autoAlignAndIntakeAlgae(Constants.SetpointConstants.REEF_L3,
+                                                Constants.SetpointConstants.ALGAE_DUNK_L3))
+                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD)));
+                // new Trigger(() -> operator.getPOV() == 90)
+                // .whileTrue(swerveCommands
+                // .autoAlignAndIntakeAlgae(Constants.SetpointConstants.ALGAE_SCORE))
+                // .onFalse(Commands.sequence(intakeCommands.intakeStop(),
+                // arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
                 new Trigger(() -> operator.getPOV() == 180)
-                                .onTrue(elevator.goDown());
+                                .whileTrue(elevator.intakeGroundAlgae())
+                                .onFalse(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));
 
                 new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
                                 .whileTrue(Commands.parallel(
@@ -426,11 +435,14 @@ public class RobotContainer {
                                                 arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
 
                 // .onTrue(elevator.goLittleDown(1));
-                new JoystickButton(operator, XboxController.Button.kBack.value)
+                new JoystickButton(operator, XboxController.Button.kBack.value) // left
                                 .whileTrue(intakeCommands.eject())
                                 .onFalse(Commands.sequence(intakeCommands.intakeStop(),
                                                 funnelSubsystem.stop()));
 
+                new JoystickButton(operator, XboxController.Button.kStart.value) // right
+                                .whileTrue(intakeCommands.ejectAlgae())
+                                .onFalse(intakeCommands.intakeStop());
                 // .onTrue(elevator.goLittleUp(1));
 
                 new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));

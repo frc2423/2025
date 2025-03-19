@@ -134,32 +134,34 @@ public class SwerveCommands {
 
     public Command autoAlignAndDescoreAlgae(double setpoint) {
         Command descoreCommand = elevatorSubsystem.descoreAlgae(setpoint);
-        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), -.1);
-        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), -.1);
+        Command autoAlignCommand1 = new AutoAlignFar(swerve, this, 1, true, Optional.empty());
+        Command autoAlignCommand2 = new AutoAlignNear(swerve, this, .4, true, Optional.empty());
         var command = Commands.sequence(
                 autoAlignCommand1,
                 Commands.sequence(
                         descoreCommand,
                         Commands.waitUntil(() -> {
-                            return elevatorSubsystem.isAtSetpoint();
+                            return elevatorSubsystem.isAtSetpoint() && armSubsystem.isAtSetpoint();
                         }),
                         autoAlignCommand2));
         command.setName("autoDescorAlgaeButBetter");
         return command;
     }
 
-    public Command autoAlignAndIntakeAlgae(double setpoint) {
-        Command intakeAlgaeCommand = elevatorSubsystem.intakeAlgae(setpoint);
-        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), -.3); // offsets are made up
-        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), -.3); // offsets are made up
+    public Command autoAlignAndIntakeAlgae(double setpoint, double setpoint2) {
+        Command intakeAlgaeCommand1 = elevatorSubsystem.intakeAlgae(setpoint);
+        Command intakeAlgaeCommand2 = elevatorSubsystem.goToSetpoint(setpoint2);
+        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), .1);
+        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), .1);
         var command = Commands.sequence(
                 autoAlignCommand1,
                 Commands.sequence(
-                        intakeAlgaeCommand,
+                        intakeAlgaeCommand1,
                         Commands.waitUntil(() -> {
-                            return elevatorSubsystem.isAtSetpoint();
+                            return elevatorSubsystem.isAtSetpoint();// && armSubsystem.isAtSetpoint();
                         }),
-                        autoAlignCommand2));
+                        autoAlignCommand2,
+                        intakeAlgaeCommand2));
         command.setName("autoIntakeAlgae");
         return command;
     }

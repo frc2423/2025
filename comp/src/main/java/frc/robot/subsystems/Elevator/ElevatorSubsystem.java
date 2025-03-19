@@ -167,8 +167,26 @@ public class ElevatorSubsystem extends SubsystemBase {
                 Commands.waitUntil(() -> {
                     return isAtSetpoint();
                 }),
-                arm.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORE),
-                intake.intakeIn());
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_INTAKE),
+                intake.intakeJustIn());
+    }
+
+    public Command intakeGroundAlgae() {
+        return Commands.sequence(goToSetpoint(Constants.SetpointConstants.ZERO),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_GROUND),
+                intake.intakeJustIn());
+    }
+
+    public Command outtakeAlgae(double setpoint) {
+        return Commands.sequence(goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_SCORE),
+                intake.intakeOut());
     }
 
     public double getElevatorVelocity() { // for manual control, sick

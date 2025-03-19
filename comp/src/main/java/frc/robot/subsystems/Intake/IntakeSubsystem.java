@@ -18,25 +18,31 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class IntakeSubsystem extends SubsystemBase {
     private SparkFlex motor = new SparkFlex(23, MotorType.kBrushless);
     private LaserCan intakeDist = new LaserCan(26);
+    private double speed = 0;
+
+    @Override
+    public void periodic() {
+        motor.set(speed);
+    }
 
     public IntakeSubsystem() {
 
     }
 
     public void intake(double speed) {
-        motor.set(speed);
+        this.speed = speed;
     }
 
     public void outtake(double speed) {
-        motor.set(speed);
+        this.speed = speed;
     }
 
     public void backwards(double speed) {
-        motor.set(-speed);
+        this.speed = -speed;
     }
 
     public void stop() {
-        motor.set(0);
+        speed = 0;
     }
 
     public double distMm() {
