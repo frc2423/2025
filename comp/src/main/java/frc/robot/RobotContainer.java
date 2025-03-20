@@ -389,10 +389,10 @@ public class RobotContainer {
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
                 new JoystickButton(operator, XboxController.Button.kA.value)
-                                .whileTrue(climberSubsystem.climb());
+                                .whileTrue(arm.goLittleUp(1));// climberSubsystem.climb());
 
                 new JoystickButton(operator, XboxController.Button.kB.value)
-                                .whileTrue(climberSubsystem.deClimb());
+                                .whileTrue(arm.goLittleDown(1)); // climberSubsystem.deClimb());
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.in());
@@ -442,7 +442,8 @@ public class RobotContainer {
 
                 new JoystickButton(operator, XboxController.Button.kStart.value) // right
                                 .whileTrue(intakeCommands.ejectAlgae())
-                                .onFalse(intakeCommands.intakeStop());
+                                .onFalse(Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR),
+                                                intakeCommands.intakeStop()));
                 // .onTrue(elevator.goLittleUp(1));
 
                 new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));

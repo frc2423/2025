@@ -94,6 +94,20 @@ public class ArmSubsystem extends SubsystemBase {
         });
     }
 
+    public Command goLittleDown(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition - constant);
+        });
+    }
+
+    public Command goLittleUp(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition + constant);
+        });
+    }
+
     public Command stopElevator() {
         Command command = runOnce(() -> {
             setSetpoint(encoderPosition);

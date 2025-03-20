@@ -31,10 +31,28 @@ public class IntakeCommands {
 
     public Command intakeJustIn() {
         var command = Commands.runOnce(() -> {
+            intake.intake(.3);
+        });
+        command.addRequirements(intake);
+        command.setName("Just IN");
+        return command;
+    }
+
+    public Command intakeAlgae() {
+        var command = Commands.runOnce(() -> {
             intake.intake(1);
         });
         command.addRequirements(intake);
-        command.setName("Just Out");
+        command.setName("algae intake");
+        return command;
+    }
+
+    public Command holdAlgae() {
+        var command = Commands.runOnce(() -> {
+            intake.intake(.3);
+        });
+        command.addRequirements(intake);
+        command.setName("algae intake");
         return command;
     }
 
@@ -58,7 +76,7 @@ public class IntakeCommands {
 
     public Command ejectAlgae() {
         var command = Commands.runOnce(() -> {
-            intake.intake(.3);
+            intake.intake(-.3);
         });
         command.addRequirements(intake);
         command.setName("Eject Algae");

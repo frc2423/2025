@@ -168,7 +168,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                     return isAtSetpoint();
                 }),
                 arm.goToSetpoint(Constants.ArmConstants.ALGAE_INTAKE),
-                intake.intakeJustIn());
+                intake.intakeAlgae());
     }
 
     public Command intakeGroundAlgae() {
@@ -177,7 +177,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                     return isAtSetpoint();
                 }),
                 arm.goToSetpoint(Constants.ArmConstants.ALGAE_GROUND),
-                intake.intakeJustIn());
+                intake.intakeAlgae());
     }
 
     public Command outtakeAlgae(double setpoint) {
