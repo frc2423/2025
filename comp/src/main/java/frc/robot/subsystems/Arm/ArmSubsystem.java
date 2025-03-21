@@ -21,8 +21,8 @@ public class ArmSubsystem extends SubsystemBase {
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double encoderPosition = 0;
-    private double maximum = 0; // some value
-    private double minumum = -13.8; // some value
+    private double maximum = 0.923;
+    private double minumum = 0.704;
     private double setpoint = 0;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
     private double MAX_VOLTAGE = 0.9;
@@ -31,15 +31,16 @@ public class ArmSubsystem extends SubsystemBase {
 
     private ArmSimulation armSim = new ArmSimulation(armPivot);
 
-    ProfiledPIDController arm_PID = new ProfiledPIDController(3.5, 0, 0, new TrapezoidProfile.Constraints(100, 100));
+    ProfiledPIDController arm_PID = new ProfiledPIDController(3.5 * 78, 0, 0,
+            new TrapezoidProfile.Constraints(100.0 / 78, 100.0 / 78));
 
     public ArmSubsystem() {
-        armPivot.getEncoder().setPosition(0);
+        // armPivot.getEncoder().setPosition(0);
     }
 
     @Override
     public void periodic() {
-        encoderPosition = armPivot.getEncoder().getPosition();
+        encoderPosition = armPivot.getAbsoluteEncoder().getPosition();
         calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
@@ -49,12 +50,12 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         if (encoderPosition > maximum) {
-            calculatedPID = Math.min(calculatedPID, 0);
-        } else if (encoderPosition < minumum) {
             calculatedPID = Math.max(calculatedPID, 0);
+        } else if (encoderPosition < minumum) {
+            calculatedPID = Math.min(calculatedPID, 0);
         }
 
-        armPivot.set(calculatedPID);
+        armPivot.set(-calculatedPID);
         // scoringWheelMotor.set(scoringWheelSpeed);
     }
 
@@ -78,6 +79,20 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command goUp() { // for manual control, sick
         return goToSetpoint(maximum);
+    }
+
+    public Command goLittleUp(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition + constant);
+        });
+    }
+
+    public Command goLittleDown(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition - constant);
+        });
     }
 
     public Command goScoreL4() {
@@ -131,7 +146,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isInSafeArea() {
-        if (encoderPosition < -1.9 && encoderPosition > -5.3) {
+        if (encoderPosition < 0.888900 && encoderPosition > 0.840048) {// 0.888900 and 0.840048
             return true;
         } else {
             return false;
@@ -144,10 +159,11 @@ public class ArmSubsystem extends SubsystemBase {
         super.initSendable(builder);
 
         builder.addDoubleProperty("calculatePid", () -> calculatedPID, null);
-        builder.addDoubleProperty("encoderPosition", () -> encoderPosition, null);
+        builder.addDoubleProperty("absoluteEncoderPosition", () -> encoderPosition, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("scoringWheelSpeed", () -> scoringWheelSpeed, null);
         builder.addBooleanProperty("isInSafeArea", () -> isInSafeArea(), null);
+        builder.addDoubleProperty("encoder", () -> armPivot.getEncoder().getPosition(), null);
 
         if (Robot.isSimulation()) {
             armSim.initSendable(builder);
