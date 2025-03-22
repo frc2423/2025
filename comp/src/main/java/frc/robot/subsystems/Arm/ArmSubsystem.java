@@ -22,7 +22,7 @@ public class ArmSubsystem extends SubsystemBase {
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double encoderPosition = 0;
-    private double maximum = 0.9;
+    private double maximum = 0.917;
     private double minumum = 0.735;
     private double setpoint = maximum;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0.455, 0, 0);
@@ -32,7 +32,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private ArmSimulation armSim = new ArmSimulation(armPivot);
 
-    ProfiledPIDController arm_PID = new ProfiledPIDController(78, 0, 0,
+    ProfiledPIDController arm_PID = new ProfiledPIDController(70, 0, 0,
             new TrapezoidProfile.Constraints(4, 6));
 
     public ArmSubsystem() {
