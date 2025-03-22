@@ -4,13 +4,19 @@ import java.util.Map;
 import java.util.Optional;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.Interpolatable;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,21 +35,20 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private ArmSubsystem armSubsystem;
     private IntakeCommands intakeCommands;
-    private Vision vision;
-
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
     private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
+    ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
+
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, Vision vision) {
+            IntakeCommands intakeCommands, ArmSubsystem armSubsystem) {
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
         this.armSubsystem = armSubsystem;
-        this.vision = vision;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
     }
 
@@ -94,7 +99,7 @@ public class SwerveCommands {
 
     public Pose2d addScoringOffset(Pose2d pose, double distance, boolean isRight) {// robot POV
         double y = .178;
-        double offsetY = (isRight ? y : -y) - Units.inchesToMeters(5);
+        double offsetY = (isRight ? .178 : -.148) - Units.inchesToMeters(5);
         return addOffset(pose, distance, offsetY);
     }
 
@@ -125,11 +130,28 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
     }
 
-    public Command autoDescorAlgae(double setpoint) {
+    public Command autoDescoreAlgae(double setpoint) {
         var command = Commands.parallel(
                 elevatorSubsystem.descoreAlgae(setpoint),
+                new AutoAlign(swerve, this, 1, Optional.empty(), -.1),
                 new AutoAlign(swerve, this, .4, Optional.empty(), -.1));
         command.setName("autoDescorAlgae");
+        return command;
+    }
+
+    public Command autoAlignAndDescoreAlgae(double setpoint) {
+        Command descoreCommand = elevatorSubsystem.descoreAlgae(setpoint);
+        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), -.1);
+        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), -.1);
+        var command = Commands.sequence(
+                autoAlignCommand1,
+                Commands.sequence(
+                        descoreCommand,
+                        Commands.waitUntil(() -> {
+                            return elevatorSubsystem.isAtSetpoint();
+                        }),
+                        autoAlignCommand2));
+        command.setName("autoDescorAlgaeButBetter");
         return command;
     }
 
@@ -143,21 +165,32 @@ public class SwerveCommands {
                 new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
+        Command prepareElevator = Commands.sequence(
+                Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
+                        (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
+                                : new Translation2d(4.507, 4.031)) < 2),
+                elevatorLevelCommand,
+                Commands.waitUntil(() -> {
+                    return elevatorSubsystem.isAtSetpoint();
+                }),
+                goScoreCommand,
+                Commands.waitUntil(() -> {
+                    return armSubsystem.isAtSetpoint();
+                }));
+
         var command = Commands.sequence(
-                new AutoAlign(swerve, this, 1, isRight, tagNumber),
-                stopMoving().until(() -> vision.hasTarget() && curStdDevs < 10),
                 Commands.parallel(
                         Commands.sequence(
-                                elevatorLevelCommand,
-                                Commands.waitUntil(() -> {
-                                    return elevatorSubsystem.isAtSetpoint();
-                                }),
-                                goScoreCommand),
-                        Commands.sequence(
-                                Commands.waitSeconds(.6),
-                                autoAlignNearCommand,
-                                autoAlignNearCommand2,
-                                stopMoving())),
+                                new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
+                                stopMoving()),
+                        prepareElevator),
+
+                Commands.sequence(
+                        // Commands.waitSeconds(.3),
+                        autoAlignNearCommand,
+                        // autoAlignNearCommand2,
+                        stopMoving()),
+
                 intakeCommands.intakeOut());
 
         command.setName("autoScoralClosest");
@@ -177,12 +210,28 @@ public class SwerveCommands {
         return autoScoral(Optional.empty(), elevatorSubsystem.goToSetpoint(setpoint), isRight);
     }
 
-    public Command lookAtNearestTag() {
-        var command = Commands.run(() -> {
-            int tag = swerve.vision.findClosestTagID(swerve.getPose());
-            int angle = swerve.vision.iDtoAngle(tag);
-            actuallyLookAngleButMove(Rotation2d.fromDegrees(angle).plus(Rotation2d.k180deg));
+    public double getDistanceBetweenPoses(Pose2d a, Pose2d b) {
+        double y = a.getY() - b.getY();
+        double x = a.getX() - b.getX();
+        return Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
+    }
 
+    public Rotation2d getLookAngle(Pose2d targetPose) {
+        Pose2d currentPose = swerve.getPose();
+        double distance = getDistanceBetweenPoses(currentPose, targetPose);
+        if (distance < Units.inchesToMeters(8)) {
+            return currentPose.getRotation();
+        }
+        double angleRads = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
+        return new Rotation2d(angleRads);
+    }
+
+    static Pose2d reefCenter = new Pose2d(new Translation2d(13.055, 4.007), Rotation2d.fromDegrees(0));
+
+    public Command orbitReefCenter() {
+        var command = Commands.run(() -> {
+            Rotation2d angle = getLookAngle(reefCenter);
+            actuallyLookAngleButMove(angle);
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);
         return command;
@@ -202,7 +251,7 @@ public class SwerveCommands {
         double x = MathUtil.applyDeadband(
                 driverXbox.getLeftX(),
                 OperatorConstants.LEFT_X_DEADBAND);
-        if (PoseTransformUtils.isRedAlliance()) {
+        if (!PoseTransformUtils.isRedAlliance()) {
             x *= -1;
         }
         double ySpeedTarget = m_xspeedLimiter.calculate(x);
@@ -210,7 +259,7 @@ public class SwerveCommands {
         double y = MathUtil.applyDeadband(
                 driverXbox.getLeftY(),
                 OperatorConstants.LEFT_Y_DEADBAND);
-        if (PoseTransformUtils.isRedAlliance()) {
+        if (!PoseTransformUtils.isRedAlliance()) {
             y *= -1;
         }
 
@@ -250,39 +299,99 @@ public class SwerveCommands {
 
         if (!enableX) {
             x = 0;
-        } else if (xDistance > .7) {
-            x = .8;
-        } else if (xDistance > .4) {
-            x = .6;
-        } else if (xDistance > .2) {
-            x = .55;
-        } else if (xDistance > .03) {
-            x = .53;
-        } else if (xDistance > .02) {
-            x = .47;
-        } else if (xDistance > .015) {
-            x = .43;
         } else {
-            x = 0;
+            // x = MathUtil.interpolate(0.5, 0.7, (xDistance - 0.5) / (0.7 - 0.5));
+            x = .5;
+
         }
 
         if (!enableY) {
             y = 0;
-        } else if (yDistance > .7) {
-            y = .8;
-        } else if (yDistance > .4) {
-            y = .6;
-        } else if (yDistance > .2) {
-            y = .47;
-        } else if (yDistance > .03) {
-            y = .42;
-        } else if (yDistance > .02) {
-            y = .35;
-        } else if (yDistance > .015) {
-            y = .3;
         } else {
-            y = 0;
+            // y = MathUtil.interpolate(0.5, 0.7, (yDistance - 0.5) / (0.7 - 0.5));
+            y = .5;
+
         }
+        x *= xSign;
+        y *= ySign;
+
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
+                pose2d.getRotation());
+
+        final double maxRadsPerSecond = 5;
+
+        if (isAngleClose) {
+            // desiredSpeeds.omegaRadiansPerSecond = 0;
+        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
+                    desiredSpeeds.omegaRadiansPerSecond);
+        }
+
+        swerve.drive(desiredSpeeds);
+    }
+
+    public void actuallyMoveToFar(Pose2d pose2d, boolean enableX, boolean enableY) {
+
+        Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
+        Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
+
+        boolean isAngleClose = AngleUtils.areAnglesClose(pose2d.getRotation(),
+                swerve.getPose().getRotation(),
+                Rotation2d.fromDegrees(1));
+
+        double xSign = Math.copySign(1, translationDiff.getX());
+        double ySign = Math.copySign(1, translationDiff.getY());
+
+        double xDistance = Math.abs(translationDiff.getX());
+        double yDistance = Math.abs(translationDiff.getY());
+
+        double x = 0;
+        double y = 0;
+
+        if (!enableX) {
+            x = 0;
+        } else {
+            x = MathUtil.interpolate(0.5, 0.9, (xDistance - 0.25) / (2 - 0.25));
+
+        }
+
+        // else if (xDistance > .7) {}
+        // x = .6;
+        // } else if (xDistance > .4) {
+        // x = .6;
+        // } else if (xDistance > .2) {
+        // x = .55;
+        // } else if (xDistance > .03) {
+        // x = .55;
+        // } else if (xDistance > .02) {
+        // x = .55;
+        // } else if (xDistance > .015) {
+        // x = .5;
+        // } else {
+        // x = 0;
+        // }
+
+        if (!enableY) {
+            y = 0;
+        } else {
+            y = MathUtil.interpolate(0.5, 0.9, (yDistance - 0.25) / (2 - 0.25));
+        }
+
+        // } else if (yDistance > .7) {
+        // y = .6;
+        // } else if (yDistance > .4) {
+        // y = .6;
+        // } else if (yDistance > .2) {
+        // y = .55;
+        // } else if (yDistance > .03) {
+        // y = .55;
+        // } else if (yDistance > .02) {
+        // y = .55;
+        // } else if (yDistance > .015) {
+        // y = .5;
+        // } else {
+        // y = 0;
+        // }
 
         x *= xSign;
         y *= ySign;

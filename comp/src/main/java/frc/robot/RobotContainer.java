@@ -352,7 +352,7 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
-                                .onTrue(swerveCommands.lookAtNearestTag());
+                                .onTrue(swerveCommands.orbitReefCenter());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
@@ -412,7 +412,7 @@ public class RobotContainer {
 
                 new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
                                 .whileTrue(Commands.parallel(
-                                                swerveCommands.autoDescorAlgae(
+                                                swerveCommands.autoAlignAndDescoreAlgae(
                                                                 Constants.SetpointConstants.ALGAE_DESCORE_L2),
                                                 ledKwarqs.isAutoScoring(true)))
                                 .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
@@ -420,7 +420,8 @@ public class RobotContainer {
                                                 ledKwarqs.isAutoScoring(false)));
 
                 new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
-                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
+                                .whileTrue(swerveCommands
+                                                .autoAlignAndDescoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
                                 .onFalse(Commands.sequence(intakeCommands.intakeStop(),
                                                 arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
 

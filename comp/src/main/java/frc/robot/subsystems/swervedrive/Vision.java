@@ -396,7 +396,7 @@ public class Vision {
    * @return True when an april tag is discovered.
    */
   public boolean seesFrontAprilTag() {
-    return Cameras.FRONT_CAM.hasTarget();
+    return Cameras.FRONT_RIGHT_CAM.hasTarget() || Cameras.FRONT_LEFT_CAM.hasTarget();
   }
 
   /**
@@ -407,11 +407,18 @@ public class Vision {
    * 
    */
   enum Cameras {
-    FRONT_CAM("Arducam_OV9281_USB_Camera",
+    FRONT_RIGHT_CAM("right_cam",
         new Rotation3d(0, Math.toRadians(-20), Math.toRadians(0)),
         new Translation3d(Units.inchesToMeters(10.5), // center to front
             Units.inchesToMeters(-5),
             Units.inchesToMeters(6)), // front floor
+        VecBuilder.fill(2, 2, 8), VecBuilder.fill(0.5, 0.5, 1)),
+
+    FRONT_LEFT_CAM("left_cam",
+        new Rotation3d(0, Math.toRadians(-20), Math.toRadians(-45)),
+        new Translation3d(Units.inchesToMeters(5.707),
+            Units.inchesToMeters(9.793),
+            Units.inchesToMeters(7.75)),
         VecBuilder.fill(2, 2, 8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
