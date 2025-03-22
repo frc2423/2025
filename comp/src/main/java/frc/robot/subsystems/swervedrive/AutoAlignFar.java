@@ -68,7 +68,7 @@ public class AutoAlignFar extends Command {
             reachedY = true;
         }
 
-        swerveCommands.actuallyMoveToFar(pose2d, !reachedX, timerY.get() <= 0.5);
+        swerveCommands.actuallyMoveToFar(pose2d, !reachedX, !reachedY/* timerY.get() <= 0.5 */);
     }
 
     @Override
