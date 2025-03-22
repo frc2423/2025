@@ -193,6 +193,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("encoderPosition", this::getEncoderPosition, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
+        builder.addDoubleProperty("motor1Current", motor1::getOutputCurrent, null);
+        builder.addDoubleProperty("motor2Current", motor2::getOutputCurrent, null);
 
         if (Robot.isSimulation()) {
             elevatorSim.initSendable(builder);

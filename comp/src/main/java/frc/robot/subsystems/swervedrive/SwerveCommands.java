@@ -166,32 +166,30 @@ public class SwerveCommands {
                 new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
+        Command prepareElevator = Commands.sequence(
+                Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
+                        (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
+                                : new Translation2d(4.507, 4.031)) < 2),
+                elevatorLevelCommand,
+                Commands.waitUntil(() -> {
+                    return elevatorSubsystem.isAtSetpoint();
+                }),
+                goScoreCommand,
+                Commands.waitUntil(() -> {
+                    return armSubsystem.isAtSetpoint();
+                }));
+
         var command = Commands.sequence(
                 Commands.parallel(
-
                         Commands.sequence(
                                 new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
                                 stopMoving()),
-
-                        Commands.sequence(
-                                Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
-                                        (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
-                                                : new Translation2d(4.507, 4.031)) < 2),
-                                elevatorLevelCommand,
-                                Commands.waitUntil(() -> {
-                                    return elevatorSubsystem.isAtSetpoint();
-                                }),
-                                goScoreCommand,
-                                Commands.waitUntil(() -> {
-                                    return armSubsystem.isAtSetpoint();
-                                }))
-
-                ),
+                        prepareElevator),
 
                 Commands.sequence(
-                        Commands.waitSeconds(.3),
+                        // Commands.waitSeconds(.3),
                         autoAlignNearCommand,
-                        autoAlignNearCommand2,
+                        // autoAlignNearCommand2,
                         stopMoving()),
 
                 intakeCommands.intakeOut());
@@ -303,14 +301,16 @@ public class SwerveCommands {
         if (!enableX) {
             x = 0;
         } else {
-            x = MathUtil.interpolate(0.5, 0.7, (xDistance - 0.5) / (0.7 - 0.5));
+            // x = MathUtil.interpolate(0.5, 0.7, (xDistance - 0.5) / (0.7 - 0.5));
+            x = .5;
 
         }
 
         if (!enableY) {
             y = 0;
         } else {
-            y = MathUtil.interpolate(0.5, 0.7, (yDistance - 0.5) / (0.7 - 0.5));
+            // y = MathUtil.interpolate(0.5, 0.7, (yDistance - 0.5) / (0.7 - 0.5));
+            y = .5;
 
         }
         x *= xSign;
@@ -352,7 +352,7 @@ public class SwerveCommands {
         if (!enableX) {
             x = 0;
         } else {
-            x = MathUtil.interpolate(0.5, 0.8, (xDistance - 0.5) / (0.8 - 0.5));
+            x = MathUtil.interpolate(0.5, 0.9, (xDistance - 0.25) / (2 - 0.25));
 
         }
 
@@ -375,8 +375,7 @@ public class SwerveCommands {
         if (!enableY) {
             y = 0;
         } else {
-            y = MathUtil.interpolate(0.5, 0.8, (yDistance - 0.5) / (0.8 - 0.5));
-
+            y = MathUtil.interpolate(0.5, 0.9, (yDistance - 0.25) / (2 - 0.25));
         }
 
         // } else if (yDistance > .7) {
