@@ -87,8 +87,14 @@ public final class Constants {
         public static final double REEF_L3 = 34.8;
         public static final double REEF_L2 = 18.2;
 
+        public static final double ALGAE_INTAKE_L2 = 17;
+        public static final double ALGAE_DUNK_L2 = 15.5;
+        public static final double ALGAE_DUNK_L3 = 32;
+
         public static final double ALGAE_DESCORE_L3 = 26;
         public static final double ALGAE_DESCORE_L2 = 9;
+
+        public static final double ALGAE_SCORE = 60;
 
         public static final double ZERO = 0.1;
     }
@@ -97,9 +103,16 @@ public final class Constants {
         public static final double REEF_L4 = -11; // not real
         public static final double REEF_L2 = -11; // not real
         public static final double REEF_L3 = -11; // not real
+
         public static final double ALGAE_DESCORE = -7.5;// .2; // not real
+        public static final double ALGAE_INTAKE = -6.8; // not real
+        public static final double ALGAE_SCORE = -5; // not real
+        public static final double ALGAE_GROUND = -14; // NOT REAL
+        public static final double ALGAE_HOLD = -2;
+
         public static final double HANDOFF_POSE = 0;
         public static final double OUTSIDE_ELEVATOR = -3;
+
         public static final double SCORING_POSITION = -6.2;
         public static final double L4_SCORING_POSITION = -6.7;
 
@@ -110,7 +123,6 @@ public final class Constants {
         public static final Rotation2d REEF_TAG_6_Rotation = new Rotation2d(Math.PI / 3);
         public static final Pose2d REEF_TAG_6 = new Pose2d(2.76, 13.786, REEF_TAG_6_Rotation);
         public static final Pose2d TEST_POSE2D = new Pose2d(1, 1, REEF_TAG_6_Rotation);
-
     }
 
     public static double inchToSetPoint(double inches) {

@@ -22,7 +22,7 @@ public class ArmSubsystem extends SubsystemBase {
     private double scoringWheelSpeed = 0;
     private double encoderPosition = 0;
     private double maximum = 0; // some value
-    private double minumum = -13.8; // some value
+    private double minumum = -14.5; // some value
     private double setpoint = 0;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
     private double MAX_VOLTAGE = 0.9;
@@ -91,6 +91,20 @@ public class ArmSubsystem extends SubsystemBase {
     public Command goToSetpoint(double position) {
         return runOnce(() -> {
             setSetpoint(position);
+        });
+    }
+
+    public Command goLittleDown(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition - constant);
+        });
+    }
+
+    public Command goLittleUp(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition + constant);
         });
     }
 
