@@ -47,11 +47,12 @@ public class AutoAlignFar extends Command {
         }
         reachedX = false;
         reachedY = false;
+        timerY.reset();
+        timerY.start();
     }
 
     @Override
     public void execute() {
-        timerY.reset();
         Pose2d pose2d = swerveCommands.addScoringOffset(pose, dist, isRight);
 
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
@@ -65,6 +66,13 @@ public class AutoAlignFar extends Command {
         }
         if (yDistance < Units.inchesToMeters(2)) {
             timerY.start();
+            reachedY = true;
+        }
+        if (timerY.get() >= 0.5 && yDistance > Units.inchesToMeters(2)) {
+            reachedY = false;
+            timerY.reset();
+        }
+        if (yDistance < Units.inchesToMeters(2)) {
             reachedY = true;
         }
 
