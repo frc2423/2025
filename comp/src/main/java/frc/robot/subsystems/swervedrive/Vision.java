@@ -696,6 +696,8 @@ public class Vision {
         // Increase std devs based on (average) distance
         if (numTags == 1 && avgDist > 4) {
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        } else if (avgDist <= 1) {
+          estStdDevs = estStdDevs.times(.5); // number subject to change
         } else {
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
         }

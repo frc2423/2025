@@ -147,7 +147,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     setupPathPlanner();
 
-    pdh.setSwitchableChannel(true);
+    pdh.setSwitchableChannel(false);
   }
 
   public void toggleLedRing() {
