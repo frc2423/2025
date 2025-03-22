@@ -7,32 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoScoral 22 Left"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "FE Human Player"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Elevator Down"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Intake Coral From Human Player"
+            "name": "AutoScoral 11 Right"
           }
         },
         {
@@ -42,32 +17,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HP to 17 Left"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": null
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AutoScoral 17 Left"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CD to Human Player BLUE"
+                  "pathName": "IJ to HP RED"
                 }
               },
               {
@@ -75,6 +25,18 @@
                 "data": {
                   "name": "Elevator Down"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Start"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Funnel Start"
+                }
               }
             ]
           }
@@ -82,7 +44,32 @@
         {
           "type": "named",
           "data": {
-            "name": "Intake Coral From Human Player"
+            "name": "Run Intake Short"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Run Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "HP to 6 RIght"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoScoral 6 Right"
           }
         },
         {
@@ -92,13 +79,25 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HP to 17 Right"
+                  "pathName": "KL to HP"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": null
+                  "name": "Elevator Down"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Start"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Funnel Start"
                 }
               }
             ]
@@ -107,7 +106,32 @@
         {
           "type": "named",
           "data": {
-            "name": "AutoScoral 17 Right"
+            "name": "Run Intake Short"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Run Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "HP to 6 Left"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoScoral 6 Left"
           }
         }
       ]

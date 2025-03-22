@@ -55,6 +55,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
         builder.addDoubleProperty("laserCan distance", () -> distMm(), null);
     }
 }
