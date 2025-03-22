@@ -23,7 +23,7 @@ public class ArmSubsystem extends SubsystemBase {
     private double scoringWheelSpeed = 0;
     private double encoderPosition = 0;
     private double maximum = 0.917;
-    private double minumum = 0.735;
+    private double minumum = 0.7;
     private double setpoint = maximum;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0.455, 0, 0);
     private double MAX_VOLTAGE = 0.9;
