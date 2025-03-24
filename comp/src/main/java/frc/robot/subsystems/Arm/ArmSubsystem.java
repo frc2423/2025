@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -21,25 +22,27 @@ public class ArmSubsystem extends SubsystemBase {
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double encoderPosition = 0;
-    private double maximum = 0; // some value
-    private double minumum = -13.8; // some value
-    private double setpoint = 0;// will change varibly
-    private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0, 0, 0);
+    private double maximum = 0.917;
+    private double minumum = 0.7;
+    private double setpoint = maximum;// will change varibly
+    private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0.455, 0, 0);
     private double MAX_VOLTAGE = 0.9;
 
     double calculatedPID = 0;
 
     private ArmSimulation armSim = new ArmSimulation(armPivot);
 
-    ProfiledPIDController arm_PID = new ProfiledPIDController(3.5, 0, 0, new TrapezoidProfile.Constraints(100, 100));
+    ProfiledPIDController arm_PID = new ProfiledPIDController(70, 0, 0,
+            new TrapezoidProfile.Constraints(4, 6));
 
     public ArmSubsystem() {
-        armPivot.getEncoder().setPosition(0);
+        // armPivot.getEncoder().setPosition(0);
+        SmartDashboard.putData("arm_PID", arm_PID);
     }
 
     @Override
     public void periodic() {
-        encoderPosition = armPivot.getEncoder().getPosition();
+        encoderPosition = armPivot.getAbsoluteEncoder().getPosition();
         calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
@@ -49,9 +52,9 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         if (encoderPosition > maximum) {
-            calculatedPID = Math.min(calculatedPID, 0);
-        } else if (encoderPosition < minumum) {
             calculatedPID = Math.max(calculatedPID, 0);
+        } else if (encoderPosition < minumum) {
+            calculatedPID = Math.min(calculatedPID, 0);
         }
 
         armPivot.set(calculatedPID);
@@ -68,7 +71,7 @@ public class ArmSubsystem extends SubsystemBase {
         double pid = arm_PID.calculate(encoderPosition, position);
         var setpoint = arm_PID.getSetpoint();
 
-        double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
+        double feedforward = m_feedforward.calculate(getArmAngle(), 0);
         return (feedforward + pid) / RobotController.getBatteryVoltage(); // +pid
     }
 
@@ -76,8 +79,26 @@ public class ArmSubsystem extends SubsystemBase {
         return goToSetpoint(minumum);
     }
 
+    public double getArmAngle() {
+        return (encoderPosition - 0.64) * (2 * Math.PI);
+    }
+
     public Command goUp() { // for manual control, sick
         return goToSetpoint(maximum);
+    }
+
+    public Command goLittleUp(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition + constant);
+        });
+    }
+
+    public Command goLittleDown(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(encoderPosition - constant);
+        });
     }
 
     public Command goScoreL4() {
@@ -131,7 +152,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isInSafeArea() {
-        if (encoderPosition < -1.9 && encoderPosition > -5.3) {
+        if (encoderPosition < 0.888900 && encoderPosition > 0.840048) {// 0.888900 and 0.840048
             return true;
         } else {
             return false;
@@ -144,10 +165,12 @@ public class ArmSubsystem extends SubsystemBase {
         super.initSendable(builder);
 
         builder.addDoubleProperty("calculatePid", () -> calculatedPID, null);
-        builder.addDoubleProperty("encoderPosition", () -> encoderPosition, null);
+        builder.addDoubleProperty("absoluteEncoderPosition", () -> encoderPosition, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("scoringWheelSpeed", () -> scoringWheelSpeed, null);
         builder.addBooleanProperty("isInSafeArea", () -> isInSafeArea(), null);
+        builder.addDoubleProperty("encoder", () -> armPivot.getEncoder().getPosition(), null);
+        builder.addDoubleProperty("getArmAngle", () -> getArmAngle(), null);
 
         if (Robot.isSimulation()) {
             armSim.initSendable(builder);

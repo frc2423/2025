@@ -17,6 +17,7 @@ public class IntakeCommands {
     public IntakeCommands(IntakeSubsystem intake, FunnelSubsystem funnel) {
         this.intake = intake;
         this.funnel = funnel;
+        intake.setDefaultCommand(intakeStop());
     }
 
     public Command intakeIn() {

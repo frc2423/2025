@@ -339,7 +339,7 @@ public class SwerveCommands {
         if (!enableX) {
             x = 0;
         } else {
-            x = MathUtil.interpolate(0.5, 0.9, (xDistance - 0.25) / (2 - 0.25));
+            x = MathUtil.interpolate(0.5, 1, (xDistance - 0.25) / (1.5 - 0.25));
 
         }
 
@@ -362,7 +362,7 @@ public class SwerveCommands {
         if (!enableY) {
             y = 0;
         } else {
-            y = MathUtil.interpolate(0.5, 0.9, (yDistance - 0.25) / (2 - 0.25));
+            y = MathUtil.interpolate(0.45, 0.9, (yDistance - 0.176) / (2 - 0.176));
         }
 
         // } else if (yDistance > .7) {
