@@ -161,9 +161,6 @@ public class SwerveCommands {
         Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.51, isRight, tagNumber),
                 new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
-        Command autoAlignNearCommand2 = Commands.either(new AutoAlignNear(swerve, this, 0.51, isRight, tagNumber),
-                new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
-                () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
         Command prepareElevator = Commands.sequence(
                 Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
@@ -179,18 +176,9 @@ public class SwerveCommands {
                 }));
 
         var command = Commands.sequence(
-                Commands.parallel(
-                        Commands.sequence(
-                                new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
-                                stopMoving()),
-                        prepareElevator),
-
-                Commands.sequence(
-                        // Commands.waitSeconds(.3),
-                        autoAlignNearCommand,
-                        // autoAlignNearCommand2,
-                        stopMoving()),
-
+                Commands.parallel(prepareElevator,
+                        Commands.sequence(new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
+                                autoAlignNearCommand)),
                 intakeCommands.intakeOut());
 
         command.setName("autoScoralClosest");
