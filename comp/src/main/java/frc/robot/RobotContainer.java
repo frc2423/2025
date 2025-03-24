@@ -164,6 +164,11 @@ public class RobotContainer {
                 m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
                 m_chooser.addOption("Back Right Single (Robot Oriented)", "Back Right Single (Robot Oriented)");
                 m_chooser.addOption("Back Left Single (robot oriented)", "Back Left Single (robot oriented)");
+                m_chooser.addOption("Left Side 2 3/4", "Left Side 3 Piece BLUE E & C & D");
+                m_chooser.addOption("Right Side 3 BLUE", "Right Side 3 Piece BLUE E & C & D");
+                m_chooser.addOption("Left Side 3 BLUE", "Left Side 3 Piece BLUE J & K & L");
+                m_chooser.addOption("Left Side 3 RED", "Left Side 3 Piece RED J & K & L");
+                m_chooser.addOption("Right Side 3 RED", "Right Side 3 Piece RED E & C & D");
 
                 // m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE
                 // E & C"); //BAD DONT USE
@@ -241,6 +246,28 @@ public class RobotContainer {
                 NamedCommands.registerCommand("AutoScoral 19 Left",
                                 swerveCommands.autoScoral(Optional.of(19),
                                                 Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("AutoScoral 11 Right",
+                                swerveCommands.autoScoral(Optional.of(11),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Right",
+                                swerveCommands.autoScoral(Optional.of(6),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Left",
+                                swerveCommands.autoScoral(Optional.of(6),
+                                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("Intake Start",
+                                intakeCommands.intakeStart());
+
+                NamedCommands.registerCommand("Funnel Start",
+                                funnelSubsystem.funnelStart());
+
+                NamedCommands.registerCommand("Run Intake Short", intakeCommands.intakeShort());
+
+                NamedCommands.registerCommand("Run Intake", intakeCommands.intakeHumanPlayer());
 
                 addAutoScoreCommand("AutoScoral left near", 11, 20, false);
                 addAutoScoreCommand("AutoScoral left far", 6, 19, true);

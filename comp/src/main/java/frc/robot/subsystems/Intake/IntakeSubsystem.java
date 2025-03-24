@@ -39,6 +39,14 @@ public class IntakeSubsystem extends SubsystemBase {
         motor.set(0);
     }
 
+    public boolean haveCoral() {
+        if (distMm() < 100) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public double distMm() {
         var dist = intakeDist.getMeasurement();
         if (dist == null) {
@@ -55,6 +63,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void initSendable(SendableBuilder builder) {
+        super.initSendable(builder);
         builder.addDoubleProperty("laserCan distance", () -> distMm(), null);
     }
 }
