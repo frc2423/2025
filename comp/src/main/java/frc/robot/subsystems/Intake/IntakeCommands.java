@@ -44,6 +44,33 @@ public class IntakeCommands {
         return intakeHumanPlayer().withTimeout(0.5).withName("Run Intake Short");
     }
 
+    public Command intakeJustIn() {
+        var command = Commands.runOnce(() -> {
+            intake.intake(.3);
+        });
+        command.addRequirements(intake);
+        command.setName("Just IN");
+        return command;
+    }
+
+    public Command intakeAlgae() {
+        var command = Commands.runOnce(() -> {
+            intake.intake(1);
+        }).until(() -> intake.hasAlgae());
+        command.addRequirements(intake);
+        command.setName("algae intake");
+        return command;
+    }
+
+    public Command holdAlgae() {
+        var command = Commands.runOnce(() -> {
+            intake.intake(.3);
+        });
+        command.addRequirements(intake);
+        command.setName("algae intake");
+        return command;
+    }
+
     public Command intakeOut() {
         var command = Commands.run(() -> {
             intake.intake(1);
@@ -59,6 +86,15 @@ public class IntakeCommands {
         });
         command.addRequirements(intake);
         command.setName("Just Out");
+        return command;
+    }
+
+    public Command ejectAlgae() {
+        var command = Commands.runOnce(() -> {
+            intake.outtakeAlgae(1);
+        });
+        command.addRequirements(intake);
+        command.setName("Eject Algae");
         return command;
     }
 

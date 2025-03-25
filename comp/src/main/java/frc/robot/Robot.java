@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import au.grapplerobotics.CanBridge;
 import java.util.Map;
 
 import org.littletonrobotics.urcl.URCL;
@@ -36,6 +37,7 @@ public class Robot extends TimedRobot {
     instance = this;
     // CanBridge.runTCP();
     CameraServer.startAutomaticCapture();
+    CanBridge.runTCP();
   }
 
   public static Robot getInstance() {
