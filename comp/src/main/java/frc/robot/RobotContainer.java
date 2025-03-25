@@ -53,7 +53,6 @@ public class RobotContainer {
         // final CommandXboxController driverXbox = new CommandXboxController(0);
         XboxController driverXbox = new XboxController(0);
         XboxController operator = new XboxController(1);
-        boolean isPanel = false;
         String deployDirectory = (Robot.isSimulation()) ? "sim-swerve/neo" : "swerve";
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
@@ -320,7 +319,7 @@ public class RobotContainer {
                 return driveFieldOrientedAngularVelocity; // :P
         }
 
-        private void configureDriverBindings() {
+        private void configureDriverBindings() { // RIP isPanel() day 0, 2025 -> 3/25/2025
 
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
@@ -361,14 +360,11 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new Trigger(() -> driverXbox.getPOV() == 270)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
-                                                : Constants.SetpointConstants.REEF_L2));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
                 new Trigger(() -> driverXbox.getPOV() == 0)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
-                                                : Constants.SetpointConstants.REEF_L3));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L3));
                 new Trigger(() -> driverXbox.getPOV() == 90)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
-                                                : Constants.SetpointConstants.REEF_L4));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
                 new Trigger(() -> driverXbox.getPOV() == 180)
                                 .onTrue(elevator.goDown());
 
@@ -380,7 +376,7 @@ public class RobotContainer {
 
         }
 
-        private void configureOperatorBindings() {
+        private void configureOperatorBindings() { // RIP isPanel() day 0, 2025 -> 3/25/2025
 
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;

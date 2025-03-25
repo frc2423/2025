@@ -52,9 +52,9 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         if (encoderPosition > maximum) {
-            calculatedPID = Math.max(calculatedPID, 0);
-        } else if (encoderPosition < minumum) {
             calculatedPID = Math.min(calculatedPID, 0);
+        } else if (encoderPosition < minumum) {
+            calculatedPID = Math.max(calculatedPID, 0);
         }
 
         armPivot.set(calculatedPID);
@@ -144,7 +144,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isAtSetpoint() {
-        return (Math.abs(getEncoderPosition() - setpoint) < 2);
+        return (Math.abs(getEncoderPosition() - setpoint) < 2.0 / 78.0);
     }
 
     public double getEncoderPosition() {

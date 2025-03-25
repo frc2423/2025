@@ -95,7 +95,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public double getRawSensorValue() {
         var dist = intakeDist.getMeasurement();
-        if (dist == null && intakeDist.getMeasurement().status == intakeDist.LASERCAN_STATUS_OUT_OF_BOUNDS) {
+        if (dist == null || intakeDist.getMeasurement().status == intakeDist.LASERCAN_STATUS_OUT_OF_BOUNDS) {
             return 10000;
         } else {
             return dist.distance_mm;
@@ -103,7 +103,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isOut() {
-        return distMm() > 60;
+        return getRawSensorValue() > 60;
     }
 
     public boolean hasAlgae() {

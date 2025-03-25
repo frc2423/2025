@@ -110,7 +110,7 @@ public final class Constants {
         public static final double OUTSIDE_ELEVATOR = 0.874339;
 
         public static final double SCORING_POSITION = 0.825457;
-        public static final double L4_SCORING_POSITION = 0.819636;
+        public static final double L4_SCORING_POSITION = 0.79;
 
         public static final double ZERO = -1; // not real
     }
