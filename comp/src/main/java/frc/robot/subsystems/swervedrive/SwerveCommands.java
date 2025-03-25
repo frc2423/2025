@@ -130,35 +130,55 @@ public class SwerveCommands {
                 this::selectElevatorLevel);
     }
 
-    public Command autoDescoreAlgae(double setpoint) {
-        var command = Commands.parallel(
-                elevatorSubsystem.descoreAlgae(setpoint),
-                new AutoAlign(swerve, this, 1, Optional.empty(), -.1),
-                new AutoAlign(swerve, this, .4, Optional.empty(), -.1));
-        command.setName("autoDescorAlgae");
-        return command;
-    }
+    // public Command autoDescoreAlgae(double setpoint) {
+    // var command = Commands.parallel(
+    // elevatorSubsystem.descoreAlgae(setpoint),
+    // new AutoAlign(swerve, this, 1, Optional.empty(), -.1),
+    // new AutoAlign(swerve, this, .4, Optional.empty(), -.1));
+    // command.setName("autoDescorAlgae");
+    // return command;
+    // }
 
-    public Command autoAlignAndDescoreAlgae(double setpoint) {
-        Command descoreCommand = elevatorSubsystem.descoreAlgae(setpoint);
-        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), -.1);
-        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), -.1);
+    // public Command autoAlignAndDescoreAlgae(double setpoint) {
+    // Command descoreCommand = elevatorSubsystem.descoreAlgae(setpoint);
+    // Command autoAlignCommand1 = new AutoAlignFar(swerve, this, 1, true,
+    // Optional.empty());
+    // Command autoAlignCommand2 = new AutoAlignNear(swerve, this, .4, true,
+    // Optional.empty());
+    // var command = Commands.sequence(
+    // autoAlignCommand1,
+    // Commands.sequence(
+    // descoreCommand,
+    // Commands.waitUntil(() -> {
+    // return elevatorSubsystem.isAtSetpoint() && armSubsystem.isAtSetpoint();
+    // }),
+    // autoAlignCommand2));
+    // command.setName("autoDescorAlgaeButBetter");
+    // return command;
+    // }
+
+    public Command autoAlignAndIntakeAlgae(double setpoint, double setpoint2) {
+        Command intakeAlgaeCommand1 = elevatorSubsystem.intakeAlgae(setpoint);
+        Command intakeAlgaeCommand2 = elevatorSubsystem.goToSetpoint(setpoint2);
+        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), .1);
+        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), .1);
         var command = Commands.sequence(
                 autoAlignCommand1,
                 Commands.sequence(
-                        descoreCommand,
+                        intakeAlgaeCommand1,
                         Commands.waitUntil(() -> {
-                            return elevatorSubsystem.isAtSetpoint();
+                            return elevatorSubsystem.isAtSetpoint();// && armSubsystem.isAtSetpoint();
                         }),
-                        autoAlignCommand2));
-        command.setName("autoDescorAlgaeButBetter");
+                        autoAlignCommand2,
+                        intakeAlgaeCommand2));
+        command.setName("autoIntakeAlgae");
         return command;
     }
 
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
-        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.51, isRight, tagNumber),
+        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.53, isRight, tagNumber),
                 new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
