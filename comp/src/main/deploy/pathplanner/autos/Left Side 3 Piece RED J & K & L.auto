@@ -54,7 +54,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Run Intake Short"
+                  "name": "Run Intake"
                 }
               },
               {
@@ -116,7 +116,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Run Intake Short"
+                  "name": "Run Intake"
                 }
               },
               {
