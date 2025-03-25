@@ -319,7 +319,7 @@ public class RobotContainer {
                 return driveFieldOrientedAngularVelocity; // :P
         }
 
-        private void configureDriverBindings() { // RIP isPanel() day 0, 2025 -> 3/25/2025
+        private void configureDriverBindings() { // RIP isPanel day 0, 2025 -> 3/25/2025
 
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
@@ -376,7 +376,7 @@ public class RobotContainer {
 
         }
 
-        private void configureOperatorBindings() { // RIP isPanel() day 0, 2025 -> 3/25/2025
+        private void configureOperatorBindings() { // RIP isPanel day 0, 2025 -> 3/25/2025
 
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
