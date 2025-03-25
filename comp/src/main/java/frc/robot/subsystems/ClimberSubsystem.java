@@ -36,9 +36,13 @@ public class ClimberSubsystem extends SubsystemBase {
         speed = inputspeed;
     }
 
+    // private void setSetpoint(double inputspeed) {
+    // speed = inputspeed;
+    // }
+
     public Command climb() {
         var command = run(() -> {
-            setSetpoint(.106, 1);
+            setSetpoint(.791, 1);
         });
         command.setName("Climber going up");
         return command;
@@ -46,7 +50,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command deClimb() {
         var command = run(() -> {
-            setSetpoint(.54, 1);
+            setSetpoint(.203, 1);
         });
         command.setName("Climber going down");
         return command;
