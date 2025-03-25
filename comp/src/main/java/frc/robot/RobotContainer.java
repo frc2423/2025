@@ -429,9 +429,10 @@ public class RobotContainer {
 
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
-                                .whileTrue(intakeCommands.eject())
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                funnelSubsystem.stop()));
+                                .whileTrue(Commands.parallel(intakeCommands.eject(), ledKwarqs.isEjectingPOOP(true)))
+                                .onFalse(Commands.parallel(ledKwarqs.isEjectingPOOP(false),
+                                                Commands.sequence(intakeCommands.intakeStop(),
+                                                                funnelSubsystem.stop())));
 
                 // .onTrue(elevator.goLittleUp(1));
 

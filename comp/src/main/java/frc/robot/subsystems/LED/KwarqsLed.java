@@ -17,6 +17,7 @@ public class KwarqsLed extends SubsystemBase {
     private final XboxController xboxController;
 
     private boolean isAutoScoring = false;
+    private boolean isEjectingPOOP = false;
 
     public static boolean isRedAlliance() {
         var alliance = DriverStation.getAlliance();
@@ -38,6 +39,7 @@ public class KwarqsLed extends SubsystemBase {
         ledController.add("GreenCycle", new GreenCycle());
         ledController.add("RedCycle", new RedCycle());
         ledController.add("BlueCycle", new BlueCycle());
+        ledController.add("POOP", new POOP());
 
         ledController.add("AutoDown", new AutoDown());
         ledController.set("dark");
@@ -102,6 +104,14 @@ public class KwarqsLed extends SubsystemBase {
         return command;
     }
 
+    public Command isEjectingPOOP(boolean flag) {
+        var command = Commands.runOnce(() -> {
+            isEjectingPOOP = flag;
+        });
+        // command.addRequirements(this);
+        return command;
+    }
+
     @Override
     public void periodic() {
         if (RobotState.isTeleop() && !RobotState.isDisabled()) {
@@ -127,6 +137,10 @@ public class KwarqsLed extends SubsystemBase {
 
         if (isAutoScoring) {
             ledController.set("rainbow");
+        }
+
+        if (isEjectingPOOP) {
+            ledController.set("POOP");
         }
 
         ledController.run();
