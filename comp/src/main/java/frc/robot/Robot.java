@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import au.grapplerobotics.CanBridge;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -33,6 +34,7 @@ public class Robot extends TimedRobot {
     instance = this;
     // CanBridge.runTCP();
     CameraServer.startAutomaticCapture();
+    CanBridge.runTCP();
   }
 
   public static Robot getInstance() {

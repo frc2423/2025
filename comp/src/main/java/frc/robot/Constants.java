@@ -106,8 +106,8 @@ public final class Constants {
 
         public static final double ALGAE_DESCORE = -7.5;// .2; // not real
         public static final double ALGAE_INTAKE = -6.8; // not real
-        public static final double ALGAE_SCORE = -5; // not real
-        public static final double ALGAE_GROUND = -14; // NOT REAL
+        public static final double ALGAE_SCORE = 6; // not real
+        public static final double ALGAE_GROUND = -14.5; // NOT REAL
         public static final double ALGAE_HOLD = -2;
 
         public static final double HANDOFF_POSE = 0;

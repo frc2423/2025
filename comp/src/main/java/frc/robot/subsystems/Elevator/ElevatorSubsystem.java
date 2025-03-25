@@ -153,6 +153,15 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
+    public Command scoreAlgae() {
+        return Commands.sequence(goToSetpoint(Constants.SetpointConstants.REEF_L4),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_SCORE));
+        // intake.ejectAlgae());
+    }
+
     public Command descoreAlgae(double setpoint) {
         return Commands.sequence(goToSetpoint(setpoint),
                 Commands.waitUntil(() -> {

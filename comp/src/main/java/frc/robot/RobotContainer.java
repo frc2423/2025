@@ -389,10 +389,10 @@ public class RobotContainer {
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
                 new JoystickButton(operator, XboxController.Button.kA.value)
-                                .whileTrue(arm.goLittleUp(1));// climberSubsystem.climb());
+                                .whileTrue(arm.goLittleUp(.05));// climberSubsystem.climb());
 
                 new JoystickButton(operator, XboxController.Button.kB.value)
-                                .whileTrue(arm.goLittleDown(1)); // climberSubsystem.deClimb());
+                                .whileTrue(arm.goLittleDown(.05)); // climberSubsystem.deClimb());
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.in());
@@ -408,13 +408,11 @@ public class RobotContainer {
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(swerveCommands.autoAlignAndIntakeAlgae(Constants.SetpointConstants.REEF_L3,
                                                 Constants.SetpointConstants.ALGAE_DUNK_L3))
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD)));
-                // new Trigger(() -> operator.getPOV() == 90)
-                // .whileTrue(swerveCommands
-                // .autoAlignAndIntakeAlgae(Constants.SetpointConstants.ALGAE_SCORE))
-                // .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                // arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
+                                .onFalse(/* Commands.sequence(intakeCommands.intakeStop(), */
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));// );
+                new Trigger(() -> operator.getPOV() == 90).whileTrue(elevator.scoreAlgae())
+                                .onFalse(intakeCommands.intakeStop());
+
                 new Trigger(() -> operator.getPOV() == 180)
                                 .whileTrue(elevator.intakeGroundAlgae())
                                 .onFalse(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));
