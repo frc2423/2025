@@ -162,14 +162,14 @@ public class ElevatorSubsystem extends SubsystemBase {
         // intake.ejectAlgae());
     }
 
-    public Command descoreAlgae(double setpoint) {
-        return Commands.sequence(goToSetpoint(setpoint),
-                Commands.waitUntil(() -> {
-                    return isAtSetpoint();
-                }),
-                arm.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORE),
-                intake.intakeJustOut());
-    }
+    // public Command descoreAlgae(double setpoint) {
+    // return Commands.sequence(goToSetpoint(setpoint),
+    // Commands.waitUntil(() -> {
+    // return isAtSetpoint();
+    // }),
+    // arm.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORE),
+    // intake.intakeJustOut());
+    // }
 
     public Command intakeAlgae(double setpoint) {
         return Commands.sequence(goToSetpoint(setpoint),
@@ -229,6 +229,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("encoderPosition", this::getEncoderPosition, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
+        builder.addDoubleProperty("motor1Current", motor1::getOutputCurrent, null);
+        builder.addDoubleProperty("motor2Current", motor2::getOutputCurrent, null);
 
         if (Robot.isSimulation()) {
             elevatorSim.initSendable(builder);

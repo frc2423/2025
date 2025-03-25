@@ -5,6 +5,10 @@
 package frc.robot;
 
 import au.grapplerobotics.CanBridge;
+import java.util.Map;
+
+import org.littletonrobotics.urcl.URCL;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,7 +16,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-//import org.littletonrobotics.urcl;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -62,7 +65,7 @@ public class Robot extends TimedRobot {
     }
 
     DataLogManager.start();
-    // URCL.start();
+    URCL.start(Map.ofEntries(Map.entry(1, "bleh")));
 
     m_robotContainer.configureBindings();
   }

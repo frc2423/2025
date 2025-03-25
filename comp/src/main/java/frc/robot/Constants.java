@@ -100,21 +100,17 @@ public final class Constants {
     }
 
     public static class ArmConstants {
-        public static final double REEF_L4 = -11; // not real
-        public static final double REEF_L2 = -11; // not real
-        public static final double REEF_L3 = -11; // not real
+        // public static final double ALGAE_DESCORE = -7.5;// -7.5;// .2; // not real
+        public static final double ALGAE_INTAKE = -6.8; // all relative
+        public static final double ALGAE_SCORE = 0.5; // 6; // relative
+        public static final double ALGAE_GROUND = 0.718154; // -14.5; // NOT REAL relative
+        public static final double ALGAE_HOLD = -2; // relative
 
-        public static final double ALGAE_DESCORE = -7.5;// .2; // not real
-        public static final double ALGAE_INTAKE = -6.8; // not real
-        public static final double ALGAE_SCORE = 6; // not real
-        public static final double ALGAE_GROUND = -14.5; // NOT REAL
-        public static final double ALGAE_HOLD = -2;
+        public static final double HANDOFF_POSE = 0.911322;
+        public static final double OUTSIDE_ELEVATOR = 0.874339;
 
-        public static final double HANDOFF_POSE = 0;
-        public static final double OUTSIDE_ELEVATOR = -3;
-
-        public static final double SCORING_POSITION = -6.2;
-        public static final double L4_SCORING_POSITION = -6.7;
+        public static final double SCORING_POSITION = 0.825457;
+        public static final double L4_SCORING_POSITION = 0.819636;
 
         public static final double ZERO = -1; // not real
     }

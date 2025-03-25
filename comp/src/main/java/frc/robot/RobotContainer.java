@@ -389,10 +389,10 @@ public class RobotContainer {
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
                 new JoystickButton(operator, XboxController.Button.kA.value)
-                                .whileTrue(arm.goLittleUp(.05));// climberSubsystem.climb());
+                                .whileTrue(arm.goLittleUp(.05)); // climberSubsystem.climb());
 
                 new JoystickButton(operator, XboxController.Button.kB.value)
-                                .whileTrue(arm.goLittleDown(.05)); // climberSubsystem.deClimb());
+                                .whileTrue(arm.goLittleDown(.05));// climberSubsystem.deClimb());
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
                                 .onTrue(intakeCommands.in());
@@ -417,20 +417,20 @@ public class RobotContainer {
                                 .whileTrue(elevator.intakeGroundAlgae())
                                 .onFalse(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));
 
-                new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
-                                .whileTrue(Commands.parallel(
-                                                swerveCommands.autoAlignAndDescoreAlgae(
-                                                                Constants.SetpointConstants.ALGAE_DESCORE_L2),
-                                                ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
-                                                ledKwarqs.isAutoScoring(false)));
+                // new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
+                // .whileTrue(Commands.parallel(
+                // swerveCommands.autoAlignAndDescoreAlgae(
+                // Constants.SetpointConstants.ALGAE_DESCORE_L2),
+                // ledKwarqs.isAutoScoring(true)))
+                // .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
+                // arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
+                // ledKwarqs.isAutoScoring(false)));
 
-                new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
-                                .whileTrue(swerveCommands
-                                                .autoAlignAndDescoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
+                // new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
+                // .whileTrue(swerveCommands
+                // .autoAlignAndDescoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
+                // .onFalse(Commands.sequence(intakeCommands.intakeStop(),
+                // arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
 
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value) // left
