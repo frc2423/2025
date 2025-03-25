@@ -164,8 +164,9 @@ public class RobotContainer {
                 m_chooser.addOption("Back Right Single (Robot Oriented)", "Back Right Single (Robot Oriented)");
                 m_chooser.addOption("Back Left Single (robot oriented)", "Back Left Single (robot oriented)");
                 m_chooser.addOption("Left Side 2 3/4", "Left Side 3 Piece BLUE E & C & D");
-                m_chooser.addOption("Right Side 3 BLUE", "Right Side 3 Piece BLUE E & C & D");
-                m_chooser.addOption("Left Side 3 BLUE", "Left Side 3 Piece BLUE J & K & L");
+                // m_chooser.addOption("Right Side 3 BLUE", "Right Side 3 Piece BLUE E & C &
+                // D");
+                // m_chooser.addOption("Left Side 3 BLUE", "Left Side 3 Piece BLUE J & K & L");
                 m_chooser.addOption("Left Side 3 RED", "Left Side 3 Piece RED J & K & L");
                 m_chooser.addOption("Right Side 3 RED", "Right Side 3 Piece RED E & C & D");
 
@@ -269,9 +270,13 @@ public class RobotContainer {
                 NamedCommands.registerCommand("Run Intake", intakeCommands.intakeHumanPlayer());
 
                 addAutoScoreCommand("AutoScoral left near", 11, 20, false);
+                addAutoScoreCommand("AutoScoral 11/20 right", 11, 20, true);
                 addAutoScoreCommand("AutoScoral left far", 6, 19, true);
+                addAutoScoreCommand("AutoScoral 6/19 left", 6, 19, false);
                 addAutoScoreCommand("AutoScoral right near", 9, 22, false);
+                addAutoScoreCommand("AutoScoral 9/22 right", 9, 22, true);
                 addAutoScoreCommand("AutoScoral right far", 8, 17, false);
+                addAutoScoreCommand("AutoScoral 8/17 right", 8, 17, true);
                 addAutoScoreCommand("AutoScoral back right (robot oriented)", 10, 21, true);
                 addAutoScoreCommand("AutoScoral back left (robot oriented)", 10, 21, false);
 

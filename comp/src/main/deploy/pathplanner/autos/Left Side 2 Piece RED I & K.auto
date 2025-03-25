@@ -55,19 +55,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "JK to HP"
+                  "pathName": "I Human Player"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "Elevator Down"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake Coral From Human Player"
                 }
               }
             ]
