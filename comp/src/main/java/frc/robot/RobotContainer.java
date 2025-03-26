@@ -404,21 +404,26 @@ public class RobotContainer {
                                                                 Constants.SetpointConstants.ALGAE_INTAKE_L2,
                                                                 Constants.SetpointConstants.ALGAE_DUNK_L2),
                                                 ledKwarqs.isAutoScoring(true)))
-                                .onFalse(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));
+                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                intakeCommands.holdAlgae()));
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(Commands.parallel(
                                                 swerveCommands.autoAlignAndIntakeAlgae(
                                                                 Constants.SetpointConstants.REEF_L3,
                                                                 Constants.SetpointConstants.ALGAE_DUNK_L3),
                                                 ledKwarqs.isAutoScoring(true)))
-                                .onFalse(/* Commands.sequence(intakeCommands.intakeStop(), */
-                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));// );
+                                .onFalse(Commands.parallel(ledKwarqs.isAutoScoring(false),
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                intakeCommands.holdAlgae()));// );
                 new Trigger(() -> operator.getPOV() == 90)
                                 .whileTrue(arm.goToSetpoint(Constants.ArmConstants.ALGAE_PROCESS));
 
                 new Trigger(() -> operator.getPOV() == 180)
-                                .whileTrue(elevator.intakeGroundAlgae())
-                                .onFalse(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));
+                                .onTrue(elevator.intakeGroundAlgae())
+                                .onFalse(Commands.parallel(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                intakeCommands.holdAlgae()));
 
                 // new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
                 // .whileTrue(Commands.parallel(
@@ -443,7 +448,7 @@ public class RobotContainer {
 
                 new JoystickButton(operator, XboxController.Button.kStart.value) // right
                                 .whileTrue(intakeCommands.ejectAlgae())
-                                .onFalse(Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR),
+                                .onFalse(Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.HANDOFF_POSE),
                                                 intakeCommands.intakeStop()));
                 // .onTrue(elevator.goLittleUp(1));
 
