@@ -399,17 +399,22 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(swerveCommands
-                                                .autoAlignAndIntakeAlgae(Constants.SetpointConstants.ALGAE_INTAKE_L2,
-                                                                Constants.SetpointConstants.ALGAE_DUNK_L2))
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoAlignAndIntakeAlgae(
+                                                                Constants.SetpointConstants.ALGAE_INTAKE_L2,
+                                                                Constants.SetpointConstants.ALGAE_DUNK_L2),
+                                                ledKwarqs.isAutoScoring(true)))
                                 .onFalse(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));
                 new Trigger(() -> operator.getPOV() == 0)
-                                .whileTrue(swerveCommands.autoAlignAndIntakeAlgae(Constants.SetpointConstants.REEF_L3,
-                                                Constants.SetpointConstants.ALGAE_DUNK_L3))
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoAlignAndIntakeAlgae(
+                                                                Constants.SetpointConstants.REEF_L3,
+                                                                Constants.SetpointConstants.ALGAE_DUNK_L3),
+                                                ledKwarqs.isAutoScoring(true)))
                                 .onFalse(/* Commands.sequence(intakeCommands.intakeStop(), */
                                                 arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD));// );
-                new Trigger(() -> operator.getPOV() == 90).whileTrue(elevator.scoreAlgae())
-                                .onFalse(intakeCommands.intakeStop());
+                new Trigger(() -> operator.getPOV() == 90)
+                                .whileTrue(arm.goToSetpoint(Constants.ArmConstants.ALGAE_PROCESS));
 
                 new Trigger(() -> operator.getPOV() == 180)
                                 .whileTrue(elevator.intakeGroundAlgae())
