@@ -401,8 +401,7 @@ public class RobotContainer {
                 new Trigger(() -> operator.getPOV() == 270)
                                 .whileTrue(Commands.parallel(
                                                 swerveCommands.autoAlignAndIntakeAlgae(
-                                                                Constants.SetpointConstants.ALGAE_INTAKE_L2,
-                                                                Constants.SetpointConstants.ALGAE_DUNK_L2),
+                                                                Constants.SetpointConstants.ALGAE_INTAKE_L2),
                                                 ledKwarqs.isAutoScoring(true)))
                                 .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
                                                 arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
@@ -411,11 +410,11 @@ public class RobotContainer {
                 new Trigger(() -> operator.getPOV() == 0)
                                 .whileTrue(Commands.parallel(
                                                 swerveCommands.autoAlignAndIntakeAlgae(
-                                                                Constants.SetpointConstants.REEF_L3,
-                                                                Constants.SetpointConstants.ALGAE_DUNK_L3),
+                                                                Constants.SetpointConstants.REEF_L3),
                                                 ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.parallel(ledKwarqs.isAutoScoring(false),
+                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
                                                 arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
                                                 intakeCommands.holdAlgae()));// );
                 new Trigger(() -> operator.getPOV() == 90)
                                 .whileTrue(arm.goToSetpoint(Constants.ArmConstants.ALGAE_PROCESS));
