@@ -44,6 +44,16 @@ public class AutoAlignNear extends Command {
         this.addRequirements(swerve);
     }
 
+    public AutoAlignNear(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist,
+            Optional<Integer> tagNumber) {
+        this.isAlgae = true;
+        this.dist = dist;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
+    }
+
     @Override
     public void initialize() {
         reachedY = false;
@@ -63,7 +73,9 @@ public class AutoAlignNear extends Command {
 
     @Override
     public void execute() {
-        Pose2d pose2d = swerveCommands.addScoringOffset(pose, dist, isRight);// .55
+        Pose2d pose2d = isAlgae ? swerveCommands.addOffset(pose, dist, .1)
+                : swerveCommands.addScoringOffset(pose, dist, isRight);
+
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
 
         Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();

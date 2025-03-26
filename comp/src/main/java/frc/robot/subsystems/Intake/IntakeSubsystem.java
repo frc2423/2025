@@ -51,10 +51,10 @@ public class IntakeSubsystem extends SubsystemBase {
          * to do:
          * 0 try distance
          * 0 make distance work
-         * O fine tune algae descore w/ abs encoder
-         * O make autoalign and descore
-         * O try barge
-         * O try processor
+         * 0 fine tune algae descore w/ abs encoder
+         * 0 make autoalign and descore
+         * 0 try barge
+         * 0 try processor
          */
     }
 
@@ -64,7 +64,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public IntakeSubsystem() {
-        setCurrentLimit(80, 80);
+        setCurrentLimit(60, 60);
     }
 
     public void intake(double speed) {

@@ -88,8 +88,8 @@ public final class Constants {
         public static final double REEF_L2 = 18.2;
 
         public static final double ALGAE_INTAKE_L2 = 17;
-        public static final double ALGAE_DUNK_L2 = 15.5;
-        public static final double ALGAE_DUNK_L3 = 32;
+        // public static final double ALGAE_DUNK_L2 = 15.5;
+        // public static final double ALGAE_DUNK_L3 = 32;
 
         public static final double ALGAE_DESCORE_L3 = 26;
         public static final double ALGAE_DESCORE_L2 = 9;
@@ -101,16 +101,19 @@ public final class Constants {
 
     public static class ArmConstants {
         // public static final double ALGAE_DESCORE = -7.5;// -7.5;// .2; // not real
-        public static final double ALGAE_INTAKE = 0.819670;// -6.8; // all relative
+        public static final double ALGAE_INTAKE = 0.809670;// -6.8; // all relative
         public static final double ALGAE_SCORE = 0.5; // 6; // relative can't use bc stupid
         public static final double ALGAE_GROUND = 0.718154; // -14.5; // NOT REAL relative
         public static final double ALGAE_HOLD = 0.885966; // relative
+        public static final double ALGAE_PROCESS = 0.85; // relative
 
         public static final double HANDOFF_POSE = 0.911322;
         public static final double OUTSIDE_ELEVATOR = 0.874339;
 
         public static final double SCORING_POSITION = 0.825457;
         public static final double L4_SCORING_POSITION = 0.79;
+
+        public static final double ALGAE_DUNK = .79;
 
         public static final double ZERO = -1; // not real
     }
