@@ -160,8 +160,8 @@ public class SwerveCommands {
     public Command autoAlignAndIntakeAlgae(double setpoint, double setpoint2) {
         Command intakeAlgaeCommand1 = elevatorSubsystem.intakeAlgae(setpoint);
         Command intakeAlgaeCommand2 = elevatorSubsystem.goToSetpoint(setpoint2);
-        Command autoAlignCommand1 = new AutoAlign(swerve, this, 1, Optional.empty(), .1);
-        Command autoAlignCommand2 = new AutoAlign(swerve, this, .4, Optional.empty(), .1);
+        Command autoAlignCommand1 = new AutoAlignFar(swerve, this, 1, Optional.empty());
+        Command autoAlignCommand2 = new AutoAlignNear(swerve, this, .4, Optional.empty());
         var command = Commands.sequence(
                 autoAlignCommand1,
                 Commands.sequence(
