@@ -22,8 +22,8 @@ public class ArmSubsystem extends SubsystemBase {
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double encoderPosition = 0;
-    private double maximum = 0.917;
-    private double minumum = 0.7;
+    private double maximum = 0.917; // relative: 6
+    private double minumum = .7; // relative -14.5
     private double setpoint = maximum;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0.455, 0, 0);
     private double MAX_VOLTAGE = 0.9;
@@ -52,9 +52,9 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         if (encoderPosition > maximum) {
-            calculatedPID = Math.max(calculatedPID, 0);
-        } else if (encoderPosition < minumum) {
             calculatedPID = Math.min(calculatedPID, 0);
+        } else if (encoderPosition < minumum) {
+            calculatedPID = Math.max(calculatedPID, 0);
         }
 
         armPivot.set(calculatedPID);
@@ -144,7 +144,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isAtSetpoint() {
-        return (Math.abs(getEncoderPosition() - setpoint) < 2);
+        return (Math.abs(getEncoderPosition() - setpoint) < 2.0 / 78.0);
     }
 
     public double getEncoderPosition() {

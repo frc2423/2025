@@ -8,12 +8,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -153,13 +147,40 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
-    public Command descoreAlgae(double setpoint) {
+    public Command scoreAlgae() {
+        return Commands.sequence(goToSetpoint(Constants.SetpointConstants.REEF_L4),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_SCORE));
+        // intake.ejectAlgae());
+    }
+
+    public Command intakeAlgae(double setpoint) {
         return Commands.sequence(goToSetpoint(setpoint),
                 Commands.waitUntil(() -> {
                     return isAtSetpoint();
                 }),
-                arm.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORE),
-                intake.intakeJustOut());
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_INTAKE),
+                intake.intakeAlgae());
+    }
+
+    public Command intakeGroundAlgae() {
+        return Commands.sequence(goToSetpoint(Constants.SetpointConstants.ZERO),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_GROUND),
+                intake.intakeAlgae());
+    }
+
+    public Command outtakeAlgae(double setpoint) {
+        return Commands.sequence(goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_SCORE),
+                intake.intakeOut());
     }
 
     public double getElevatorVelocity() { // for manual control, sick
