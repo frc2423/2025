@@ -83,7 +83,7 @@ public final class Constants {
     }
 
     public static class SetpointConstants {
-        public static final double REEF_L4 = 62.6569420;// 69.56; // noice
+        public static final double REEF_L4 = 63.1569420;// 69.56; // noice
         public static final double REEF_L3 = 34.8;
         public static final double REEF_L2 = 18.2;
 
@@ -110,7 +110,7 @@ public final class Constants {
         public static final double OUTSIDE_ELEVATOR = 0.874339;
 
         public static final double SCORING_POSITION = 0.825457;
-        public static final double L4_SCORING_POSITION = 0.79;
+        public static final double L4_SCORING_POSITION = 0.80;
 
         public static final double ZERO = -1; // not real
     }

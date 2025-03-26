@@ -7,8 +7,10 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
+import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
-
+import au.grapplerobotics.interfaces.LaserCanInterface;
+import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.MedianFilter;
@@ -61,6 +63,11 @@ public class IntakeSubsystem extends SubsystemBase {
     private void setCurrentLimit(int limit, int free) {
         motorConfig.smartCurrentLimit(limit, free);
         motor.configureAsync(motorConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        // try {
+        // intakeDist.setRegionOfInterest(new RegionOfInterest(8, 8, 8, 8));
+        // } catch (ConfigurationFailedException exception) {
+        // exception.printStackTrace();
+        // }
     }
 
     public IntakeSubsystem() {
@@ -103,7 +110,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public double getRawSensorValue() {
         var dist = intakeDist.getMeasurement();
-        if (dist == null || intakeDist.getMeasurement().status == intakeDist.LASERCAN_STATUS_OUT_OF_BOUNDS) {
+        if (dist == null || intakeDist.getMeasurement().status != intakeDist.LASERCAN_STATUS_VALID_MEASUREMENT) {
             return 10000;
         } else {
             return dist.distance_mm;
@@ -115,16 +122,18 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean hasAlgae() {
-        return distMm() > 95 && distMm() < 160;
+        return distMm() > 95 && distMm() < 110;
     }
 
     @Override
     public void initSendable(SendableBuilder builder) {
         super.initSendable(builder);
         builder.addDoubleProperty("laserCan distance", () -> distMm(), null);
+        builder.addDoubleProperty("laserCan Raw Value", () -> getRawSensorValue(), null);
         builder.addDoubleProperty("current current (haha)", () -> motor.getOutputCurrent(), null);
         builder.addDoubleProperty("speed", () -> motor.get(), null);
         builder.addBooleanProperty("hasAlgae", () -> hasAlgae(), null);
         builder.addBooleanProperty("hasCoral", () -> !isOut(), null);
+        builder.addIntegerProperty("LaserCan status", () -> intakeDist.getMeasurement().status, null);
     }
 }
