@@ -108,15 +108,19 @@ public class KwarqsLed extends SubsystemBase {
         var command = Commands.runOnce(() -> {
             isEjectingPOOP = flag;
         });
-        // command.addRequirements(this);
+        command.addRequirements(this);
         return command;
     }
 
     @Override
     public void periodic() {
+
         if (RobotState.isTeleop() && !RobotState.isDisabled()) {
 
-            if (isRedAlliance()) {
+            if (isEjectingPOOP) {
+                ledController.set("POOP");
+
+            } else if (isRedAlliance()) {
                 ledController.set("RedCycle");
             } else if (!isRedAlliance()) {
                 ledController.set("BlueCycle");
@@ -137,10 +141,6 @@ public class KwarqsLed extends SubsystemBase {
 
         if (isAutoScoring) {
             ledController.set("rainbow");
-        }
-
-        if (isEjectingPOOP) {
-            ledController.set("POOP");
         }
 
         ledController.run();

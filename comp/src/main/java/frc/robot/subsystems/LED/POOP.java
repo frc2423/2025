@@ -14,17 +14,14 @@ public class POOP implements Led {
     public void start(AddressableLEDBuffer buffer, int length) {
         timer.reset();
         timer.start();
-        // Start all LEDs at full brightness
+        // Start all LEDs at brown color
         for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.setHSV(i, (int) (30 * 2.55), 255, (int) (59 * 2.55));
+            buffer.setHSV(i, 30, 255, 59); // Brown color
         }
     }
 
     public void run(AddressableLEDBuffer buffer, int length) {
         double timeElapsed = timer.get();
-        // if (timeElapsed > DURATION) {
-        // return;
-        // }
 
         // Calculate how many LEDs should be off based on time
         int ledsToTurnOff = (int) ((timeElapsed / DURATION) * buffer.getLength());
@@ -32,19 +29,18 @@ public class POOP implements Led {
         // Turn off LEDs one by one from the start
         for (int i = 0; i < buffer.getLength(); i++) {
             if (i < ledsToTurnOff) {
-                // LED should be off
-                buffer.setHSV(i, 195, 255, 255);
+                // LED should be light blue
+                buffer.setHSV(i, 120, 255, 255); // Light blue color
             } else {
-                // LED should still be on
-                buffer.setHSV(i, (int) (30 * 2.55), 255, (int) (59 * 2.55));
+                // LED should still be brown
+                buffer.setHSV(i, 30, 255, 59); // Brown color
             }
         }
     }
 
     public void end(AddressableLEDBuffer buffer, int length) {
-        // timer.stop();
         for (int i = 0; i < buffer.getLength(); i++) {
-            buffer.setHSV(i, 240, 255, 0);
+            buffer.setHSV(i, 195, 255, 255); // Light blue color
         }
     }
 }
