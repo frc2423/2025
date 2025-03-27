@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 
 public class POOP implements Led {
-    private static final double DURATION = 8.0; // Total seconds before LEDs turn off
+    private static final double DURATION = 4.0; // Total seconds before LEDs turn off
     private final Timer timer = new Timer();
 
     public POOP() {
@@ -27,7 +27,7 @@ public class POOP implements Led {
         int ledsToTurnOff = (int) ((timeElapsed / DURATION) * buffer.getLength());
 
         // Turn off LEDs one by one from the start
-        for (int i = 0; i < buffer.getLength(); i++) {
+        for (int i = buffer.getLength() - 1; i >= 0; i--) {
             if (i < ledsToTurnOff) {
                 // LED should be light blue
                 buffer.setHSV(i, 120, 255, 255); // Light blue color
