@@ -134,6 +134,7 @@ public class IntakeSubsystem extends SubsystemBase {
         builder.addDoubleProperty("speed", () -> motor.get(), null);
         builder.addBooleanProperty("hasAlgae", () -> hasAlgae(), null);
         builder.addBooleanProperty("hasCoral", () -> !isOut(), null);
-        builder.addIntegerProperty("LaserCan status", () -> intakeDist.getMeasurement().status, null);
+        // builder.addIntegerProperty("LaserCan status", () ->
+        // intakeDist.getMeasurement().status, null);
     }
 }

@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.AutoAlign;
+import frc.robot.subsystems.swervedrive.AutoCommand;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -497,9 +498,19 @@ public class RobotContainer {
          *
          * @return the command to run in autonomous
          */
-        public Command getAutonomousCommand() {
+        public AutoCommand getAutonomousCommand() {
                 // An example command will be run in autonomous
-                return drivebase.getAutonomousCommand(m_chooser.getSelected());
+                boolean isRed = false;
+                if (m_chooser.getSelected().equals("Left Side 3 Piece RED J & K & L")) {
+                        isRed = true;
+                } else if (m_chooser.getSelected().equals("Right Side 3 Piece RED E & C & D")) {
+                        isRed = true;
+                }
+                return drivebase.getAutonomousCommand(m_chooser.getSelected(), isRed);
+        }
+
+        public void setIsBlue(boolean isBlue) {
+                drivebase.setIsBlue(isBlue);
         }
 
         public void configureBindings() {
