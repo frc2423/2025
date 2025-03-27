@@ -4,6 +4,7 @@ package frc.robot.subsystems.Intake;
 import frc.robot.subsystems.FunnelSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.Timer;
 
 import java.util.function.BooleanSupplier;
 
@@ -23,11 +24,24 @@ public class IntakeCommands {
     public Command intakeIn() {
         var command = Commands.run(() -> {
             // arm.goUp(),
-            intake.intake(.25);
+            intake.intake(.2);
         });
         command.setName("Intake In");
         command.addRequirements(intake);
         return command;
+    }
+
+    public Command intakeStart() {
+        var command = Commands.runOnce(() -> {
+            intake.intake(.25);
+        });
+        command.setName("Intake Once");
+        command.addRequirements(intake);
+        return command;
+    }
+
+    public Command intakeShort() {
+        return intakeHumanPlayer().withTimeout(0.5).withName("Run Intake Short");
     }
 
     public Command intakeJustIn() {

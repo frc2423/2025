@@ -42,7 +42,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command climb() {
         var command = run(() -> {
-            setSetpoint(.791, 1);
+            setSetpoint(.369, 1);
         });
         command.setName("Climber going up");
         return command;
@@ -50,7 +50,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command deClimb() {
         var command = run(() -> {
-            setSetpoint(.203, 1);
+            setSetpoint(.8, 1);
         });
         command.setName("Climber going down");
         return command;

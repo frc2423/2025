@@ -694,7 +694,7 @@ public class Vision {
           estStdDevs = multiTagStdDevs;
         }
         // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 4) {
+        if (numTags == 1 && avgDist > 6) {
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         } else if (avgDist <= 1) {
           estStdDevs = estStdDevs.times(.5); // number subject to change

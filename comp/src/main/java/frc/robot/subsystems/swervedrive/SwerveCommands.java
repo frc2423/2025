@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swervedrive;
 
+import java.lang.module.ModuleDescriptor.Builder;
 import java.util.Map;
 import java.util.Optional;
 
@@ -187,7 +188,7 @@ public class SwerveCommands {
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
-        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.53, isRight, tagNumber),
+        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.51, isRight, tagNumber),
                 new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
@@ -207,6 +208,7 @@ public class SwerveCommands {
         var command = Commands.sequence(
                 Commands.parallel(prepareElevator,
                         Commands.sequence(new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
+                                Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
                 intakeCommands.intakeOut());
 

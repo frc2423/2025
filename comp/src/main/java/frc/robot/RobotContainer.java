@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.AutoAlign;
+import frc.robot.subsystems.swervedrive.AutoCommand;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -163,6 +164,12 @@ public class RobotContainer {
                 m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
                 m_chooser.addOption("Back Right Single (Robot Oriented)", "Back Right Single (Robot Oriented)");
                 m_chooser.addOption("Back Left Single (robot oriented)", "Back Left Single (robot oriented)");
+                m_chooser.addOption("Left Side 2 3/4", "Left Side 3 Piece BLUE E & C & D");
+                // m_chooser.addOption("Right Side 3 BLUE", "Right Side 3 Piece BLUE E & C &
+                // D");
+                // m_chooser.addOption("Left Side 3 BLUE", "Left Side 3 Piece BLUE J & K & L");
+                m_chooser.addOption("Left Side 3 RED", "Left Side 3 Piece RED J & K & L");
+                m_chooser.addOption("Right Side 3 RED", "Right Side 3 Piece RED E & C & D");
 
                 // m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE
                 // E & C"); //BAD DONT USE
@@ -241,10 +248,36 @@ public class RobotContainer {
                                 swerveCommands.autoScoral(Optional.of(19),
                                                 Constants.SetpointConstants.REEF_L4, false));
 
+                NamedCommands.registerCommand("AutoScoral 11 Right",
+                                swerveCommands.autoScoral(Optional.of(11),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Right",
+                                swerveCommands.autoScoral(Optional.of(6),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Left",
+                                swerveCommands.autoScoral(Optional.of(6),
+                                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("Intake Start",
+                                intakeCommands.intakeStart());
+
+                NamedCommands.registerCommand("Funnel Start",
+                                funnelSubsystem.funnelStart());
+
+                NamedCommands.registerCommand("Run Intake Short", intakeCommands.intakeShort());
+
+                NamedCommands.registerCommand("Run Intake", intakeCommands.intakeHumanPlayer());
+
                 addAutoScoreCommand("AutoScoral left near", 11, 20, false);
+                addAutoScoreCommand("AutoScoral 11/20 right", 11, 20, true);
                 addAutoScoreCommand("AutoScoral left far", 6, 19, true);
+                addAutoScoreCommand("AutoScoral 6/19 left", 6, 19, false);
                 addAutoScoreCommand("AutoScoral right near", 9, 22, false);
+                addAutoScoreCommand("AutoScoral 9/22 right", 9, 22, true);
                 addAutoScoreCommand("AutoScoral right far", 8, 17, false);
+                addAutoScoreCommand("AutoScoral 8/17 right", 8, 17, true);
                 addAutoScoreCommand("AutoScoral back right (robot oriented)", 10, 21, true);
                 addAutoScoreCommand("AutoScoral back left (robot oriented)", 10, 21, false);
 
@@ -465,9 +498,19 @@ public class RobotContainer {
          *
          * @return the command to run in autonomous
          */
-        public Command getAutonomousCommand() {
+        public AutoCommand getAutonomousCommand() {
                 // An example command will be run in autonomous
-                return drivebase.getAutonomousCommand(m_chooser.getSelected());
+                boolean isRed = false;
+                if (m_chooser.getSelected().equals("Left Side 3 Piece RED J & K & L")) {
+                        isRed = true;
+                } else if (m_chooser.getSelected().equals("Right Side 3 Piece RED E & C & D")) {
+                        isRed = true;
+                }
+                return drivebase.getAutonomousCommand(m_chooser.getSelected(), isRed);
+        }
+
+        public void setIsBlue(boolean isBlue) {
+                drivebase.setIsBlue(isBlue);
         }
 
         public void configureBindings() {

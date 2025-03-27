@@ -79,6 +79,8 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private final boolean visionDriveTest = true;
 
+  private boolean isPathBlue = true;
+
   private PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
   /**
    * PhotonVision class to keep an accurate odometry.
@@ -240,10 +242,10 @@ public class SwerveSubsystem extends SubsystemBase {
             // alliance
             // This will flip the path being followed to the red side of the field.
             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
+            // return false;
             var alliance = DriverStation.getAlliance();
             if (alliance.isPresent()) {
-              return alliance.get() == DriverStation.Alliance.Red;
+              return alliance.get() == (isPathBlue ? DriverStation.Alliance.Red : DriverStation.Alliance.Blue);
             }
             return false;
           },
@@ -258,6 +260,10 @@ public class SwerveSubsystem extends SubsystemBase {
     // Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
+  }
+
+  public void setIsBlue(boolean pathBlue) {
+    isPathBlue = pathBlue;
   }
 
   /**
@@ -332,10 +338,16 @@ public class SwerveSubsystem extends SubsystemBase {
    *          PathPlanner path name.
    * @return {@link AutoBuilder#followPath(PathPlannerPath)} path command.
    */
-  public Command getAutonomousCommand(String pathName) {
+  public AutoCommand getAutonomousCommand(String pathName, boolean isRed) {
     // Create a path following command using AutoBuilder. This will also trigger
     // event markers.
-    return new PathPlannerAuto(pathName);
+    return new AutoCommand(pathName, isRed);
+  }
+
+  public AutoCommand getAutonomousCommand(String pathName) {
+    // Create a path following command using AutoBuilder. This will also trigger
+    // event markers.
+    return new AutoCommand(pathName, false);
   }
 
   /**

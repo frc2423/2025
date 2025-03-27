@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class FunnelSubsystem extends SubsystemBase {
@@ -31,6 +32,14 @@ public class FunnelSubsystem extends SubsystemBase {
 
     public Command spinIn() {
         var command = run(() -> {
+            spinIn(-1.0);
+        });
+        command.setName("Spin IN (funnel)");
+        return command;
+    }
+
+    public Command funnelStart() {
+        var command = runOnce(() -> {
             spinIn(-1.0);
         });
         command.setName("Spin IN (funnel)");
