@@ -54,17 +54,17 @@ public class IntakeCommands {
     }
 
     public Command intakeAlgae() {
-        var command = Commands.runOnce(() -> {
+        var command = Commands.run(() -> {
             intake.intake(1);
-        }).until(() -> intake.hasAlgae());
+        });// .until(() -> intake.hasAlgae());
         command.addRequirements(intake);
         command.setName("algae intake");
         return command;
     }
 
     public Command holdAlgae() {
-        var command = Commands.runOnce(() -> {
-            intake.intake(.3);
+        var command = Commands.run(() -> {
+            intake.intake(1);
         });
         command.addRequirements(intake);
         command.setName("algae intake");
@@ -90,7 +90,7 @@ public class IntakeCommands {
     }
 
     public Command ejectAlgae() {
-        var command = Commands.runOnce(() -> {
+        var command = Commands.run(() -> {
             intake.outtakeAlgae(1);
         });
         command.addRequirements(intake);
