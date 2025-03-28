@@ -498,15 +498,19 @@ public class RobotContainer {
          *
          * @return the command to run in autonomous
          */
-        public AutoCommand getAutonomousCommand() {
+        public AutoCommand getAutonomousCommand(String auto) {
                 // An example command will be run in autonomous
                 boolean isRed = false;
-                if (m_chooser.getSelected().equals("Left Side 3 Piece RED J & K & L")) {
+                if (auto.equals("Left Side 3 Piece RED J & K & L")) {
                         isRed = true;
-                } else if (m_chooser.getSelected().equals("Right Side 3 Piece RED E & C & D")) {
+                } else if (auto.equals("Right Side 3 Piece RED E & C & D")) {
                         isRed = true;
                 }
-                return drivebase.getAutonomousCommand(m_chooser.getSelected(), isRed);
+                return drivebase.getAutonomousCommand(auto, isRed);
+        }
+
+        public AutoCommand getAutonomousCommand() {
+                return getAutonomousCommand(m_chooser.getSelected());
         }
 
         public void setIsBlue(boolean isBlue) {
