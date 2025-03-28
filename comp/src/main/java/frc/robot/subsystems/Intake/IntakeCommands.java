@@ -108,6 +108,13 @@ public class IntakeCommands {
         return command;
     }
 
+    public Command isOut() {
+        var command = Commands.run(() -> {
+            intake.isOut();
+        });
+        return command;
+    }
+
     public Command intakeStop() {
         var command = Commands.runOnce(() -> intake.stop());
         command.addRequirements(intake);

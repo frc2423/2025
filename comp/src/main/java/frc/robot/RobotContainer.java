@@ -67,7 +67,7 @@ public class RobotContainer {
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
         RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
 
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm, intakeSubsystem);
 
         KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 

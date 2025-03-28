@@ -227,7 +227,7 @@ public class SwerveCommands {
         return Commands.either(
                 Commands.none(),
                 autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint), isRight),
-                () -> true/* intakeCommands.isOut() */);
+                () -> intakesubsystem.isOut());
         // return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint),
         // isRight);
     }
