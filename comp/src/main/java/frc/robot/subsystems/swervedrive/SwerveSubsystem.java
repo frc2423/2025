@@ -347,11 +347,8 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public AutoCommand getAutonomousCommand(String pathName, boolean isRed) {
     if (autoStuff.containsKey(pathName)) {
-      System.out.println("CACHED!!!");
       return autoStuff.get(pathName);
     } else {
-      System.out.println("Not cached :'(");
-
       return autoStuff.put(pathName, new AutoCommand(pathName, isRed));
     }
     // Create a path following command using AutoBuilder. This will also trigger
