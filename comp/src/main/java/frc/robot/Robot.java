@@ -55,6 +55,8 @@ public class Robot extends TimedRobot {
     // and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    m_robotContainer.getAutonomousCommand("Left Side 3 Piece RED J & K & L");
+    m_robotContainer.getAutonomousCommand("Right Side 3 Piece RED E & C & D");
 
     // Create a timer to disable motor brake a few seconds after disable. This will
     // let the robot stop

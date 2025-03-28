@@ -31,6 +31,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -45,7 +46,10 @@ import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
+import java.net.CacheRequest;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -56,6 +60,7 @@ import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.math.SwerveMath;
+import swervelib.parser.Cache;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -86,6 +91,8 @@ public class SwerveSubsystem extends SubsystemBase {
    * PhotonVision class to keep an accurate odometry.
    */
   public Vision vision;
+
+  private static Map<String, AutoCommand> autoStuff = new HashMap<>();
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -339,9 +346,13 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return {@link AutoBuilder#followPath(PathPlannerPath)} path command.
    */
   public AutoCommand getAutonomousCommand(String pathName, boolean isRed) {
+    if (autoStuff.containsKey(pathName)) {
+      return autoStuff.get(pathName);
+    } else {
+      return autoStuff.put(pathName, new AutoCommand(pathName, isRed));
+    }
     // Create a path following command using AutoBuilder. This will also trigger
     // event markers.
-    return new AutoCommand(pathName, isRed);
   }
 
   public AutoCommand getAutonomousCommand(String pathName) {
