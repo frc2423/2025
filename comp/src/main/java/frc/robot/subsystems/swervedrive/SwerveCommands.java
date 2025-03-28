@@ -3,6 +3,7 @@ package frc.robot.subsystems.swervedrive;
 import java.lang.module.ModuleDescriptor.Builder;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -26,6 +27,7 @@ import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.AngleUtils;
 import frc.robot.Constants;
 import frc.robot.NTHelper;
@@ -36,6 +38,8 @@ public class SwerveCommands {
     private SwerveSubsystem swerve;
     private ArmSubsystem armSubsystem;
     private IntakeCommands intakeCommands;
+    private IntakeSubsystem intakesubsystem;
+
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
     private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
@@ -45,7 +49,8 @@ public class SwerveCommands {
     ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands, ArmSubsystem armSubsystem) {
+            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem) {
+        this.intakesubsystem = intakesubsystem;
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
@@ -218,7 +223,13 @@ public class SwerveCommands {
     }
 
     public Command autoScoral(Optional<Integer> tagNumber, double setpoint, boolean isRight) {
-        return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint), isRight);
+
+        return Commands.either(
+                Commands.none(),
+                autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint), isRight),
+                () -> intakesubsystem.isOut());
+        // return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint),
+        // isRight);
     }
 
     public Command autoScoralClosest(boolean isRight) {
