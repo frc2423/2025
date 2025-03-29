@@ -524,18 +524,31 @@ public class Vision {
       }
     }
 
-    // public void log() {
-    // NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDev", 0);
-    // NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected",
-    // );
-    // NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/",
-    // hasTarget());
-    // NTHelper.setPose("/visionDebug/" + camera.getName() + "/estimatedPose", );
-    // NTHelper.setDouble("/visionDebug" + camera.getName() + "/height", );
-    // NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity",
-    // getPoseAmbiguityFromBestTarget());
-    // NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", );
-    // }
+    public Double getEstPoseX() {
+      return estimatedRobotPose.get().estimatedPose.getX();
+    }
+
+    public Double getEstPoseY() {
+      return estimatedRobotPose.get().estimatedPose.getY();
+    }
+
+    public Double getEstPoseRot() {
+      return Math.toDegrees(estimatedRobotPose.get().estimatedPose.getRotation().getAngle());
+    }
+
+    public void log() {
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDevX", getCurrentStdDevsX());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDevY", getCurrentStdDevsY());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDevRot", getCurrentStdDevsRot());
+      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected", camera.isConnected());
+      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/", hasTarget());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/estimatedPoseX", getEstPoseX());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/estimatedPoseY", getEstPoseY());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/estimatedPoseRot", getEstPoseRot());
+      // NTHelper.setDouble("/visionDebug" + camera.getName() + "/height",);
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity", getPoseAmbiguityFromBestTarget());
+      NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", isRejecting);
+    }
 
     /**
      * Add camera to {@link VisionSystemSim} for simulated photon vision.
@@ -575,25 +588,25 @@ public class Vision {
       return Optional.of(bestResult);
     }
 
-    // public Double getPoseAmbiguityFromBestTarget() {
-    // if (resultsList.isEmpty()) {
-    // return null;
-    // }
+    public Double getPoseAmbiguityFromBestTarget() {
+      if (resultsList.isEmpty()) {
+        return null;
+      }
 
-    // PhotonPipelineResult bestResult = resultsList.get(0);
-    // double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
-    // double currentAmbiguity = 0;
+      PhotonPipelineResult bestResult = resultsList.get(0);
+      double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
+      double currentAmbiguity = 0;
 
-    // for (PhotonPipelineResult result : resultsList) {
-    // currentAmbiguity = result.getBestTarget().getPoseAmbiguity();
-    // if (currentAmbiguity < amiguity && currentAmbiguity > 0) {
-    // bestResult = result;
-    // amiguity = currentAmbiguity;
-    // }
-    // }
+      for (PhotonPipelineResult result : resultsList) {
+        currentAmbiguity = result.getBestTarget().getPoseAmbiguity();
+        if (currentAmbiguity < amiguity && currentAmbiguity > 0) {
+          bestResult = result;
+          amiguity = currentAmbiguity;
+        }
+      }
 
-    // return bestResult.getBestTarget().getPoseAmbiguity();
-    // }
+      return bestResult.getBestTarget().getPoseAmbiguity();
+    }
 
     /*
      * Check whether there was a recently discovered target
@@ -688,7 +701,20 @@ public class Vision {
      * @param targets
      *          All targets in this camera frame
      */
-    private double currentStdDevs;
+
+    private Double getCurrentStdDevsX() {
+      return curStdDevs.get(0, 0);
+    }
+
+    private Double getCurrentStdDevsY() {
+      return curStdDevs.get(1, 0);
+    }
+
+    private Double getCurrentStdDevsRot() {
+      return curStdDevs.get(2, 0);
+    }
+
+    private Boolean isRejecting = null;
 
     private void updateEstimationStdDevs(
         Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
@@ -731,15 +757,17 @@ public class Vision {
         // Increase std devs based on (average) distance
         if (numTags == 1 && avgDist > 6) {
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+          isRejecting = true;
         } else if (avgDist <= 1) {
           estStdDevs = estStdDevs.times(.5); // number subject to change
+          isRejecting = false;
         } else {
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+          isRejecting = false;
         }
         curStdDevs = estStdDevs;
         // herp
       }
-      // currentStdDevs = curStdDevs.get(curStdDevs.);
 
     }
 
