@@ -525,13 +525,14 @@ public class Vision {
     }
 
     public void log() {
-      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDev", 0);
-      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected", );
-      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/", );
-      NTHelper.setPose("/visionDebug/" + camera.getName() + "/estimatedPose", );
-      NTHelper.setDouble("/visionDebug" + camera.getName() + "/height", );
-      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity", );
-      NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", );
+      // NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDev", 0);
+      // NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected",
+      // );
+      // NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/", );
+      // NTHelper.setPose("/visionDebug/" + camera.getName() + "/estimatedPose", );
+      // NTHelper.setDouble("/visionDebug" + camera.getName() + "/height", );
+      // NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity", );
+      // NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", );
     }
 
     /**

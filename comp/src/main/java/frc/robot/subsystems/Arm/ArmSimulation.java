@@ -57,15 +57,15 @@ public class ArmSimulation {
     public void simPeriodic() {
         // In this method, we update our simulation of what our elevator is doing
         // First, we set our "inputs" (voltages)
-        armSim.setInput(-motorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+        armSim.setInput(motorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
 
         // Next, we update it. The standard loop time is 20ms.
         armSim.update(0.020);
 
         // Now, we update the Spark Flex
-        final double MAX_ENCODER_POSITION = -15;// read what encoder value on dashboard
-        double percentRads = armSim.getAngleRads() / MAX_ARM_ROTATION;
-        motorSim.setPosition(MAX_ENCODER_POSITION * percentRads);
+        double rotations = armSim.getAngleRads() / (Math.PI * 2);
+        double position = rotations + 0.64;
+        motorSim.setPosition(position);
         motorSim.iterate(
                 armSim.getVelocityRadPerSec(),
                 RobotController.getBatteryVoltage(),

@@ -22,9 +22,9 @@ public class ArmSubsystem extends SubsystemBase {
     // MotorType.kBrushless);
     private double scoringWheelSpeed = 0;
     private double encoderPosition = 0;
-    private double maximum = 0.917; // relative: 6
-    private double minumum = .7; // relative -14.5
-    private double setpoint = maximum;// will change varibly
+    public static final double MAX_ENCODER_POSITION = 0.917; // relative: 6
+    public static final double MIN_ENCODER_POSITION = .7; // relative -14.5
+    private double setpoint = MAX_ENCODER_POSITION;// will change varibly
     private final ArmFeedforward m_feedforward = new ArmFeedforward(0, 0.455, 0, 0);
     private double MAX_VOLTAGE = 0.9;
 
@@ -42,7 +42,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        encoderPosition = armPivot.getAbsoluteEncoder().getPosition();
+        encoderPosition = Robot.isSimulation() ? armPivot.getEncoder().getPosition()
+                : armPivot.getAbsoluteEncoder().getPosition();
         calculatedPID = calculatePid(setpoint);
 
         if (calculatedPID > MAX_VOLTAGE) {
@@ -51,9 +52,9 @@ public class ArmSubsystem extends SubsystemBase {
             calculatedPID = -MAX_VOLTAGE;
         }
 
-        if (encoderPosition > maximum) {
+        if (encoderPosition > MAX_ENCODER_POSITION) {
             calculatedPID = Math.min(calculatedPID, 0);
-        } else if (encoderPosition < minumum) {
+        } else if (encoderPosition < MIN_ENCODER_POSITION) {
             calculatedPID = Math.max(calculatedPID, 0);
         }
 
@@ -76,7 +77,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command goDown() { // for manual control, sick
-        return goToSetpoint(minumum);
+        return goToSetpoint(MIN_ENCODER_POSITION);
     }
 
     public double getArmAngle() {
@@ -84,7 +85,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Command goUp() { // for manual control, sick
-        return goToSetpoint(maximum);
+        return goToSetpoint(MAX_ENCODER_POSITION);
     }
 
     public Command goLittleUp(double constant) {
@@ -138,7 +139,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     private void setSetpoint(double position) {
-        if (position <= maximum && position >= minumum) {
+        if (position <= MAX_ENCODER_POSITION && position >= MIN_ENCODER_POSITION) {
             setpoint = position;
         }
     }
@@ -164,13 +165,15 @@ public class ArmSubsystem extends SubsystemBase {
         // This is used to add things to NetworkTables
         super.initSendable(builder);
 
+        builder.addDoubleProperty("armPivotVoltage", () -> armPivot.get(), null);
         builder.addDoubleProperty("calculatePid", () -> calculatedPID, null);
-        builder.addDoubleProperty("absoluteEncoderPosition", () -> encoderPosition, null);
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
+        builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
         builder.addDoubleProperty("scoringWheelSpeed", () -> scoringWheelSpeed, null);
         builder.addBooleanProperty("isInSafeArea", () -> isInSafeArea(), null);
-        builder.addDoubleProperty("encoder", () -> armPivot.getEncoder().getPosition(), null);
-        builder.addDoubleProperty("getArmAngle", () -> getArmAngle(), null);
+        builder.addDoubleProperty("relativeEncoderPosition", () -> armPivot.getEncoder().getPosition(), null);
+        builder.addDoubleProperty("absoluteEncoderPosition", () -> encoderPosition, null);
+        builder.addDoubleProperty("getArmAngleDegrees", () -> getArmAngle(), null);
 
         if (Robot.isSimulation()) {
             armSim.initSendable(builder);
