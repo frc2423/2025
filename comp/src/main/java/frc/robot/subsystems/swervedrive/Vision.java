@@ -407,14 +407,14 @@ public class Vision {
    * 
    */
   enum Cameras {
-    FRONT_RIGHT_CAM("right_cam",
+    FRONT_RIGHT_CAM("right_cam_2",
         new Rotation3d(0, Math.toRadians(-20), Math.toRadians(0)),
         new Translation3d(Units.inchesToMeters(10.5), // center to front
             Units.inchesToMeters(-5),
             Units.inchesToMeters(6)), // front floor
         VecBuilder.fill(2, 2, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-    FRONT_LEFT_CAM("left_cam",
+    FRONT_LEFT_CAM("left_cam_spare",
         new Rotation3d(0, Math.toRadians(-20), Math.toRadians(-45)),
         new Translation3d(Units.inchesToMeters(5.707),
             Units.inchesToMeters(9.793),
@@ -522,6 +522,16 @@ public class Vision {
         cameraSim = new PhotonCameraSim(camera, cameraProp);
         cameraSim.enableDrawWireframe(true);
       }
+    }
+
+    public void log() {
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDev", 0);
+      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected", );
+      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/", );
+      NTHelper.setPose("/visionDebug/" + camera.getName() + "/estimatedPose", );
+      NTHelper.setDouble("/visionDebug" + camera.getName() + "/height", );
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity", );
+      NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", );
     }
 
     /**
