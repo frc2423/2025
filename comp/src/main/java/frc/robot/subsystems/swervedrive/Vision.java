@@ -407,14 +407,14 @@ public class Vision {
    * 
    */
   enum Cameras {
-    FRONT_RIGHT_CAM("right_cam_2",
+    FRONT_RIGHT_CAM("right_cam",
         new Rotation3d(0, Math.toRadians(-20), Math.toRadians(0)),
         new Translation3d(Units.inchesToMeters(10.5), // center to front
             Units.inchesToMeters(-5),
             Units.inchesToMeters(6)), // front floor
         VecBuilder.fill(2, 2, 8), VecBuilder.fill(0.5, 0.5, 1)),
 
-    FRONT_LEFT_CAM("left_cam_spare",
+    FRONT_LEFT_CAM("left_cam",
         new Rotation3d(0, Math.toRadians(-20), Math.toRadians(-45)),
         new Translation3d(Units.inchesToMeters(5.707),
             Units.inchesToMeters(9.793),
@@ -524,15 +524,18 @@ public class Vision {
       }
     }
 
-    public void log() {
-      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDev", 0);
-      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected", );
-      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/", );
-      NTHelper.setPose("/visionDebug/" + camera.getName() + "/estimatedPose", );
-      NTHelper.setDouble("/visionDebug" + camera.getName() + "/height", );
-      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity", );
-      NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", );
-    }
+    // public void log() {
+    // NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDev", 0);
+    // NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected",
+    // );
+    // NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/",
+    // hasTarget());
+    // NTHelper.setPose("/visionDebug/" + camera.getName() + "/estimatedPose", );
+    // NTHelper.setDouble("/visionDebug" + camera.getName() + "/height", );
+    // NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity",
+    // getPoseAmbiguityFromBestTarget());
+    // NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", );
+    // }
 
     /**
      * Add camera to {@link VisionSystemSim} for simulated photon vision.
@@ -571,6 +574,26 @@ public class Vision {
       }
       return Optional.of(bestResult);
     }
+
+    // public Double getPoseAmbiguityFromBestTarget() {
+    // if (resultsList.isEmpty()) {
+    // return null;
+    // }
+
+    // PhotonPipelineResult bestResult = resultsList.get(0);
+    // double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
+    // double currentAmbiguity = 0;
+
+    // for (PhotonPipelineResult result : resultsList) {
+    // currentAmbiguity = result.getBestTarget().getPoseAmbiguity();
+    // if (currentAmbiguity < amiguity && currentAmbiguity > 0) {
+    // bestResult = result;
+    // amiguity = currentAmbiguity;
+    // }
+    // }
+
+    // return bestResult.getBestTarget().getPoseAmbiguity();
+    // }
 
     /*
      * Check whether there was a recently discovered target
@@ -665,6 +688,8 @@ public class Vision {
      * @param targets
      *          All targets in this camera frame
      */
+    private double currentStdDevs;
+
     private void updateEstimationStdDevs(
         Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
       if (estimatedPose.isEmpty()) {
@@ -712,7 +737,9 @@ public class Vision {
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
         }
         curStdDevs = estStdDevs;
+        // herp
       }
+      // currentStdDevs = curStdDevs.get(curStdDevs.);
 
     }
 
