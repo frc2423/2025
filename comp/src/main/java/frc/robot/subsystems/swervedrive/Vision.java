@@ -109,6 +109,12 @@ public class Vision {
     }
   }
 
+  public void logCameras() {
+    for (Cameras cam : Cameras.values()) {
+      cam.log();
+    }
+  }
+
   public static Pose2d getTagPose(int id) {
     return fieldLayout.getTagPose(id).get().toPose2d();
   }
@@ -174,6 +180,7 @@ public class Vision {
         NTHelper.setDouble("/swerveSubsystem/vision/stdDevX", stdDev.get(0, 0));
         NTHelper.setDouble("/swerveSubsystem/vision/stdDevY", stdDev.get(1, 0));
         NTHelper.setDouble("/swerveSubsystem/vision/stdDevAngle", stdDev.get(2, 0));
+
       }
     }
 
@@ -524,16 +531,32 @@ public class Vision {
       }
     }
 
-    public Double getEstPoseX() {
+    public double getEstPoseX() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
       return estimatedRobotPose.get().estimatedPose.getX();
     }
 
-    public Double getEstPoseY() {
+    public double getEstPoseY() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
       return estimatedRobotPose.get().estimatedPose.getY();
     }
 
-    public Double getEstPoseRot() {
+    public double getEstPoseRot() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
       return Math.toDegrees(estimatedRobotPose.get().estimatedPose.getRotation().getAngle());
+    }
+
+    public double getEstPoseZ() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
+      return estimatedRobotPose.get().estimatedPose.getZ();
     }
 
     public void log() {
@@ -547,7 +570,8 @@ public class Vision {
       NTHelper.setDouble("/visionDebug/" + camera.getName() + "/estimatedPoseRot", getEstPoseRot());
       // NTHelper.setDouble("/visionDebug" + camera.getName() + "/height",);
       NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity", getPoseAmbiguityFromBestTarget());
-      NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag", isRejecting);
+      // NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag",
+      // isRejecting);
     }
 
     /**
@@ -588,9 +612,9 @@ public class Vision {
       return Optional.of(bestResult);
     }
 
-    public Double getPoseAmbiguityFromBestTarget() {
+    public double getPoseAmbiguityFromBestTarget() {
       if (resultsList.isEmpty()) {
-        return null;
+        return -100000;
       }
 
       PhotonPipelineResult bestResult = resultsList.get(0);
@@ -714,7 +738,7 @@ public class Vision {
       return curStdDevs.get(2, 0);
     }
 
-    private Boolean isRejecting = null;
+    // private Boolean isRejecting = null;
 
     private void updateEstimationStdDevs(
         Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
@@ -755,15 +779,15 @@ public class Vision {
           estStdDevs = multiTagStdDevs;
         }
         // Increase std devs based on (average) distance
-        if (numTags == 1 && avgDist > 6) {
+        if (numTags == 1 && avgDist > 8) {
           estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-          isRejecting = true;
+          // isRejecting = true;
         } else if (avgDist <= 1) {
           estStdDevs = estStdDevs.times(.5); // number subject to change
-          isRejecting = false;
+          // isRejecting = false;
         } else {
           estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-          isRejecting = false;
+          // isRejecting = false;
         }
         curStdDevs = estStdDevs;
         // herp
