@@ -1,36 +1,37 @@
 package frc.robot.subsystems.Intake;
 
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
-import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
+import au.grapplerobotics.simulation.MockLaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface;
-import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.MedianFilter;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 public class IntakeSubsystem extends SubsystemBase {
     private SparkFlex motor = new SparkFlex(23, MotorType.kBrushless);
     SparkFlexConfig motorConfig = new SparkFlexConfig();
     // private boolean hasAlgae = false;
-    private LaserCan intakeDist = new LaserCan(26);
+    private final LaserCanInterface intakeDist;
     private double speed = 0;
     MedianFilter distanceFilter = new MedianFilter(10);
     private double distMm;
     private boolean ejecting = false;
+
+    public IntakeSubsystem() {
+        setCurrentLimit(60, 60);
+        intakeDist = Robot.isSimulation() ? new MockLaserCan() : new LaserCan(26);
+    }
+
+    @Override
+    public void simulationPeriodic() {
+
+    }
 
     @Override
     public void periodic() {
@@ -70,10 +71,6 @@ public class IntakeSubsystem extends SubsystemBase {
         // }
     }
 
-    public IntakeSubsystem() {
-        setCurrentLimit(60, 60);
-    }
-
     public void intake(double speed) {
         this.speed = speed;
     }
@@ -108,9 +105,9 @@ public class IntakeSubsystem extends SubsystemBase {
         return distMm;
     }
 
-    public double getRawSensorValue() {
+    public int getRawSensorValue() {
         var dist = intakeDist.getMeasurement();
-        if (dist == null || intakeDist.getMeasurement().status != intakeDist.LASERCAN_STATUS_VALID_MEASUREMENT) {
+        if (dist == null || intakeDist.getMeasurement().status != LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT) {
             return 10000;
         } else {
             return dist.distance_mm;
@@ -134,7 +131,13 @@ public class IntakeSubsystem extends SubsystemBase {
         builder.addDoubleProperty("speed", () -> motor.get(), null);
         builder.addBooleanProperty("hasAlgae", () -> hasAlgae(), null);
         builder.addBooleanProperty("hasCoral", () -> !isOut(), null);
-        // builder.addIntegerProperty("LaserCan status", () ->
-        // intakeDist.getMeasurement().status, null);
+
+        if (Robot.isSimulation()) {
+            builder.addBooleanProperty("simulateHasCoral", () -> !isOut(), value -> {
+                ((MockLaserCan) intakeDist)
+                        .setMeasurementPartialSim(LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT,
+                                value ? 20 : 1000, 0);
+            });
+        }
     }
 }

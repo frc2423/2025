@@ -223,7 +223,9 @@ public class SwerveCommands {
     }
 
     public Command autoScoral(Optional<Integer> tagNumber, double setpoint, boolean isRight) {
-        Command command = Commands.runOnce(() -> swerve.drive(new ChassisSpeeds()));
+        Command command = Commands.run(() -> {
+            swerve.drive(new ChassisSpeeds(0, 0, 0));
+        }).withTimeout(.2);
         command.addRequirements(swerve);
         return Commands.either(
                 command,
