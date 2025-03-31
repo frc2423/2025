@@ -133,10 +133,10 @@ public class IntakeSubsystem extends SubsystemBase {
         builder.addBooleanProperty("hasCoral", () -> !isOut(), null);
 
         if (Robot.isSimulation()) {
-            builder.addBooleanProperty("simulateHasCoral", this::haveCoral, value -> {
+            builder.addBooleanProperty("simulateHasCoral", () -> !isOut(), value -> {
                 ((MockLaserCan) intakeDist)
                         .setMeasurementPartialSim(LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT,
-                                value ? 50 : 1000, 0);
+                                value ? 20 : 1000, 0);
             });
         }
     }

@@ -176,6 +176,8 @@ public class RobotContainer {
                 // m_chooser.addOption("Left 2 Piece I & L BLUE", "Left 2 Piece I & L BLUE");
                 // //BAD DONT USE
 
+                NamedCommands.registerCommand("stopMoving", swerveCommands.stopMoving());
+
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
 
