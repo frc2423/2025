@@ -233,6 +233,7 @@ public class SwerveCommands {
                 () -> intakesubsystem.isOut());
         // return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint),
         // isRight);
+
     }
 
     public Command autoScoralClosest(boolean isRight) {

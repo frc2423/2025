@@ -366,16 +366,25 @@ public class RobotContainer {
                                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(Commands.parallel(
+                                .whileTrue(Commands.sequence(Commands.parallel(
                                                 swerveCommands.autoScoralClosest(false),
-                                                ledKwarqs.isAutoScoring(true)))
+                                                ledKwarqs.isAutoScoring(true)),
+                                                Commands.either(
+                                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                                Commands.none(),
+                                                                () -> intakeSubsystem.isOut())))
+
                                 .onFalse(Commands.parallel(intakeCommands.intakeStop(),
                                                 ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
-                                .whileTrue(Commands.parallel(
+                                .whileTrue(Commands.sequence(Commands.parallel(
                                                 swerveCommands.autoScoralClosest(true),
-                                                ledKwarqs.isAutoScoring(true)))
+                                                ledKwarqs.isAutoScoring(true)),
+                                                Commands.either(
+                                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                                Commands.none(),
+                                                                () -> intakeSubsystem.isOut())))
                                 .onFalse(Commands.parallel(intakeCommands.intakeStop(),
                                                 ledKwarqs.isAutoScoring(false)));
 
