@@ -71,8 +71,6 @@ public class RobotContainer {
 
         KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 
-        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
         private static boolean runOnce = false;
 
         SendableChooser<String> m_chooser = new SendableChooser<>();
@@ -339,7 +337,7 @@ public class RobotContainer {
                                         if (!PoseTransformUtils.isRedAlliance()) {
                                                 y *= -1;
                                         }
-                                        return m_yspeedLimiter.calculate(y);
+                                        return drivebase.m_yspeedLimiter.calculate(y);
                                 },
                                 () -> {
                                         double x = MathUtil.applyDeadband(
@@ -348,7 +346,7 @@ public class RobotContainer {
                                         if (!PoseTransformUtils.isRedAlliance()) {
                                                 x *= -1;
                                         }
-                                        return m_xspeedLimiter.calculate(x);
+                                        return drivebase.m_xspeedLimiter.calculate(x);
                                 },
                                 () -> -driverXbox.getRightX());
                 return driveFieldOrientedAngularVelocity; // :P
@@ -390,6 +388,9 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(elevator.goDownAndIntake());
+
+                new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                                .onTrue(swerveCommands.lookAtNearestHPTag());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .onTrue(intakeCommands.intakeOut());
