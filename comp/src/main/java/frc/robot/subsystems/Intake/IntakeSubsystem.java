@@ -93,14 +93,6 @@ public class IntakeSubsystem extends SubsystemBase {
         ejecting = false;
     }
 
-    public boolean haveCoral() {
-        if (distMm() < 100) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public double distMm() {
         return distMm;
     }

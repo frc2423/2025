@@ -105,7 +105,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goDownAndIntake() {
-        Command command = Commands.sequence(goDown(), intake.in());
+        Command command = Commands.sequence(goDown(), intake.in()/* , intake.backwards().withTimeout(.1) */);
         command.setName("goDownAndIntake");
         return command;
     }

@@ -198,6 +198,7 @@ public class SwerveCommands {
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
         Command prepareElevator = Commands.sequence(
+                intakeCommands.in(),
                 Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
                         (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
                                 : new Translation2d(4.507, 4.031)) < 2),
