@@ -393,10 +393,10 @@ public class RobotContainer {
                                 .onTrue(swerveCommands.lookAtNearestHPTag());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .onTrue(intakeCommands.intakeOut());
+                                .onTrue(intakeCommands.eject());
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
-                                .onTrue(intakeCommands.intakeJustIn());
+                                .onTrue(intakeCommands.ejectAlgae());
 
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
                                 .onTrue(swerveCommands.orbitReefCenter());
@@ -405,16 +405,40 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new Trigger(() -> driverXbox.getPOV() == 270)
-                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+                                .whileTrue(climberSubsystem.deClimb()).onFalse(climberSubsystem.climbStop());
+
                 new Trigger(() -> driverXbox.getPOV() == 0)
-                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L3));
+                                .whileTrue(climberSubsystem.climb()).onFalse(climberSubsystem.climbStop());
+
                 new Trigger(() -> driverXbox.getPOV() == 90)
-                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
+                                .onTrue(elevator.intakeGroundAlgae())
+                                .onFalse(Commands.parallel(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                intakeCommands.holdAlgae()));
                 new Trigger(() -> driverXbox.getPOV() == 180)
                                 .onTrue(elevator.goDown());
 
-                new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .onTrue(elevator.goDown());
+                new JoystickButton(driverXbox, XboxController.Button.kLeftStick.value)
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoAlignAndIntakeAlgae(
+                                                                Constants.SetpointConstants.REEF_L3),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                intakeCommands.holdAlgae()));
+
+                new JoystickButton(driverXbox, XboxController.Button.kRightStick.value)
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoAlignAndIntakeAlgae(
+                                                                Constants.SetpointConstants.REEF_L2),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                intakeCommands.holdAlgae()));
+
+                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                // .onTrue(elevator.goDown());
 
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
