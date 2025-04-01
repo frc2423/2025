@@ -322,6 +322,19 @@ public class Vision {
 
   }
 
+  public Integer findClosestHPSTagID(Pose2d currentPose) {
+    int[] AprilTagIDs = { 1, 2, 12, 13 };
+    List<Pose2d> poseList = new ArrayList<Pose2d>();
+    Map<Pose2d, Integer> tagMap = new HashMap<Pose2d, Integer>();
+    for (int tag : AprilTagIDs) {
+      poseList.add(fieldLayout.getTagPose(tag).get().toPose2d());
+      tagMap.put(fieldLayout.getTagPose(tag).get().toPose2d(), tag);
+    }
+
+    return tagMap.get(currentPose.nearest(poseList));
+
+  }
+
   public int iDtoAngle(int tag) {
     int[] AprilTagIDs = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
 
@@ -342,6 +355,16 @@ public class Vision {
 
     return tagMap.get(tag);
 
+  }
+
+  public int hpIDToAngle(int tag) {
+    // int[] AprilTagIDs = { 1, 2, 12, 13 };
+    Map<Integer, Integer> tagMap = new HashMap<Integer, Integer>();
+    tagMap.put(1, -60);
+    tagMap.put(2, 60);
+    tagMap.put(12, 60);
+    tagMap.put(13, -60);
+    return tagMap.get(tag);
   }
 
   /**
