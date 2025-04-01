@@ -24,7 +24,7 @@ public class IntakeCommands {
     public Command intakeIn() {
         var command = Commands.run(() -> {
             // arm.goUp(),
-            intake.intake(.2);
+            intake.intake(.15); // .17
         });
         command.setName("Intake In");
         command.addRequirements(intake);
@@ -124,6 +124,12 @@ public class IntakeCommands {
         return command;
     }
 
+    public Command backwards() {
+        var command = Commands.run(() -> intake.backwards(.15));
+        command.setName("intake backwards");
+        return command;
+    }
+
     public Command stop() {
         var command = Commands.sequence(
                 intakeStop(),
@@ -141,5 +147,9 @@ public class IntakeCommands {
         command.addRequirements(funnel);
         command.setName("Intake Coral From Human Player");
         return command;
+    }
+
+    public BooleanSupplier hasNoCoral() {
+        return () -> !intake.isOut();
     }
 }
