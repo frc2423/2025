@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -48,11 +49,25 @@ public class ClimberSubsystem extends SubsystemBase {
         return command;
     }
 
+    public Command deClimbMore() {
+        var command = run(() -> {
+            setSetpoint(.85, 1);
+        });
+        command.setName("Climber going up");
+        return command;
+    }
+
     public Command deClimb() {
         var command = run(() -> {
             setSetpoint(.8, 1);
         });
         command.setName("Climber going down");
+        return command;
+    }
+
+    public Command deClimbSpecial() {
+        var command = Commands.sequence(deClimbMore(), deClimb());
+        command.setName("Climber special");
         return command;
     }
 

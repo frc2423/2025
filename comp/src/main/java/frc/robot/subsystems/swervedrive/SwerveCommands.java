@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
+import com.ctre.phoenix.CustomParamConfiguration;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
@@ -39,6 +42,7 @@ public class SwerveCommands {
     private ArmSubsystem armSubsystem;
     private IntakeCommands intakeCommands;
     private IntakeSubsystem intakesubsystem;
+    private ClimberSubsystem climberSubsystem;
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -49,12 +53,14 @@ public class SwerveCommands {
     ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem) {
+            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem,
+            ClimberSubsystem climberSubsystem) {
         this.intakesubsystem = intakesubsystem;
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
         this.armSubsystem = armSubsystem;
+        this.climberSubsystem = climberSubsystem;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
     }
 
@@ -188,6 +194,18 @@ public class SwerveCommands {
         // intakeAlgaeCommand2));
         command.setName("autoIntakeAlgae");
         return command;
+    }
+
+    public Command autoAlignClimb(Pose2d pose) {
+        if (pose != null) {
+            Command command = Commands.sequence(
+                    new AutoAlignFar(swerve, this, pose),
+                    new AutoAlignNear(swerve, this, pose),
+                    Commands.parallel(new MoveSideways(swerve, 6, .25), climberSubsystem.deClimb()));
+            command.setName("autoAlignClimb");
+            return command;
+        }
+        return climberSubsystem.deClimb();
     }
 
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
