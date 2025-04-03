@@ -360,8 +360,8 @@ public class Vision {
   public int hpIDToAngle(int tag) {
     // int[] AprilTagIDs = { 1, 2, 12, 13 };
     Map<Integer, Integer> tagMap = new HashMap<Integer, Integer>();
-    tagMap.put(1, -60);
-    tagMap.put(2, 60);
+    tagMap.put(1, 120);
+    tagMap.put(2, 240);
     tagMap.put(12, 60);
     tagMap.put(13, -60);
     return tagMap.get(tag);

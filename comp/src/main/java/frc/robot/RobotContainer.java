@@ -396,8 +396,8 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.eject());
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
-                                .onTrue(intakeCommands.ejectAlgae());
-
+                                .onTrue(intakeCommands.ejectAlgae().withTimeout(0.25)
+                                                .andThen(intakeCommands.stop()));
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
                                 .onTrue(swerveCommands.orbitReefCenter());
 

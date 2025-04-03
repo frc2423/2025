@@ -152,4 +152,8 @@ public class IntakeCommands {
     public BooleanSupplier hasNoCoral() {
         return () -> !intake.isOut();
     }
+
+    public BooleanSupplier hasNoAlgae() {
+        return () -> !intake.hasAlgae();
+    }
 }
