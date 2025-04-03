@@ -530,8 +530,10 @@ public class RobotContainer {
                                                 intakeCommands.intakeStop()));
                 // .onTrue(elevator.goLittleUp(1));
 
-                new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));
-                new JoystickButton(operator, XboxController.Button.kLeftBumper.value).onTrue(elevator.goLittleDown(1));
+                new JoystickButton(operator, XboxController.Button.kRightBumper.value)
+                                .onTrue(arm.goLittleUp(.075));
+                new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
+                                .onTrue(arm.goLittleDown(.075));
                 // .whileTrue(intakeCommands.intakeStop());
 
                 // .whileTrue(swerveCommands.lookAtNearestTag());

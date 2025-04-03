@@ -40,6 +40,20 @@ public class ClimberSubsystem extends SubsystemBase {
     // speed = inputspeed;
     // }
 
+    public Command goLittleUp(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(getPosition() + constant, 1);
+        });
+    }
+
+    public Command goLittleDown(double constant) {
+        // for manual control, sick
+        return runOnce(() -> {
+            setSetpoint(getPosition() - constant, 1);
+        });
+    }
+
     public Command climb() {
         var command = run(() -> {
             setSetpoint(.369, 1);
