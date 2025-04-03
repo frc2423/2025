@@ -468,25 +468,34 @@ public class RobotContainer {
                                 .onTrue(intakeCommands.intakeOut());
 
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(Commands.parallel(
-                                                swerveCommands.autoAlignAndIntakeAlgae(
-                                                                Constants.SetpointConstants.ALGAE_INTAKE_L2),
-                                                ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
-                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
-                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
-                                                intakeCommands.holdAlgae()));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+
                 new Trigger(() -> operator.getPOV() == 0)
-                                .whileTrue(Commands.parallel(
-                                                swerveCommands.autoAlignAndIntakeAlgae(
-                                                                Constants.SetpointConstants.REEF_L3),
-                                                ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
-                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
-                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
-                                                intakeCommands.holdAlgae()));// );
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L3));
+
                 new Trigger(() -> operator.getPOV() == 90)
-                                .whileTrue(arm.goToSetpoint(Constants.ArmConstants.ALGAE_PROCESS));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
+
+                // new Trigger(() -> operator.getPOV() == 270)
+                // .whileTrue(Commands.parallel(
+                // swerveCommands.autoAlignAndIntakeAlgae(
+                // Constants.SetpointConstants.ALGAE_INTAKE_L2),
+                // ledKwarqs.isAutoScoring(true)))
+                // .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                // arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                // elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                // intakeCommands.holdAlgae()));
+                // new Trigger(() -> operator.getPOV() == 0)
+                // .whileTrue(Commands.parallel(
+                // swerveCommands.autoAlignAndIntakeAlgae(
+                // Constants.SetpointConstants.REEF_L3),
+                // ledKwarqs.isAutoScoring(true)))
+                // .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                // arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                // elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                // intakeCommands.holdAlgae()));// );
+                // new Trigger(() -> operator.getPOV() == 90)
+                // .whileTrue(arm.goToSetpoint(Constants.ArmConstants.ALGAE_PROCESS));
 
                 new Trigger(() -> operator.getPOV() == 180)
                                 .onTrue(elevator.intakeGroundAlgae())
