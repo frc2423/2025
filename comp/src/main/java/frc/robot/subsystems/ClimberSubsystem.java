@@ -56,7 +56,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command climb() {
         var command = run(() -> {
-            setSetpoint(.369, 1);
+            setSetpoint(.407, 1);
         });
         command.setName("Climber going up");
         return command;
