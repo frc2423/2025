@@ -99,7 +99,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public int getRawSensorValue() {
         var dist = intakeDist.getMeasurement();
-        if (dist == null || intakeDist.getMeasurement().status != LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT) {
+        if (dist == null || dist.status != LaserCanInterface.LASERCAN_STATUS_VALID_MEASUREMENT) {
             return 10000;
         } else {
             return dist.distance_mm;

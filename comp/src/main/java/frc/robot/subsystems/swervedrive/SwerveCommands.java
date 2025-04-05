@@ -270,13 +270,40 @@ public class SwerveCommands {
         return new Rotation2d(angleRads);
     }
 
-    static Pose2d reefCenter = new Pose2d(new Translation2d(13.055, 4.007), Rotation2d.fromDegrees(0));
+    static Pose2d REDreefCenter = new Pose2d(new Translation2d(13.055, 4.007), Rotation2d.fromDegrees(0));
+    static Pose2d BLUEreefCenter = new Pose2d(new Translation2d(4.495, 4.019), Rotation2d.fromDegrees(0));
+
+    private boolean isRightStickBeingUsed() {
+        return Math.abs(driverXbox.getRightX()) > .1 || Math.abs(driverXbox.getRightY()) > .1;
+    }
 
     public Command orbitReefCenter() {
         var command = Commands.run(() -> {
-            Rotation2d angle = getLookAngle(reefCenter);
-            actuallyLookAngleButMove(angle);
-        }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
+
+            int tag = swerve.vision.findClosestHPSTagID(swerve.getPose());
+            double dist = swerve.vision.getDistanceFromAprilTag(tag);
+            if (PoseTransformUtils.isRedAlliance()) {
+                if (dist >= 3) {
+                    Rotation2d angle = getLookAngle(REDreefCenter);
+                    actuallyLookAngleButMove(angle);
+
+                } else {
+                    int hpAngle = swerve.vision.hpIDToAngle(tag);
+                    actuallyLookAngleButMove(Rotation2d.fromDegrees(hpAngle));
+                }
+            } else {
+                if (dist >= 3) {
+                    Rotation2d angle = getLookAngle(BLUEreefCenter);
+                    actuallyLookAngleButMove(angle);
+
+                } else {
+                    int hpAngle = swerve.vision.hpIDToAngle(tag);
+                    actuallyLookAngleButMove(Rotation2d.fromDegrees(hpAngle));
+                }
+
+            }
+
+        }).until(() -> (isRightStickBeingUsed()));
         command.addRequirements(swerve);
         return command;
     }
@@ -284,7 +311,7 @@ public class SwerveCommands {
     public Command lookAtAngle(double angle) {
         var command = Commands.run(() -> {
             actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
-        }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
+        }).until(() -> (isRightStickBeingUsed()));
         command.addRequirements(swerve);
         return command;
     }
