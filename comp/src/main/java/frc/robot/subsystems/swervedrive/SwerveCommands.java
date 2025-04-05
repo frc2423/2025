@@ -46,8 +46,6 @@ public class SwerveCommands {
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
-    private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
-    private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
     ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
@@ -125,6 +123,17 @@ public class SwerveCommands {
         Command stopCommand = Commands.runOnce(() -> swerve.drive(new ChassisSpeeds()));
         stopCommand.addRequirements(swerve);
         return stopCommand;
+    }
+
+    public Command lookAtNearestHPTag() {
+        var command = Commands.run(() -> {
+            int tag = swerve.vision.findClosestHPSTagID(swerve.getPose());
+            int angle = swerve.vision.hpIDToAngle(tag);
+            actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
+            // .plus(Rotation2d.k180deg));
+        }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
+        command.addRequirements(swerve);
+        return command;
     }
 
     public Command getElevatorLevelCommand() {
@@ -279,13 +288,40 @@ public class SwerveCommands {
         return new Rotation2d(angleRads);
     }
 
-    static Pose2d reefCenter = new Pose2d(new Translation2d(13.055, 4.007), Rotation2d.fromDegrees(0));
+    static Pose2d REDreefCenter = new Pose2d(new Translation2d(13.055, 4.007), Rotation2d.fromDegrees(0));
+    static Pose2d BLUEreefCenter = new Pose2d(new Translation2d(4.495, 4.019), Rotation2d.fromDegrees(0));
+
+    private boolean isRightStickBeingUsed() {
+        return Math.abs(driverXbox.getRightX()) > .1 || Math.abs(driverXbox.getRightY()) > .1;
+    }
 
     public Command orbitReefCenter() {
         var command = Commands.run(() -> {
-            Rotation2d angle = getLookAngle(reefCenter);
-            actuallyLookAngleButMove(angle);
-        }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
+
+            int tag = swerve.vision.findClosestHPSTagID(swerve.getPose());
+            double dist = swerve.vision.getDistanceFromAprilTag(tag);
+            if (PoseTransformUtils.isRedAlliance()) {
+                if (dist >= 3) {
+                    Rotation2d angle = getLookAngle(REDreefCenter);
+                    actuallyLookAngleButMove(angle);
+
+                } else {
+                    int hpAngle = swerve.vision.hpIDToAngle(tag);
+                    actuallyLookAngleButMove(Rotation2d.fromDegrees(hpAngle));
+                }
+            } else {
+                if (dist >= 3) {
+                    Rotation2d angle = getLookAngle(BLUEreefCenter);
+                    actuallyLookAngleButMove(angle);
+
+                } else {
+                    int hpAngle = swerve.vision.hpIDToAngle(tag);
+                    actuallyLookAngleButMove(Rotation2d.fromDegrees(hpAngle));
+                }
+
+            }
+
+        }).until(() -> (isRightStickBeingUsed()));
         command.addRequirements(swerve);
         return command;
     }
@@ -293,7 +329,7 @@ public class SwerveCommands {
     public Command lookAtAngle(double angle) {
         var command = Commands.run(() -> {
             actuallyLookAngleButMove(Rotation2d.fromDegrees(angle));
-        }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
+        }).until(() -> (isRightStickBeingUsed()));
         command.addRequirements(swerve);
         return command;
     }
@@ -307,7 +343,7 @@ public class SwerveCommands {
         if (!PoseTransformUtils.isRedAlliance()) {
             x *= -1;
         }
-        double ySpeedTarget = m_xspeedLimiter.calculate(x);
+        double ySpeedTarget = swerve.m_xspeedLimiter.calculate(x);
 
         double y = MathUtil.applyDeadband(
                 driverXbox.getLeftY(),
@@ -316,7 +352,7 @@ public class SwerveCommands {
             y *= -1;
         }
 
-        double xSpeedTarget = m_yspeedLimiter.calculate(y);
+        double xSpeedTarget = swerve.m_yspeedLimiter.calculate(y);
 
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(xSpeedTarget, ySpeedTarget,
                 rotation2d);
