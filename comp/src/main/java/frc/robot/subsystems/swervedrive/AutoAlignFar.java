@@ -15,6 +15,7 @@ public class AutoAlignFar extends Command {
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
     private boolean isAlgae = false;
+    private Optional<Pose2d> climbPose = Optional.empty();
 
     private boolean reachedX = false;
     private boolean reachedY = false;
@@ -49,13 +50,24 @@ public class AutoAlignFar extends Command {
         this.addRequirements(swerve);
     }
 
+    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, Pose2d climbPose) {
+        this.isAlgae = true;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.addRequirements(swerve);
+        this.climbPose = Optional.of(climbPose);
+    }
+
     @Override
     public void initialize() {
         if (tagNumber.isPresent()) {
             pose = Vision.getTagPose(tagNumber.get());
-        } else {
+        } else if (climbPose.isEmpty()) {
             pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
+        } else {
+            pose = climbPose.get();
         }
+
         reachedX = false;
         reachedY = false;
         timerY.reset();
@@ -64,8 +76,14 @@ public class AutoAlignFar extends Command {
 
     @Override
     public void execute() {
-        Pose2d pose2d = isAlgae ? swerveCommands.addOffset(pose, dist, .1)
-                : swerveCommands.addScoringOffset(pose, dist, isRight);
+        Pose2d pose2d;
+
+        if (!climbPose.isPresent()) {
+            pose2d = isAlgae ? swerveCommands.addOffset(pose, dist, .1)
+                    : swerveCommands.addScoringOffset(pose, dist, isRight);
+        } else {
+            pose2d = pose;
+        }
 
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
         Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
