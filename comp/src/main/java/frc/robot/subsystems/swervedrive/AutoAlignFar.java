@@ -1,6 +1,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,7 +16,7 @@ public class AutoAlignFar extends Command {
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
     private boolean isAlgae = false;
-    private Optional<Pose2d> climbPose = Optional.empty();
+    private Optional<Supplier<Pose2d>> climbPose = Optional.empty();
 
     private boolean reachedX = false;
     private boolean reachedY = false;
@@ -50,12 +51,12 @@ public class AutoAlignFar extends Command {
         this.addRequirements(swerve);
     }
 
-    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, Pose2d climbPose) {
+    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, Supplier<Pose2d> climberPoseSupplier) {
         this.isAlgae = true;
         this.swerve = swerve;
         this.swerveCommands = swerveCommands;
         this.addRequirements(swerve);
-        this.climbPose = Optional.of(climbPose);
+        this.climbPose = Optional.of(climberPoseSupplier);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class AutoAlignFar extends Command {
         } else if (climbPose.isEmpty()) {
             pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
         } else {
-            pose = climbPose.get();
+            pose = climbPose.get().get();
         }
 
         reachedX = false;

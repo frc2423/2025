@@ -35,8 +35,11 @@ import frc.robot.AngleUtils;
 import frc.robot.Constants;
 import frc.robot.NTHelper;
 import frc.robot.Constants.OperatorConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveCommands {
+    SendableChooser<String> climbPositionChooser = new SendableChooser<>();
 
     private SwerveSubsystem swerve;
     private ArmSubsystem armSubsystem;
@@ -60,6 +63,15 @@ public class SwerveCommands {
         this.armSubsystem = armSubsystem;
         this.climberSubsystem = climberSubsystem;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
+        SmartDashboard.putData("climbChooser", climbPositionChooser);
+
+        climbPositionChooser.addOption("Blue left (wall)", "Blue left (wall)");
+        climbPositionChooser.addOption("Blue middle", "Blue middle");
+        climbPositionChooser.addOption("Blue right (reef)", "Blue right (reef)");
+        climbPositionChooser.addOption("Red left (wall)", "Red left (wall)");
+        climbPositionChooser.addOption("Red middle", "Red middle");
+        climbPositionChooser.addOption("Red right (reef)", "Red right (reef)");
+        climbPositionChooser.setDefaultOption("Blue left (wall)", "Blue left (wall)");
     }
 
     public Vision getVisionFromSwerve() {
@@ -205,16 +217,32 @@ public class SwerveCommands {
         return command;
     }
 
-    public Command autoAlignClimb(Pose2d pose) {
-        if (pose != null) {
-            Command command = Commands.sequence(
-                    new AutoAlignFar(swerve, this, pose),
-                    new AutoAlignNear(swerve, this, pose),
-                    Commands.parallel(new MoveSideways(swerve, 6, .25), climberSubsystem.deClimb()));
-            command.setName("autoAlignClimb");
-            return command;
+    public Pose2d getClimbPose2d() {
+        switch (climbPositionChooser.getSelected()) {
+            case "Blue left (wall)":
+                return new Pose2d(7.121, 7.280, Rotation2d.fromDegrees(-90));
+            case "Blue middle":
+                return new Pose2d(7.121, 6.165, Rotation2d.fromDegrees(-90));
+            case "Blue right (reef)":
+                return new Pose2d(7.121, 5.075, Rotation2d.fromDegrees(-90));
+            case "Red left (wall)":
+                return new Pose2d(10.441, 3, Rotation2d.fromDegrees(90));
+            case "Red middle":
+                return new Pose2d(10.441, 1.885, Rotation2d.fromDegrees(90));
+            case "Red right (reef)":
+                return new Pose2d(10.441, 0.806, Rotation2d.fromDegrees(90));
+            default:
+                return new Pose2d(7.121, 7.280, Rotation2d.fromDegrees(-90));
         }
-        return climberSubsystem.deClimb();
+    }
+
+    public Command autoAlignClimb() {
+        Command command = Commands.sequence(
+                new AutoAlignFar(swerve, this, this::getClimbPose2d),
+                new AutoAlignNear(swerve, this, this::getClimbPose2d),
+                Commands.parallel(new MoveSideways(swerve, 6, .25), climberSubsystem.deClimb()));
+        command.setName("autoAlignClimb");
+        return command;
     }
 
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {

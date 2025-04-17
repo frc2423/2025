@@ -78,7 +78,6 @@ public class RobotContainer {
         private static boolean runOnce = false;
 
         SendableChooser<String> m_chooser = new SendableChooser<>();
-        SendableChooser<String> n_chooser = new SendableChooser<>();
 
         /**
          * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -155,19 +154,10 @@ public class RobotContainer {
                 SmartDashboard.putData("elevatorSubsystem", elevator);
                 SmartDashboard.putData("intakeSubsystewm", intakeSubsystem);
                 SmartDashboard.putData("autoChooser", m_chooser);
-                SmartDashboard.putData("climbChooser", n_chooser);
                 SmartDashboard.putData("swerveSubsystem", drivebase);
                 SmartDashboard.putData("ArmSubsystem", arm);
                 SmartDashboard.putData("ClimberSubsystem", climberSubsystem);
                 SmartDashboard.putData("ledSubsystem", ledKwarqs);
-
-                n_chooser.addOption("Blue left (wall)", "Blue left (wall)");
-                n_chooser.addOption("Blue middle", "Blue middle");
-                n_chooser.addOption("Blue right (reef)", "Blue right (reef)");
-
-                n_chooser.addOption("Red left (wall)", "Red left (wall)");
-                n_chooser.addOption("Red middle", "Red middle");
-                n_chooser.addOption("Red right (reef)", "Red right (reef)");
 
                 // m_chooser.setDefaultOption("Middle Side Auto L2", "Middle Side Auto L2");
                 // m_chooser.addOption("Middle Side Auto L3", "Middle Side Auto L3");
@@ -479,7 +469,7 @@ public class RobotContainer {
                                 .whileTrue(climberSubsystem.deClimb()).onFalse(climberSubsystem.climbStop()); // arm.goLittleDown(.05));//
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
-                                .whileTrue(swerveCommands.autoAlignClimb(getClimbPose()));
+                                .whileTrue(swerveCommands.autoAlignClimb());
 
                 new JoystickButton(operator, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
@@ -575,30 +565,6 @@ public class RobotContainer {
 
         public AutoCommand getAutonomousCommand() {
                 return getAutonomousCommand(m_chooser.getSelected()); // here
-        }
-
-        public Pose2d getClimbPose() {
-                if (n_chooser.getSelected() == null) {
-                        return null;
-                }
-
-                switch (n_chooser.getSelected()) {
-                        case "Blue left (wall)":
-                                return new Pose2d(7.121, 7.280, Rotation2d.fromDegrees(-90));
-                        case "Blue middle":
-                                return new Pose2d(7.121, 6.165, Rotation2d.fromDegrees(-90));
-                        case "Blue right (reef)":
-                                return new Pose2d(7.121, 5.075, Rotation2d.fromDegrees(-90));
-                        case "Red left (wall)":
-                                return new Pose2d(10.441, 3, Rotation2d.fromDegrees(90));
-                        case "Red middle":
-                                return new Pose2d(10.441, 1.885, Rotation2d.fromDegrees(90));
-                        case "Red right (reef)":
-                                return new Pose2d(10.441, 0.806, Rotation2d.fromDegrees(90));
-                        default:
-                                return null;
-                }
-                // return null;
         }
 
         public void setIsBlue(boolean isBlue) {
