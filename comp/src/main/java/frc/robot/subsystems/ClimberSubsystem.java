@@ -1,9 +1,12 @@
 package frc.robot.subsystems;
 
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -12,6 +15,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private SparkMax motor1 = new SparkMax(22, MotorType.kBrushless);
     private double setpoint = 0;
     private double speed = .1;
+    private DigitalInput limit = new DigitalInput(1);
 
     public ClimberSubsystem() {
         setDefaultCommand(climbStop());
@@ -97,11 +101,25 @@ public class ClimberSubsystem extends SubsystemBase {
         return command;
     }
 
+    public boolean limitSwitch() {
+        return !limit.get();
+    }
+
+    public Command automaticallyClimb() {
+        var command = run(() -> {
+            if (!limit.get())
+                climb();
+        });
+        command.setName("Climber Stop");
+        return command;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.addDoubleProperty("climbPose", () -> getPosition(), null);
         builder.addDoubleProperty("climbSetpoint", () -> setpoint, null);
         builder.addDoubleProperty("climbSpeed", () -> speed, null);
+        builder.addBooleanProperty("limitSwitch", () -> limitSwitch(), null);
     } // -147.353760 start /
 
 }

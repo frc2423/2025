@@ -249,7 +249,9 @@ public class SwerveCommands {
         Command command = Commands.sequence(
                 new AutoAlignFar(swerve, this, this::getCloserClimbPose2d),
                 Commands.parallel(new AutoAlignNear(swerve, this, this::getClimbPose2d), climberSubsystem.deClimb()),
-                new MoveForward(swerve, Units.inchesToMeters(9), -.35));
+                new MoveForward(swerve, Units.inchesToMeters(9), -.35),
+                Commands.waitSeconds(2),
+                Commands.either(climberSubsystem.climb(), Commands.none(), climberSubsystem::limitSwitch));
         command.setName("autoAlignClimb");
         return command;
     }
