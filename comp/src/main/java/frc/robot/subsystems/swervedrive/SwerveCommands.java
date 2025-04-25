@@ -51,7 +51,7 @@ public class SwerveCommands {
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
             IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem) {
         this.intakesubsystem = intakesubsystem;
-        this.elevatorLevelPicker = new ElevatorLevelPicker(elevatorSubsystem);
+        this.elevatorLevelPicker = new ElevatorLevelPicker(elevatorSubsystem, swerve);
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;

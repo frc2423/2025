@@ -13,20 +13,27 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 
 import frc.robot.Constants;
 import frc.robot.NTHelper;
-
+import frc.robot.Constants.Vision;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.NTHelper;
 
 public class ElevatorLevelPicker {
 
     private ElevatorSubsystem elevatorSubsystem;
+
+    private SwerveSubsystem swerve;
     private XboxController driverXbox = new XboxController(0);
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
-    public ElevatorLevelPicker(ElevatorSubsystem elevatorSubsystem) {
+    public ElevatorLevelPicker(ElevatorSubsystem elevatorSubsystem, SwerveSubsystem swerve) {
 
         this.elevatorSubsystem = elevatorSubsystem;
+        this.swerve = swerve;
 
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
+        NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
+        NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
+
     }
 
     private enum ElevatorLevel {
@@ -44,18 +51,28 @@ public class ElevatorLevelPicker {
     boolean[] frontLeftReef = new boolean[6];
     boolean[] backLeftReef = new boolean[6];
 
+    public boolean[] getClosestReef() {
+        int ID = swerve.vision.findClosestTagID(swerve.getPose());
+        if (ID == 19) {
+            return frontLeftReef;
+        } else {
+            return backLeftReef;
+        }
+    }
+
     public boolean isRightOpen(boolean[] array) {
         int index = 0;
         for (int i = 0; i < 6; i++) {
             if (!array[i]) {
                 index = i;
+                break;
             }
         }
         return index % 2 != 0;
     }
 
     public boolean isRightOpen() {
-        return isRightOpen(frontLeftReef);
+        return isRightOpen(getClosestReef());
     }
 
     private ElevatorLevel selectElevatorLevel() {
@@ -94,23 +111,22 @@ public class ElevatorLevelPicker {
     }
 
     public ElevatorLevel getElevatorLevelAuto() {
-        return getElevatorLevelAuto(frontLeftReef);
+        return getElevatorLevelAuto(getClosestReef());
     }
 
-    public Command setScoredLevel(boolean[] array) {
+    public Command setScoredLevel() {
         return Commands.runOnce(() -> {
+            var array = getClosestReef();
             for (int i = 0; i < 6; i++) {
                 if (!array[i]) {
                     array[i] = true;
                     break;
                 }
             }
-            NTHelper.setBooleanArray("/elevatorLevelPicker/values", array);
-        });
-    }
+            NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
+            NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
 
-    public Command setScoredLevel() {
-        return setScoredLevel(frontLeftReef);
+        });
     }
 
     public Command getElevatorLevelCommandAuto() {
