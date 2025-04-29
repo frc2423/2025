@@ -48,15 +48,33 @@ public class ElevatorLevelPicker {
             ElevatorLevel.L2, ElevatorLevel.L2
     };
 
-    boolean[] frontLeftReef = new boolean[6];
+    boolean[] frontLeftReef = new boolean[6];//
     boolean[] backLeftReef = new boolean[6];
+
+    boolean[] frontRightReef = new boolean[6];//
+    boolean[] backRightReef = new boolean[6];
+
+    boolean[] frontMiddleReef = new boolean[6];
+    boolean[] backMiddleReef = new boolean[6];
 
     public boolean[] getClosestReef() {
         int ID = swerve.vision.findClosestTagID(swerve.getPose());
-        if (ID == 19) {
+        if (ID == 19 || ID == 6) {
             return frontLeftReef;
-        } else {
+        }
+        if (ID == 17 || ID == 8) {
+            return frontRightReef;
+        }
+        if (ID == 20 || ID == 11) {
             return backLeftReef;
+        }
+        if (ID == 22 || ID == 9) {
+            return backRightReef;
+        }
+        if (ID == 18 || ID == 7) {
+            return frontMiddleReef;
+        } else {
+            return backMiddleReef;
         }
     }
 
