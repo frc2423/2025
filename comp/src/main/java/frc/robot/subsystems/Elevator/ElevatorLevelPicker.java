@@ -34,6 +34,10 @@ public class ElevatorLevelPicker {
         NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
         NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
 
+        NTHelper.listen("/elevatorLevelPicker/frontDashboard", (event) -> {
+            NTHelper.getDo
+        });
+
     }
 
     private enum ElevatorLevel {
@@ -135,16 +139,34 @@ public class ElevatorLevelPicker {
     public Command setScoredLevel() {
         return Commands.runOnce(() -> {
             var array = getClosestReef();
+
             for (int i = 0; i < 6; i++) {
                 if (!array[i]) {
                     array[i] = true;
                     break;
                 }
             }
+
+            var dash = getDash(array);
+
             NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
             NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
+            NTHelper.setDoubleArray("/elevatorLevelPicker/frontDashboard", dash);
 
         });
+    }
+
+    public double[] getDash(boolean[] array) {
+        double[] dash = new double[6];
+
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == true)
+                dash[i] = 1;
+            else
+                dash[i] = 0;
+        }
+
+        return dash;
     }
 
     public Command getElevatorLevelCommandAuto() {
