@@ -174,6 +174,10 @@ public class NTHelper {
         getEntry(key).setDoubleArray(value);
     }
 
+    public static double[] getDoubleArray(String key, double[] defaultValue) {
+        return getEntry(key).getDoubleArray(defaultValue);
+    }
+
     public static double[] getDoubleArrayPose3d(Pose3d pose) {
         var trans = pose.getTranslation();
         var rot = pose.getRotation().getQuaternion();
