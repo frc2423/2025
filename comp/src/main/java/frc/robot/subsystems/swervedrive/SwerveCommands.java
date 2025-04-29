@@ -169,6 +169,12 @@ public class SwerveCommands {
         return autoAlignHPCommand;
     }
 
+    public Command autoIntakeCoral(Optional<Boolean> isRight){
+        var command = Commands.sequence(autoHPIntake(isRight), 
+        new auto);
+        return command;
+    }
+
     public Command autoScoral(Optional<Integer> tagNumber, double setpoint, boolean isRight) {
         return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint), isRight);
     }
@@ -287,6 +293,87 @@ public class SwerveCommands {
         } else {
             y = 0;
         }
+
+        x *= xSign;
+        y *= ySign;
+
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
+                pose2d.getRotation());
+
+        final double maxRadsPerSecond = 5;
+
+        if (isAngleClose) {
+            // desiredSpeeds.omegaRadiansPerSecond = 0;
+        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
+            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
+                    desiredSpeeds.omegaRadiansPerSecond);
+        }
+
+        swerve.drive(desiredSpeeds);
+    }
+
+    public void actuallyMoveToFar(Pose2d pose2d, boolean enableX, boolean enableY) {
+
+        Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
+        Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
+
+        boolean isAngleClose = AngleUtils.areAnglesClose(pose2d.getRotation(),
+                swerve.getPose().getRotation(),
+                Rotation2d.fromDegrees(1));
+
+        double xSign = Math.copySign(1, translationDiff.getX());
+        double ySign = Math.copySign(1, translationDiff.getY());
+
+        double xDistance = Math.abs(translationDiff.getX());
+        double yDistance = Math.abs(translationDiff.getY());
+
+        double x = 0;
+        double y = 0;
+
+        if (!enableX) {
+            x = 0;
+        } else {
+            x = MathUtil.interpolate(0.5, 1, (xDistance - 0.25) / (1.5 - 0.25));
+
+        }
+
+        // else if (xDistance > .7) {}
+        // x = .6;
+        // } else if (xDistance > .4) {
+        // x = .6;
+        // } else if (xDistance > .2) {
+        // x = .55;
+        // } else if (xDistance > .03) {
+        // x = .55;
+        // } else if (xDistance > .02) {
+        // x = .55;
+        // } else if (xDistance > .015) {
+        // x = .5;
+        // } else {
+        // x = 0;
+        // }
+
+        if (!enableY) {
+            y = 0;
+        } else {
+            y = MathUtil.interpolate(0.45, 0.9, (yDistance - 0.176) / (2 - 0.176));
+        }
+
+        // } else if (yDistance > .7) {
+        // y = .6;
+        // } else if (yDistance > .4) {
+        // y = .6;
+        // } else if (yDistance > .2) {
+        // y = .55;
+        // } else if (yDistance > .03) {
+        // y = .55;
+        // } else if (yDistance > .02) {
+        // y = .55;
+        // } else if (yDistance > .015) {
+        // y = .5;
+        // } else {
+        // y = 0;
+        // }
 
         x *= xSign;
         y *= ySign;

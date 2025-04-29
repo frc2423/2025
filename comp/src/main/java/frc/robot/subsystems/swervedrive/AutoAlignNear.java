@@ -14,6 +14,7 @@ import frc.robot.AngleUtils;
 public class AutoAlignNear extends Command {
     private Pose2d pose;
     private boolean isRight;
+    private boolean isAlgae;
     private double dist;
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
@@ -43,6 +44,16 @@ public class AutoAlignNear extends Command {
         this.addRequirements(swerve);
     }
 
+    public AutoAlignNear(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist,
+            Optional<Integer> tagNumber) {
+        this.isAlgae = true;
+        this.dist = dist;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
+    }
+
     @Override
     public void initialize() {
         reachedY = false;
@@ -62,7 +73,9 @@ public class AutoAlignNear extends Command {
 
     @Override
     public void execute() {
-        Pose2d pose2d = swerveCommands.addScoringOffset(pose, dist, isRight);// .55
+        Pose2d pose2d = isAlgae ? swerveCommands.addOffset(pose, dist, .1)
+                : swerveCommands.addScoringOffset(pose, dist, isRight);
+
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
 
         Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
@@ -70,10 +83,10 @@ public class AutoAlignNear extends Command {
         double xDistance = Math.abs(translationDiff.getX());
         double yDistance = Math.abs(translationDiff.getY());
 
-        if (yDistance < Units.inchesToMeters(.8)) {
+        if (yDistance < Units.inchesToMeters(.45)) {
             reachedY = true;
         }
-        if (xDistance < Units.inchesToMeters(.8)) {
+        if (xDistance < Units.inchesToMeters(.45)) {
             reachedX = true;
         }
 
