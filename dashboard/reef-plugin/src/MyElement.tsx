@@ -1,9 +1,4 @@
-import { CSSProperties } from "react";
-import {
-  getAssetUrl,
-  createComponent,
-  numberArrayProp,
-} from "@frc-web-components/app";
+import { createComponent, numberArrayProp } from "@frc-web-components/app";
 
 export const myElement = createComponent(
   {
@@ -21,18 +16,21 @@ export const myElement = createComponent(
   },
   ({ values, setProperty }) => {
     return (
-      <div style={{
-        width: '200px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gridTemplateRows: 'repeat(3, auto)',   /* Creates 3 rows with automatic height */
-        gap: '5px' /* Sets a 5px gap between both rows and columns */
-      }}>
+      <div
+        style={{
+          width: "200px",
+          display: "grid",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gridTemplateRows:
+            "repeat(3, auto)" /* Creates 3 rows with automatic height */,
+          gap: "5px" /* Sets a 5px gap between both rows and columns */,
+        }}
+      >
         {(values ?? []).map((value, index) => {
           return (
             <button
               style={{
-                width: '95%',
+                width: "95%",
                 height: 100,
                 backgroundColor: value === 0 ? "lightgray" : "green",
               }}
