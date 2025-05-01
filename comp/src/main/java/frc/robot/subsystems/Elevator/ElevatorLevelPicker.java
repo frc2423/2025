@@ -25,21 +25,6 @@ public class ElevatorLevelPicker {
     private XboxController driverXbox = new XboxController(0);
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
-    public ElevatorLevelPicker(ElevatorSubsystem elevatorSubsystem, SwerveSubsystem swerve) {
-
-        this.elevatorSubsystem = elevatorSubsystem;
-        this.swerve = swerve;
-
-        NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
-        NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
-        NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
-
-        NTHelper.listen("/elevatorLevelPicker/frontDashboard", (event) -> {
-            NTHelper.getDo
-        });
-
-    }
-
     private enum ElevatorLevel {
         T, L2, L3, L4
     }
@@ -60,6 +45,25 @@ public class ElevatorLevelPicker {
 
     boolean[] frontMiddleReef = new boolean[6];
     boolean[] backMiddleReef = new boolean[6];
+
+    public ElevatorLevelPicker(ElevatorSubsystem elevatorSubsystem, SwerveSubsystem swerve) {
+
+        this.elevatorSubsystem = elevatorSubsystem;
+        this.swerve = swerve;
+
+        NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
+        NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
+        NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
+
+        double[] defaultLevelValues = { 0, 0, 0, 0, 0, 0 };
+        NTHelper.setDoubleArray("/elevatorLevelPicker/frontDashboard", defaultLevelValues);
+
+        NTHelper.listen("/elevatorLevelPicker/frontDashboard", (event) -> {
+            double[] newValues = NTHelper.getDoubleArray("/elevatorLevelPicker/frontDashboard", defaultLevelValues);
+            setDash(newValues);
+        });
+
+    }
 
     public boolean[] getClosestReef() {
         int ID = swerve.vision.findClosestTagID(swerve.getPose());
@@ -154,6 +158,18 @@ public class ElevatorLevelPicker {
             NTHelper.setDoubleArray("/elevatorLevelPicker/frontDashboard", dash);
 
         });
+    }
+
+    public void setDash(double[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == 1) {
+                frontLeftReef[i] = true;
+            } else {
+                frontLeftReef[i] = false;
+            }
+        }
+        NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
+
     }
 
     public double[] getDash(boolean[] array) {
