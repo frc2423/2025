@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class MoveForward extends Command {
+public class MoveSideways extends Command {
 
   private final SwerveSubsystem swerve;
   private double dist;
@@ -16,32 +16,24 @@ public class MoveForward extends Command {
   private Translation2d initialPosition;
   private double speed;
 
-  public MoveForward(SwerveSubsystem swerve, double dist, double speed) {
+  public MoveSideways(SwerveSubsystem swerve, double dist, double speed) {
     this.swerve = swerve;
     this.dist = dist;
     this.speed = speed;
     addRequirements(swerve);
   }
 
-  // public MoveForward(SwerveSubsystem swerve, Translation2d targetPosition,
-  // double speed) {
-  // this.swerve = swerve;
-  // this.targetPosition = targetPosition;
-  // this.speed = speed;
-  // addRequirements(swerve);
-  // }
-
   @Override
   public void initialize() {
     initialPosition = swerve.getPose().getTranslation();
-    // if (targetPosition != null) {
-    // dist = targetPosition.getDistance(initialPosition);
-    // }
+    if (targetPosition != null) {
+      dist = targetPosition.getDistance(initialPosition);
+    }
   }
 
   @Override
   public void execute() {
-    swerve.drive(new ChassisSpeeds(speed, 0, 0));
+    swerve.drive(new ChassisSpeeds(0, speed, 0));
   }
 
   @Override

@@ -1,9 +1,12 @@
 package frc.robot.subsystems.swervedrive;
 
 import java.lang.module.ModuleDescriptor.Builder;
+import java.time.OffsetTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
+
+import com.ctre.phoenix.CustomParamConfiguration;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -24,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorLevelPicker;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
@@ -33,13 +37,17 @@ import frc.robot.AngleUtils;
 import frc.robot.Constants;
 import frc.robot.NTHelper;
 import frc.robot.Constants.OperatorConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveCommands {
+    SendableChooser<String> climbPositionChooser = new SendableChooser<>();
 
     private SwerveSubsystem swerve;
     private ArmSubsystem armSubsystem;
     private IntakeCommands intakeCommands;
     private IntakeSubsystem intakesubsystem;
+    private ClimberSubsystem climberSubsystem;
     private ElevatorLevelPicker elevatorLevelPicker;
 
     private ElevatorSubsystem elevatorSubsystem;
@@ -49,14 +57,25 @@ public class SwerveCommands {
     ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
 
     public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem) {
+            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem,
+            ClimberSubsystem climberSubsystem) {
         this.intakesubsystem = intakesubsystem;
         this.elevatorLevelPicker = new ElevatorLevelPicker(elevatorSubsystem, swerve);
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
         this.armSubsystem = armSubsystem;
+        this.climberSubsystem = climberSubsystem;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
+        SmartDashboard.putData("climbChooser", climbPositionChooser);
+
+        climbPositionChooser.addOption("Blue left (wall)", "Blue left (wall)");
+        climbPositionChooser.addOption("Blue middle", "Blue middle");
+        climbPositionChooser.addOption("Blue right (reef)", "Blue right (reef)");
+        climbPositionChooser.addOption("Red left (wall)", "Red left (wall)");
+        climbPositionChooser.addOption("Red middle", "Red middle");
+        climbPositionChooser.addOption("Red right (reef)", "Red right (reef)");
+        climbPositionChooser.setDefaultOption("Blue left (wall)", "Blue left (wall)");
     }
 
     public Vision getVisionFromSwerve() {
@@ -159,6 +178,44 @@ public class SwerveCommands {
                                 autoAlignCommand3)));
         // intakeAlgaeCommand2));
         command.setName("autoIntakeAlgae");
+        return command;
+    }
+
+    public Pose2d getClimbPose2d(double offset) {
+        switch (climbPositionChooser.getSelected()) {
+            case "Blue left (wall)":
+                return new Pose2d(7.121 - offset, 7.280, Rotation2d.fromDegrees(-90));
+            case "Blue middle":
+                return new Pose2d(7.121 - offset, 6.165, Rotation2d.fromDegrees(-90));
+            case "Blue right (reef)":
+                return new Pose2d(7.121 - offset, 5.075, Rotation2d.fromDegrees(-90));
+            case "Red left (wall)":
+                return new Pose2d(10.441 + offset, 3, Rotation2d.fromDegrees(90));
+            case "Red middle":
+                return new Pose2d(10.441 + offset, 1.885, Rotation2d.fromDegrees(90));
+            case "Red right (reef)":
+                return new Pose2d(10.441 + offset, 0.806, Rotation2d.fromDegrees(90));
+            default:
+                return new Pose2d(7.121 - offset, 7.280, Rotation2d.fromDegrees(-90));
+        }
+    }
+
+    public Pose2d getClimbPose2d() {
+        return getClimbPose2d(0);
+    }
+
+    public Pose2d getCloserClimbPose2d() {
+        return getClimbPose2d(.5);
+    }
+
+    public Command autoAlignClimb() {
+        Command command = Commands.sequence(
+                new AutoAlignFar(swerve, this, this::getCloserClimbPose2d),
+                Commands.parallel(new AutoAlignNear(swerve, this, this::getClimbPose2d), climberSubsystem.deClimb()),
+                new MoveForward(swerve, Units.inchesToMeters(9), -.35),
+                Commands.waitSeconds(2),
+                Commands.either(climberSubsystem.climb(), Commands.none(), climberSubsystem::limitSwitch));
+        command.setName("autoAlignClimb");
         return command;
     }
 
