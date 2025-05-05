@@ -9,8 +9,11 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.AutoAlign;
+import frc.robot.subsystems.swervedrive.AutoAlignPose;
+import frc.robot.subsystems.swervedrive.AutoCommand;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -52,7 +57,6 @@ public class RobotContainer {
         // final CommandXboxController driverXbox = new CommandXboxController(0);
         XboxController driverXbox = new XboxController(0);
         XboxController operator = new XboxController(1);
-        boolean isPanel = false;
         String deployDirectory = (Robot.isSimulation()) ? "sim-swerve/neo" : "swerve";
         // The robot's subsystems and commands are defined here...
         private final SwerveSubsystem drivebase = new SwerveSubsystem(
@@ -66,12 +70,11 @@ public class RobotContainer {
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
         RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
 
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm, intakeSubsystem,
+                        climberSubsystem);
 
         KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 
-        private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-        private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
         private static boolean runOnce = false;
 
         SendableChooser<String> m_chooser = new SendableChooser<>();
@@ -163,11 +166,19 @@ public class RobotContainer {
                 m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
                 m_chooser.addOption("Back Right Single (Robot Oriented)", "Back Right Single (Robot Oriented)");
                 m_chooser.addOption("Back Left Single (robot oriented)", "Back Left Single (robot oriented)");
+                m_chooser.addOption("Left Side 2 3/4", "Left Side 3 Piece BLUE E & C & D");
+                // m_chooser.addOption("Right Side 3 BLUE", "Right Side 3 Piece BLUE E & C &
+                // D");
+                // m_chooser.addOption("Left Side 3 BLUE", "Left Side 3 Piece BLUE J & K & L");
+                m_chooser.addOption("Left Side 3 RED", "Left Side 3 Piece RED J & K & L");
+                m_chooser.addOption("Right Side 3 RED", "Right Side 3 Piece RED E & C & D");
 
                 // m_chooser.addOption("Right Side 2 Piece BLUE E & C", "Right Side 2 Piece BLUE
                 // E & C"); //BAD DONT USE
                 // m_chooser.addOption("Left 2 Piece I & L BLUE", "Left 2 Piece I & L BLUE");
                 // //BAD DONT USE
+
+                NamedCommands.registerCommand("stopMoving", swerveCommands.stopMoving());
 
                 NamedCommands.registerCommand("Elevator to Reef L2",
                                 elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
@@ -241,10 +252,36 @@ public class RobotContainer {
                                 swerveCommands.autoScoral(Optional.of(19),
                                                 Constants.SetpointConstants.REEF_L4, false));
 
+                NamedCommands.registerCommand("AutoScoral 11 Right",
+                                swerveCommands.autoScoral(Optional.of(11),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Right",
+                                swerveCommands.autoScoral(Optional.of(6),
+                                                Constants.SetpointConstants.REEF_L4, true));
+
+                NamedCommands.registerCommand("AutoScoral 6 Left",
+                                swerveCommands.autoScoral(Optional.of(6),
+                                                Constants.SetpointConstants.REEF_L4, false));
+
+                NamedCommands.registerCommand("Intake Start",
+                                intakeCommands.intakeStart());
+
+                NamedCommands.registerCommand("Funnel Start",
+                                funnelSubsystem.funnelStart());
+
+                NamedCommands.registerCommand("Run Intake Short", intakeCommands.intakeShort());
+
+                NamedCommands.registerCommand("Run Intake", intakeCommands.intakeHumanPlayer());
+
                 addAutoScoreCommand("AutoScoral left near", 11, 20, false);
+                addAutoScoreCommand("AutoScoral 11/20 right", 11, 20, true);
                 addAutoScoreCommand("AutoScoral left far", 6, 19, true);
+                addAutoScoreCommand("AutoScoral 6/19 left", 6, 19, false);
                 addAutoScoreCommand("AutoScoral right near", 9, 22, false);
+                addAutoScoreCommand("AutoScoral 9/22 right", 9, 22, true);
                 addAutoScoreCommand("AutoScoral right far", 8, 17, false);
+                addAutoScoreCommand("AutoScoral 8/17 right", 8, 17, true);
                 addAutoScoreCommand("AutoScoral back right (robot oriented)", 10, 21, true);
                 addAutoScoreCommand("AutoScoral back left (robot oriented)", 10, 21, false);
 
@@ -304,7 +341,7 @@ public class RobotContainer {
                                         if (!PoseTransformUtils.isRedAlliance()) {
                                                 y *= -1;
                                         }
-                                        return m_yspeedLimiter.calculate(y);
+                                        return drivebase.m_yspeedLimiter.calculate(y);
                                 },
                                 () -> {
                                         double x = MathUtil.applyDeadband(
@@ -313,13 +350,13 @@ public class RobotContainer {
                                         if (!PoseTransformUtils.isRedAlliance()) {
                                                 x *= -1;
                                         }
-                                        return m_xspeedLimiter.calculate(x);
+                                        return drivebase.m_xspeedLimiter.calculate(x);
                                 },
                                 () -> -driverXbox.getRightX());
                 return driveFieldOrientedAngularVelocity; // :P
         }
 
-        private void configureDriverBindings() {
+        private void configureDriverBindings() { // RIP isPanel day 0, 2025 -> 3/25/2025
 
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
@@ -331,53 +368,91 @@ public class RobotContainer {
                                 .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
-                                .whileTrue(Commands.parallel(
-                                                swerveCommands.autoScoralClosest(false),
-                                                ledKwarqs.isAutoScoring(true)))
+                                .whileTrue(Commands.sequence(Commands.parallel(
+                                                swerveCommands.autoScoralClosestAuto(),
+                                                ledKwarqs.isAutoScoring(true)),
+                                                Commands.either(
+                                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                                Commands.none(),
+                                                                () -> intakeSubsystem.isOut())))
+
                                 .onFalse(Commands.parallel(intakeCommands.intakeStop(),
                                                 ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
-                                .whileTrue(Commands.parallel(
+                                .whileTrue(Commands.sequence(Commands.parallel(
                                                 swerveCommands.autoScoralClosest(true),
-                                                ledKwarqs.isAutoScoring(true)))
+                                                ledKwarqs.isAutoScoring(true)),
+                                                Commands.either(
+                                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                                Commands.none(),
+                                                                () -> intakeSubsystem.isOut())))
                                 .onFalse(Commands.parallel(intakeCommands.intakeStop(),
                                                 ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
                                 .onTrue(elevator.goDownAndIntake());
 
-                new JoystickButton(driverXbox, XboxController.Button.kA.value)
-                                .onTrue(intakeCommands.intakeOut());
+                new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                                .onTrue(swerveCommands.orbitReefCenter());
 
+                new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                                .whileTrue(Commands.parallel(intakeCommands.eject(), ledKwarqs.isEjectingPOOP(true)))
+                                .onFalse(Commands.parallel(ledKwarqs.isEjectingPOOP(false),
+                                                Commands.sequence(intakeCommands.intakeStop(),
+                                                                funnelSubsystem.stop())));
+
+                new JoystickButton(driverXbox, XboxController.Button.kB.value)
+                                .onTrue(intakeCommands.ejectAlgae().withTimeout(0.25)
+                                                .andThen(intakeCommands.stop()));
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
-                                .onTrue(swerveCommands.lookAtNearestTag());
+                                .onTrue(swerveCommands.orbitReefCenter());
 
                 new JoystickButton(driverXbox, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
 
-                new Trigger(() -> driverXbox.getPOV() == 0)
-                                .onTrue(swerveCommands.lookAtAngle(0));
-                new Trigger(() -> driverXbox.getPOV() == 315)
-                                .onTrue(swerveCommands.lookAtAngle(60));
-                new Trigger(() -> driverXbox.getPOV() == 225)
-                                .onTrue(swerveCommands.lookAtAngle(120));
-                new Trigger(() -> driverXbox.getPOV() == 180)
-                                .onTrue(swerveCommands.lookAtAngle(180));
-                new Trigger(() -> driverXbox.getPOV() == 135)
-                                .onTrue(swerveCommands.lookAtAngle(240));
-                new Trigger(() -> driverXbox.getPOV() == 45)
-                                .onTrue(swerveCommands.lookAtAngle(300));
+                new Trigger(() -> driverXbox.getPOV() == 270)
+                                .whileTrue(climberSubsystem.deClimb()).onFalse(climberSubsystem.climbStop());
 
-                new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                new Trigger(() -> driverXbox.getPOV() == 0)
+                                .whileTrue(climberSubsystem.climb()).onFalse(climberSubsystem.climbStop());
+
+                new Trigger(() -> driverXbox.getPOV() == 90)
+                                .onTrue(elevator.intakeGroundAlgae())
+                                .onFalse(Commands.parallel(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                intakeCommands.holdAlgae()));
+                new Trigger(() -> driverXbox.getPOV() == 180)
                                 .onTrue(elevator.goDown());
+
+                new JoystickButton(driverXbox, XboxController.Button.kLeftStick.value)
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoAlignAndIntakeAlgae(
+                                                                Constants.SetpointConstants.REEF_L3),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                intakeCommands.holdAlgae()));
+
+                new JoystickButton(driverXbox, XboxController.Button.kRightStick.value)
+                                .whileTrue(Commands.parallel(
+                                                swerveCommands.autoAlignAndIntakeAlgae(
+                                                                Constants.SetpointConstants.REEF_L2),
+                                                ledKwarqs.isAutoScoring(true)))
+                                .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                                                arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                                                intakeCommands.holdAlgae()));
+
+                // new JoystickButton(driverXbox, XboxController.Button.kA.value)
+                // .onTrue(elevator.goDown());
 
                 // new JoystickButton(driverXbox, XboxController.Button.kY.value)
                 // .onTrue(elevator.goUp());
 
         }
 
-        private void configureOperatorBindings() {
+        private void configureOperatorBindings() { // RIP isPanel day 0, 2025 -> 3/25/2025
 
                 new Trigger(() -> {
                         boolean value = DriverStation.isDisabled() && RobotContainer.runOnce;
@@ -386,53 +461,86 @@ public class RobotContainer {
                 }).whileTrue(elevator.stopElevator().repeatedly().ignoringDisable(true));
 
                 new JoystickButton(operator, XboxController.Button.kA.value)
-                                .whileTrue(climberSubsystem.climb());
+                                .whileTrue(climberSubsystem.climb()).onFalse(climberSubsystem.climbStop());// arm.goLittleUp(.05));
+                                                                                                           // //
+                                                                                                           // climberSubsystem.climb());
 
                 new JoystickButton(operator, XboxController.Button.kB.value)
-                                .whileTrue(climberSubsystem.deClimb());
+                                .whileTrue(climberSubsystem.deClimb()).onFalse(climberSubsystem.climbStop()); // arm.goLittleDown(.05));//
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.in());
+                                .whileTrue(swerveCommands.autoAlignClimb());
 
                 new JoystickButton(operator, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
 
                 new Trigger(() -> operator.getPOV() == 270)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L2
-                                                : Constants.SetpointConstants.REEF_L2));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+
                 new Trigger(() -> operator.getPOV() == 0)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L3
-                                                : Constants.SetpointConstants.REEF_L3));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L3));
+
                 new Trigger(() -> operator.getPOV() == 90)
-                                .whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.REEF_L4
-                                                : Constants.SetpointConstants.REEF_L4));
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
+
+                // new Trigger(() -> operator.getPOV() == 270)
+                // .whileTrue(Commands.parallel(
+                // swerveCommands.autoAlignAndIntakeAlgae(
+                // Constants.SetpointConstants.ALGAE_INTAKE_L2),
+                // ledKwarqs.isAutoScoring(true)))
+                // .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                // arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                // elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                // intakeCommands.holdAlgae()));
+                // new Trigger(() -> operator.getPOV() == 0)
+                // .whileTrue(Commands.parallel(
+                // swerveCommands.autoAlignAndIntakeAlgae(
+                // Constants.SetpointConstants.REEF_L3),
+                // ledKwarqs.isAutoScoring(true)))
+                // .onFalse(Commands.sequence(ledKwarqs.isAutoScoring(false),
+                // arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                // elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
+                // intakeCommands.holdAlgae()));// );
+                // new Trigger(() -> operator.getPOV() == 90)
+                // .whileTrue(arm.goToSetpoint(Constants.ArmConstants.ALGAE_PROCESS));
+
                 new Trigger(() -> operator.getPOV() == 180)
-                                .onTrue(elevator.goDown());
+                                .onTrue(elevator.intakeGroundAlgae())
+                                .onFalse(Commands.parallel(arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                                                intakeCommands.holdAlgae()));
 
-                new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
-                                .whileTrue(Commands.parallel(
-                                                swerveCommands.autoDescorAlgae(
-                                                                Constants.SetpointConstants.ALGAE_DESCORE_L2),
-                                                ledKwarqs.isAutoScoring(true)))
-                                .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
-                                                ledKwarqs.isAutoScoring(false)));
+                // new Trigger(() -> operator.getLeftTriggerAxis() > 0.1)
+                // .whileTrue(Commands.parallel(
+                // swerveCommands.autoAlignAndDescoreAlgae(
+                // Constants.SetpointConstants.ALGAE_DESCORE_L2),
+                // ledKwarqs.isAutoScoring(true)))
+                // .onFalse(Commands.parallel(Commands.sequence(intakeCommands.intakeStop(),
+                // arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)),
+                // ledKwarqs.isAutoScoring(false)));
 
-                new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
-                                .whileTrue(swerveCommands.autoDescorAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
+                // new Trigger(() -> operator.getRightTriggerAxis() > 0.1)
+                // .whileTrue(swerveCommands
+                // .autoAlignAndDescoreAlgae(Constants.SetpointConstants.ALGAE_DESCORE_L3))
+                // .onFalse(Commands.sequence(intakeCommands.intakeStop(),
+                // arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR)));
 
                 // .onTrue(elevator.goLittleDown(1));
                 new JoystickButton(operator, XboxController.Button.kBack.value)
-                                .whileTrue(intakeCommands.eject())
-                                .onFalse(Commands.sequence(intakeCommands.intakeStop(),
-                                                funnelSubsystem.stop()));
+                                .whileTrue(Commands.parallel(intakeCommands.eject(), ledKwarqs.isEjectingPOOP(true)))
+                                .onFalse(Commands.parallel(ledKwarqs.isEjectingPOOP(false),
+                                                Commands.sequence(intakeCommands.intakeStop(),
+                                                                funnelSubsystem.stop())));
 
+                new JoystickButton(operator, XboxController.Button.kStart.value) // right
+                                .whileTrue(intakeCommands.ejectAlgae())
+                                .onFalse(Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.HANDOFF_POSE),
+                                                intakeCommands.intakeStop()));
                 // .onTrue(elevator.goLittleUp(1));
 
-                new JoystickButton(operator, XboxController.Button.kRightBumper.value).onTrue(elevator.goLittleUp(1));
-                new JoystickButton(operator, XboxController.Button.kLeftBumper.value).onTrue(elevator.goLittleDown(1));
+                new JoystickButton(operator, XboxController.Button.kRightBumper.value)
+                                .onTrue(arm.goLittleUp(.075));
+                new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
+                                .onTrue(arm.goLittleDown(.075));
                 // .whileTrue(intakeCommands.intakeStop());
 
                 // .whileTrue(swerveCommands.lookAtNearestTag());
@@ -444,12 +552,30 @@ public class RobotContainer {
          *
          * @return the command to run in autonomous
          */
-        public Command getAutonomousCommand() {
+        public AutoCommand getAutonomousCommand(String auto) {
                 // An example command will be run in autonomous
-                return drivebase.getAutonomousCommand(m_chooser.getSelected());
+                boolean isRed = false;
+                if (auto.equals("Left Side 3 Piece RED J & K & L")) {
+                        isRed = true;
+                } else if (auto.equals("Right Side 3 Piece RED E & C & D")) {
+                        isRed = true;
+                }
+                return drivebase.getAutonomousCommand(auto, isRed);
         }
 
-        public void setDriveMode() {
+        public AutoCommand getAutonomousCommand() {
+                return getAutonomousCommand(m_chooser.getSelected()); // here
+        }
+
+        public void setIsBlue(boolean isBlue) {
+                drivebase.setIsBlue(isBlue);
+        }
+
+        public void configureBindings() {
+                new Trigger(() -> RobotController.getUserButton()).onTrue(Commands.runOnce(() -> {
+                        drivebase.toggleLedRing();
+                }).ignoringDisable(true));
+
                 configureDriverBindings();
                 configureOperatorBindings();
         }

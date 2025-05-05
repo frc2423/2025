@@ -109,6 +109,12 @@ public class Vision {
     }
   }
 
+  public void logCameras() {
+    for (Cameras cam : Cameras.values()) {
+      cam.log();
+    }
+  }
+
   public static Pose2d getTagPose(int id) {
     return fieldLayout.getTagPose(id).get().toPose2d();
   }
@@ -169,6 +175,12 @@ public class Vision {
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
             pose.timestampSeconds,
             camera.curStdDevs);
+
+        var stdDev = camera.curStdDevs;
+        NTHelper.setDouble("/swerveSubsystem/vision/stdDevX", stdDev.get(0, 0));
+        NTHelper.setDouble("/swerveSubsystem/vision/stdDevY", stdDev.get(1, 0));
+        NTHelper.setDouble("/swerveSubsystem/vision/stdDevAngle", stdDev.get(2, 0));
+
       }
     }
 
@@ -186,6 +198,10 @@ public class Vision {
    */
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Cameras camera) {
     Optional<EstimatedRobotPose> poseEst = camera.getEstimatedGlobalPose();
+    NTHelper.setBoolean("/swerveSubsystem/vision/poseIsGood", filterPose(poseEst));
+    if (!filterPose(poseEst)) {
+      return Optional.empty();
+    }
     if (Robot.isSimulation()) {
       Field2d debugField = visionSim.getDebugField();
       // Uncomment to enable outputting of vision targets in sim.
@@ -210,7 +226,7 @@ public class Vision {
    * @return Could be empty if there isn't a good reading.
    */
   @Deprecated(since = "2024", forRemoval = true)
-  private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
+  private boolean filterPose(Optional<EstimatedRobotPose> pose) {
     if (pose.isPresent()) {
       double bestTargetAmbiguity = 1; // 1 is max ambiguity
       for (PhotonTrackedTarget target : pose.get().targetsUsed) {
@@ -219,9 +235,25 @@ public class Vision {
           bestTargetAmbiguity = ambiguity;
         }
       }
+
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/bestTargetAmbiguity", bestTargetAmbiguity);
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/x", pose.get().estimatedPose.getX());
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/y", pose.get().estimatedPose.getY());
+      NTHelper.setDouble("/swerveSubsystem/vision/filter/z", pose.get().estimatedPose.getZ());
+
       // ambiguity to high dont use estimate
       if (bestTargetAmbiguity > maximumAmbiguity) {
-        return Optional.empty();
+        return false;
+      }
+
+      if (pose.get().estimatedPose.getX() < 0 || pose.get().estimatedPose.getX() > fieldLayout.getFieldLength()) {
+        return false;
+      }
+      if (pose.get().estimatedPose.getY() < 0 || pose.get().estimatedPose.getY() > fieldLayout.getFieldWidth()) {
+        return false;
+      }
+      if (Math.abs(pose.get().estimatedPose.getZ()) > 0.32) {
+        return false;
       }
 
       // est pose is very far from recorded robot pose
@@ -231,14 +263,14 @@ public class Vision {
         // if it calculates that were 10 meter away for more than 10 times in a row its
         // probably right
         if (longDistangePoseEstimationCount < 10) {
-          return Optional.empty();
+          return false;
         }
       } else {
         longDistangePoseEstimationCount = 0;
       }
-      return pose;
+      return true;
     }
-    return Optional.empty();
+    return false;
   }
 
   /**
@@ -290,6 +322,19 @@ public class Vision {
 
   }
 
+  public Integer findClosestHPSTagID(Pose2d currentPose) {
+    int[] AprilTagIDs = { 1, 2, 12, 13 };
+    List<Pose2d> poseList = new ArrayList<Pose2d>();
+    Map<Pose2d, Integer> tagMap = new HashMap<Pose2d, Integer>();
+    for (int tag : AprilTagIDs) {
+      poseList.add(fieldLayout.getTagPose(tag).get().toPose2d());
+      tagMap.put(fieldLayout.getTagPose(tag).get().toPose2d(), tag);
+    }
+
+    return tagMap.get(currentPose.nearest(poseList));
+
+  }
+
   public int iDtoAngle(int tag) {
     int[] AprilTagIDs = { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
 
@@ -310,6 +355,16 @@ public class Vision {
 
     return tagMap.get(tag);
 
+  }
+
+  public int hpIDToAngle(int tag) {
+    // int[] AprilTagIDs = { 1, 2, 12, 13 };
+    Map<Integer, Integer> tagMap = new HashMap<Integer, Integer>();
+    tagMap.put(1, 120);
+    tagMap.put(2, 240);
+    tagMap.put(12, 60);
+    tagMap.put(13, -60);
+    return tagMap.get(tag);
   }
 
   /**
@@ -371,7 +426,7 @@ public class Vision {
    * @return True when an april tag is discovered.
    */
   public boolean seesFrontAprilTag() {
-    return Cameras.FRONT_CAM.hasTarget();
+    return Cameras.FRONT_RIGHT_CAM.hasTarget() || Cameras.FRONT_LEFT_CAM.hasTarget();
   }
 
   /**
@@ -382,12 +437,19 @@ public class Vision {
    * 
    */
   enum Cameras {
-    FRONT_CAM("Arducam_OV9281_USB_Camera",
+    FRONT_RIGHT_CAM("right_cam",
         new Rotation3d(0, Math.toRadians(-20), Math.toRadians(0)),
         new Translation3d(Units.inchesToMeters(10.5), // center to front
             Units.inchesToMeters(-5),
             Units.inchesToMeters(6)), // front floor
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+        VecBuilder.fill(2, 2, 8), VecBuilder.fill(0.5, 0.5, 1)),
+
+    FRONT_LEFT_CAM("left_cam",
+        new Rotation3d(0, Math.toRadians(-20), Math.toRadians(-45)),
+        new Translation3d(Units.inchesToMeters(5.707),
+            Units.inchesToMeters(9.793),
+            Units.inchesToMeters(7.75)),
+        VecBuilder.fill(2, 2, 8), VecBuilder.fill(0.5, 0.5, 1));
 
     /**
      * Latency alert to use when high latency is detected.
@@ -492,6 +554,49 @@ public class Vision {
       }
     }
 
+    public double getEstPoseX() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
+      return estimatedRobotPose.get().estimatedPose.getX();
+    }
+
+    public double getEstPoseY() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
+      return estimatedRobotPose.get().estimatedPose.getY();
+    }
+
+    public double getEstPoseRot() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
+      return Math.toDegrees(estimatedRobotPose.get().estimatedPose.getRotation().getAngle());
+    }
+
+    public double getEstPoseZ() {
+      if (estimatedRobotPose.isEmpty()) {
+        return -100000000;
+      }
+      return estimatedRobotPose.get().estimatedPose.getZ();
+    }
+
+    public void log() {
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDevX", getCurrentStdDevsX());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDevY", getCurrentStdDevsY());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/stdDevRot", getCurrentStdDevsRot());
+      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/camerasConnected", camera.isConnected());
+      NTHelper.setBoolean("/visionDebug/" + camera.getName() + "/seesTag/", hasTarget());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/estimatedPoseX", getEstPoseX());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/estimatedPoseY", getEstPoseY());
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/estimatedPoseRot", getEstPoseRot());
+      // NTHelper.setDouble("/visionDebug" + camera.getName() + "/height",);
+      NTHelper.setDouble("/visionDebug/" + camera.getName() + "/poseAmbiguity", getPoseAmbiguityFromBestTarget());
+      // NTHelper.getBoolean("/visionDebug/" + camera.getName() + "rejectingTag",
+      // isRejecting);
+    }
+
     /**
      * Add camera to {@link VisionSystemSim} for simulated photon vision.
      *
@@ -528,6 +633,26 @@ public class Vision {
         }
       }
       return Optional.of(bestResult);
+    }
+
+    public double getPoseAmbiguityFromBestTarget() {
+      if (resultsList.isEmpty()) {
+        return -100000;
+      }
+
+      PhotonPipelineResult bestResult = resultsList.get(0);
+      double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
+      double currentAmbiguity = 0;
+
+      for (PhotonPipelineResult result : resultsList) {
+        currentAmbiguity = result.getBestTarget().getPoseAmbiguity();
+        if (currentAmbiguity < amiguity && currentAmbiguity > 0) {
+          bestResult = result;
+          amiguity = currentAmbiguity;
+        }
+      }
+
+      return bestResult.getBestTarget().getPoseAmbiguity();
     }
 
     /*
@@ -623,52 +748,74 @@ public class Vision {
      * @param targets
      *          All targets in this camera frame
      */
+
+    private Double getCurrentStdDevsX() {
+      return curStdDevs.get(0, 0);
+    }
+
+    private Double getCurrentStdDevsY() {
+      return curStdDevs.get(1, 0);
+    }
+
+    private Double getCurrentStdDevsRot() {
+      return curStdDevs.get(2, 0);
+    }
+
+    // private Boolean isRejecting = null;
+
     private void updateEstimationStdDevs(
         Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {
       if (estimatedPose.isEmpty()) {
         // No pose input. Default to single-tag std devs
         curStdDevs = singleTagStdDevs;
-
-      } else {
-        // Pose present. Start running Heuristic
-        var estStdDevs = singleTagStdDevs;
-        int numTags = 0;
-        double avgDist = 0;
-
-        // Precalculation - see how many tags we found, and calculate an
-        // average-distance metric
-        for (var tgt : targets) {
-          var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
-          if (tagPose.isEmpty()) {
-            continue;
-          }
-          numTags++;
-          avgDist += tagPose
-              .get()
-              .toPose2d()
-              .getTranslation()
-              .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
-        }
-
-        if (numTags == 0) {
-          // No tags visible. Default to single-tag std devs
-          curStdDevs = singleTagStdDevs;
-        } else {
-          // One or more tags visible, run the full heuristic.
-          avgDist /= numTags;
-          // Decrease std devs if multiple targets are visible
-          if (numTags > 1) {
-            estStdDevs = multiTagStdDevs;
-          }
-          // Increase std devs based on (average) distance
-          if (numTags == 1 && avgDist > 4) {
-            estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-          } else {
-            estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
-          }
-          curStdDevs = estStdDevs;
-        }
+        return;
       }
+
+      // Pose present. Start running Heuristic
+      var estStdDevs = singleTagStdDevs;
+      int numTags = 0;
+      double avgDist = 0;
+
+      // Precalculation - see how many tags we found, and calculate an
+      // average-distance metric
+      for (var tgt : targets) {
+        var tagPose = poseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+        if (tagPose.isEmpty()) {
+          continue;
+        }
+        numTags++;
+        avgDist += tagPose
+            .get()
+            .toPose2d()
+            .getTranslation()
+            .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+      }
+
+      if (numTags == 0) {
+        // No tags visible. Default to single-tag std devs
+        curStdDevs = singleTagStdDevs;
+      } else {
+        // One or more tags visible, run the full heuristic.
+        avgDist /= numTags;
+        // Decrease std devs if multiple targets are visible
+        if (numTags > 1) {
+          estStdDevs = multiTagStdDevs;
+        }
+        // Increase std devs based on (average) distance
+        if (numTags == 1 && avgDist > 8) {
+          estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+          // isRejecting = true;
+        } else if (avgDist <= 1) {
+          estStdDevs = estStdDevs.times(.5); // number subject to change
+          // isRejecting = false;
+        } else {
+          estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+          // isRejecting = false;
+        }
+        curStdDevs = estStdDevs;
+        // herp
+      }
+
     }
 
   }

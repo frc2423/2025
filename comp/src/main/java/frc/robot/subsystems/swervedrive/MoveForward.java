@@ -23,19 +23,20 @@ public class MoveForward extends Command {
     addRequirements(swerve);
   }
 
-  public MoveForward(SwerveSubsystem swerve, Translation2d targetPosition, double speed) {
-    this.swerve = swerve;
-    this.targetPosition = targetPosition;
-    this.speed = speed;
-    addRequirements(swerve);
-  }
+  // public MoveForward(SwerveSubsystem swerve, Translation2d targetPosition,
+  // double speed) {
+  // this.swerve = swerve;
+  // this.targetPosition = targetPosition;
+  // this.speed = speed;
+  // addRequirements(swerve);
+  // }
 
   @Override
   public void initialize() {
     initialPosition = swerve.getPose().getTranslation();
-    if (targetPosition != null) {
-      dist = targetPosition.getDistance(initialPosition);
-    }
+    // if (targetPosition != null) {
+    // dist = targetPosition.getDistance(initialPosition);
+    // }
   }
 
   @Override

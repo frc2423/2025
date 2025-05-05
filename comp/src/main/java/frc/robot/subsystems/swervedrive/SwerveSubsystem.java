@@ -21,6 +21,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,6 +32,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -45,7 +47,10 @@ import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
+import java.net.CacheRequest;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
@@ -56,6 +61,7 @@ import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.SwerveDriveTest;
 import swervelib.math.SwerveMath;
+import swervelib.parser.Cache;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
@@ -63,6 +69,9 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase {
+
+  public final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
+  public final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
 
   /**
    * Swerve drive object.
@@ -79,11 +88,15 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private final boolean visionDriveTest = true;
 
+  private boolean isPathBlue = true;
+
   private PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
   /**
    * PhotonVision class to keep an accurate odometry.
    */
   public Vision vision;
+
+  private static Map<String, AutoCommand> autoStuff = new HashMap<>();
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -147,7 +160,11 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     setupPathPlanner();
 
-    pdh.setSwitchableChannel(true);
+    pdh.setSwitchableChannel(false);
+  }
+
+  public void toggleLedRing() {
+    pdh.setSwitchableChannel(!pdh.getSwitchableChannel());
   }
 
   /**
@@ -180,6 +197,8 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+
+    vision.logCameras();
   }
 
   public void addCameraInput(Pose2d visionPose, double timestamp, Matrix<N3, N1> standardDeviations) {
@@ -236,10 +255,10 @@ public class SwerveSubsystem extends SubsystemBase {
             // alliance
             // This will flip the path being followed to the red side of the field.
             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
+            // return false;
             var alliance = DriverStation.getAlliance();
             if (alliance.isPresent()) {
-              return alliance.get() == DriverStation.Alliance.Red;
+              return alliance.get() == (isPathBlue ? DriverStation.Alliance.Red : DriverStation.Alliance.Blue);
             }
             return false;
           },
@@ -254,6 +273,10 @@ public class SwerveSubsystem extends SubsystemBase {
     // Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
+  }
+
+  public void setIsBlue(boolean pathBlue) {
+    isPathBlue = pathBlue;
   }
 
   /**
@@ -328,10 +351,20 @@ public class SwerveSubsystem extends SubsystemBase {
    *          PathPlanner path name.
    * @return {@link AutoBuilder#followPath(PathPlannerPath)} path command.
    */
-  public Command getAutonomousCommand(String pathName) {
+  public AutoCommand getAutonomousCommand(String pathName, boolean isRed) {
+    if (autoStuff.containsKey(pathName)) {
+      return autoStuff.get(pathName);
+    } else {
+      return autoStuff.put(pathName, new AutoCommand(pathName, isRed));
+    }
     // Create a path following command using AutoBuilder. This will also trigger
     // event markers.
-    return new PathPlannerAuto(pathName);
+  }
+
+  public AutoCommand getAutonomousCommand(String pathName) {
+    // Create a path following command using AutoBuilder. This will also trigger
+    // event markers.
+    return new AutoCommand(pathName, false);
   }
 
   /**

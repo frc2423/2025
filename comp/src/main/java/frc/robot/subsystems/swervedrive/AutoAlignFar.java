@@ -41,6 +41,16 @@ public class AutoAlignFar extends Command {
         this.addRequirements(swerve);
     }
 
+    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist,
+            Optional<Integer> tagNumber) {
+        this.isAlgae = true;
+        this.dist = dist;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.tagNumber = tagNumber;
+        this.addRequirements(swerve);
+    }
+
     public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, Supplier<Pose2d> climberPoseSupplier) {
         this.isAlgae = true;
         this.swerve = swerve;

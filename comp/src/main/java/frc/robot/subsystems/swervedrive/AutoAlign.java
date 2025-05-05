@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.AngleUtils;
 
 public class AutoAlign extends Command {
@@ -81,7 +82,6 @@ public class AutoAlign extends Command {
             targetAngleFilter.calculate(100000);
             swerveAngleFilter.calculate(100000);
         }
-
     }
 
     @Override

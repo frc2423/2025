@@ -8,12 +8,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,13 +17,13 @@ import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private double maxVel = 120;
-    private double maxAccel = 120;
+    private double maxVel = 160 * 1.5;
+    private double maxAccel = 200 * 1.5;
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0,
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double encoderPosition = 0;
     private double setpoint = 0;
-    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.015, 0, 0);
+    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.0015, 0, 0);
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 63.5;
@@ -111,7 +105,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public Command goDownAndIntake() {
-        Command command = Commands.sequence(goDown(), intake.in());
+        Command command = Commands.sequence(goDown(), intake.in()/* , intake.backwards().withTimeout(.1) */);
         command.setName("goDownAndIntake");
         return command;
     }
@@ -153,13 +147,40 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
-    public Command descoreAlgae(double setpoint) {
+    public Command scoreAlgae() {
+        return Commands.sequence(goToSetpoint(Constants.SetpointConstants.REEF_L4),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_SCORE));
+        // intake.ejectAlgae());
+    }
+
+    public Command intakeAlgae(double setpoint) {
         return Commands.sequence(goToSetpoint(setpoint),
                 Commands.waitUntil(() -> {
                     return isAtSetpoint();
                 }),
-                arm.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORE),
-                intake.intakeJustOut());
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_INTAKE),
+                intake.intakeAlgae());
+    }
+
+    public Command intakeGroundAlgae() {
+        return Commands.sequence(goToSetpoint(Constants.SetpointConstants.ZERO),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_GROUND),
+                intake.intakeAlgae());
+    }
+
+    public Command outtakeAlgae(double setpoint) {
+        return Commands.sequence(goToSetpoint(setpoint),
+                Commands.waitUntil(() -> {
+                    return isAtSetpoint();
+                }),
+                arm.goToSetpoint(Constants.ArmConstants.ALGAE_SCORE),
+                intake.intakeOut());
     }
 
     public double getElevatorVelocity() { // for manual control, sick
@@ -193,6 +214,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         builder.addDoubleProperty("setpoint", () -> setpoint, null);
         builder.addDoubleProperty("encoderPosition", this::getEncoderPosition, null);
         builder.addBooleanProperty("isAtSetpoint", this::isAtSetpoint, null);
+        builder.addDoubleProperty("motor1Current", motor1::getOutputCurrent, null);
+        builder.addDoubleProperty("motor2Current", motor2::getOutputCurrent, null);
 
         if (Robot.isSimulation()) {
             elevatorSim.initSendable(builder);
