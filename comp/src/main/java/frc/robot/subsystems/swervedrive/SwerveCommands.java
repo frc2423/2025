@@ -256,7 +256,7 @@ public class SwerveCommands {
             int tag = swerve.vision.findClosestHPSTagID(swerve.getPose());
             double dist = swerve.vision.getDistanceFromAprilTag(tag);
             if (PoseTransformUtils.isRedAlliance()) {
-                if (dist >= 3) {
+                if (dist >= 1.5) {
                     Rotation2d angle = getLookAngle(REDreefCenter);
                     actuallyLookAngleButMove(angle);
 
