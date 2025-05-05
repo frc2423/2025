@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
+import frc.robot.subsystems.Elevator.ElevatorLevelPicker;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
@@ -47,6 +48,7 @@ public class SwerveCommands {
     private IntakeCommands intakeCommands;
     private IntakeSubsystem intakesubsystem;
     private ClimberSubsystem climberSubsystem;
+    private ElevatorLevelPicker elevatorLevelPicker;
 
     private ElevatorSubsystem elevatorSubsystem;
     private XboxController driverXbox = new XboxController(0);
@@ -58,6 +60,7 @@ public class SwerveCommands {
             IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem,
             ClimberSubsystem climberSubsystem) {
         this.intakesubsystem = intakesubsystem;
+        this.elevatorLevelPicker = new ElevatorLevelPicker(elevatorSubsystem, swerve);
         this.swerve = swerve;
         this.elevatorSubsystem = elevatorSubsystem;
         this.intakeCommands = intakeCommands;
@@ -88,31 +91,6 @@ public class SwerveCommands {
     // will select
     // which command to run. Can base this choice on logical conditions evaluated at
     // runtime.
-    private ElevatorLevel selectElevatorLevel() {
-        String dashboardElevatorLevel = NTHelper.getStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL)[0];
-        if (dashboardElevatorLevel.equals("L1")) {
-            return ElevatorLevel.T;
-        }
-        if (dashboardElevatorLevel.equals("L2")) {
-            return ElevatorLevel.L2;
-        }
-        if (dashboardElevatorLevel.equals("L3")) {
-            return ElevatorLevel.L3;
-        }
-        if (dashboardElevatorLevel.equals("L4")) {
-            return ElevatorLevel.L4;
-        }
-
-        if (driverXbox.getLeftTriggerAxis() < 0.5 && driverXbox.getRightTriggerAxis() < 0.5) {
-            return ElevatorLevel.T;
-        } else if (driverXbox.getLeftTriggerAxis() < 0.5 && driverXbox.getRightTriggerAxis() > 0.5) {
-            return ElevatorLevel.L2;
-        } else if (driverXbox.getLeftTriggerAxis() > 0.5 && driverXbox.getRightTriggerAxis() < 0.5) {
-            return ElevatorLevel.L3;
-        } else {
-            return ElevatorLevel.L4;
-        }
-    }
 
     public double getScoringOffset(boolean isRight) {
         double y = .178;
@@ -147,21 +125,6 @@ public class SwerveCommands {
         }).until(() -> (driverXbox.getRightX() > .1) || (driverXbox.getRightY() > .1));
         command.addRequirements(swerve);
         return command;
-    }
-
-    public Command getElevatorLevelCommand() {
-        return new SelectCommand<>(
-                // Maps selector values to commands
-                Map.ofEntries(
-                        Map.entry(ElevatorLevel.T, elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.ZERO)),
-                        Map.entry(ElevatorLevel.L2,
-                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L2)),
-                        Map.entry(ElevatorLevel.L3,
-                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L3)),
-                        Map.entry(ElevatorLevel.L4,
-                                elevatorSubsystem.goToSetpoint(Constants.SetpointConstants.REEF_L4))),
-
-                this::selectElevatorLevel);
     }
 
     // public Command autoDescoreAlgae(double setpoint) {
@@ -304,7 +267,17 @@ public class SwerveCommands {
     }
 
     public Command autoScoralClosest(boolean isRight) {
-        return autoScoral(Optional.empty(), getElevatorLevelCommand(), isRight);
+        return autoScoral(Optional.empty(), elevatorLevelPicker.getElevatorLevelCommand(), isRight);
+    }
+
+    public Command autoScoralClosestAuto() {
+        Command scoreLeft = autoScoral(Optional.empty(), elevatorLevelPicker.getElevatorLevelCommandAuto(),
+                true);
+        Command scoreRight = autoScoral(Optional.empty(), elevatorLevelPicker.getElevatorLevelCommandAuto(),
+                false);
+
+        Command whichSide = Commands.either(scoreLeft, scoreRight, () -> elevatorLevelPicker.isRightOpen());
+        return Commands.sequence(whichSide, elevatorLevelPicker.setScoredLevel());
     }
 
     public Command autoScoralClosest(double setpoint, boolean isRight) {
@@ -340,7 +313,7 @@ public class SwerveCommands {
             int tag = swerve.vision.findClosestHPSTagID(swerve.getPose());
             double dist = swerve.vision.getDistanceFromAprilTag(tag);
             if (PoseTransformUtils.isRedAlliance()) {
-                if (dist >= 3) {
+                if (dist >= 1.5) {
                     Rotation2d angle = getLookAngle(REDreefCenter);
                     actuallyLookAngleButMove(angle);
 

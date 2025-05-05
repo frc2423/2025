@@ -154,6 +154,14 @@ public class NTHelper {
         return getEntry(key).getStringArray(defaultValue);
     }
 
+    public static void setBooleanArray(String key, boolean[] value) {
+        getEntry(key).setBooleanArray(value);
+    }
+
+    public static boolean[] getBooleanArray(String key, boolean[] defaultValue) {
+        return getEntry(key).getBooleanArray(defaultValue);
+    }
+
     /**
      * Sets the current value to network tables
      * 
@@ -164,6 +172,10 @@ public class NTHelper {
      */
     public static void setDoubleArray(String key, double[] value) {
         getEntry(key).setDoubleArray(value);
+    }
+
+    public static double[] getDoubleArray(String key, double[] defaultValue) {
+        return getEntry(key).getDoubleArray(defaultValue);
     }
 
     public static double[] getDoubleArrayPose3d(Pose3d pose) {

@@ -369,7 +369,7 @@ public class RobotContainer {
 
                 new JoystickButton(driverXbox, XboxController.Button.kLeftBumper.value)
                                 .whileTrue(Commands.sequence(Commands.parallel(
-                                                swerveCommands.autoScoralClosest(false),
+                                                swerveCommands.autoScoralClosestAuto(),
                                                 ledKwarqs.isAutoScoring(true)),
                                                 Commands.either(
                                                                 elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
