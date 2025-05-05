@@ -169,11 +169,43 @@ public class SwerveCommands {
         return autoAlignHPCommand;
     }
 
-    public Command autoIntakeCoral(Optional<Boolean> isRight){
-        var command = Commands.sequence(autoHPIntake(isRight), 
-        new auto);
-        return command;
-    }
+    // public Pose2d autoIntakePose(){
+    // if (PoseTransformUtils.isRedAlliance()) {
+    // if
+    // (Vision.getAprilTagPose(1).getTranslation().getDistance(swerve.getPose().getTranslation())
+    // >= Vision
+    // .getAprilTagPose(2).getTranslation().getDistance(swerve.getPose().getTranslation()))
+    // {
+    // return new Pose2d()
+    // } else {
+    // pose = new
+    // }
+    // } else {
+    // if
+    // (Vision.getAprilTagPose(13).getTranslation().getDistance(swerve.getPose().getTranslation())
+    // >= Vision
+    // .getAprilTagPose(12).getTranslation().getDistance(swerve.getPose().getTranslation()))
+    // {
+    // pose =
+    // } else {
+    // pose =
+    // }
+    // }
+
+    // return pose;
+    // }
+
+    // public Command autoIntakeCoral() {
+    // boolean isRed = PoseTransformUtils.isRedAlliance();
+    // Commands.either(Commands.print("command 1"), Commands.print("Command 2"), ()
+    // -> PoseTransformUtils.isRedAlliance());
+    // Optional<Boolean> isRight = Optional.of(right);
+
+    // var command = Commands.sequence(
+    // new AutoAlignFar(autoIntakePose()),
+    // new AutoAlignNear());
+    // return command;
+    // }
 
     public Command autoScoral(Optional<Integer> tagNumber, double setpoint, boolean isRight) {
         return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint), isRight);
