@@ -24,7 +24,7 @@ public class IntakeCommands {
     public Command intakeIn() {
         var command = Commands.run(() -> {
             // arm.goUp(),
-            intake.intake(.15); // .17
+            intake.intake(.3); // .225
         });
         command.setName("Intake In");
         command.addRequirements(intake);

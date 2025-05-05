@@ -17,13 +17,13 @@ import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private double maxVel = 160;
-    private double maxAccel = 200;
+    private double maxVel = 160 * 1.5;
+    private double maxAccel = 200 * 1.5;
     ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0,
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double encoderPosition = 0;
     private double setpoint = 0;
-    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.015, 0, 0);
+    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.0015, 0, 0);
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 63.5;
