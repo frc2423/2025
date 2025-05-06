@@ -245,7 +245,7 @@ public class SwerveCommands {
                         Commands.sequence(new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
-                intakeCommands.intakeOut());
+                intakeCommands.intakeJustOutRun().withTimeout(.5), intakeCommands.intakeOut());
 
         command.setName("autoScoralClosest");
 

@@ -49,16 +49,6 @@ public class IntakeSubsystem extends SubsystemBase {
         // motor.set(speed);
         // hasAlgae = false;
         // }
-
-        /*
-         * to do:
-         * 0 try distance
-         * 0 make distance work
-         * 0 fine tune algae descore w/ abs encoder
-         * 0 make autoalign and descore
-         * 0 try barge
-         * 0 try processor
-         */
     }
 
     private void setCurrentLimit(int limit, int free) {
@@ -108,6 +98,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public boolean isOut() {
         return getRawSensorValue() > 60;
+    }
+
+    public boolean isOutMedianFilter() {
+        return distMm() > 60;
     }
 
     public boolean hasAlgae() {
