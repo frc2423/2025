@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.QuestNav;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
@@ -97,6 +98,8 @@ public class SwerveSubsystem extends SubsystemBase {
   public Vision vision;
 
   private static Map<String, AutoCommand> autoStuff = new HashMap<>();
+
+  QuestNav questNav = new QuestNav();
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -199,6 +202,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     vision.logCameras();
+
+    questNav.cleanupResponses();
+    questNav.processHeartbeat();
+    System.out.println("!!!!");
   }
 
   public void addCameraInput(Pose2d visionPose, double timestamp, Matrix<N3, N1> standardDeviations) {
