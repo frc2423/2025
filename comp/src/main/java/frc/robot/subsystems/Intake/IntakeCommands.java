@@ -74,7 +74,7 @@ public class IntakeCommands {
     public Command intakeOut() {
         var command = Commands.run(() -> {
             intake.intake(1);
-        }).until(() -> intake.isOut()).andThen(intakeStop());
+        }).until(() -> intake.isOutMedianFilter()).andThen(intakeStop());
         command.addRequirements(intake);
         command.setName("Intake Out");
         return command;
@@ -83,6 +83,15 @@ public class IntakeCommands {
     public Command intakeJustOut() {
         var command = Commands.runOnce(() -> {
             intake.intake(0.3);
+        });
+        command.addRequirements(intake);
+        command.setName("Just Out");
+        return command;
+    }
+
+    public Command intakeJustOutRun() {
+        var command = Commands.run(() -> {
+            intake.intake(1);
         });
         command.addRequirements(intake);
         command.setName("Just Out");
