@@ -9,6 +9,8 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.AutoAlign;
+import frc.robot.subsystems.swervedrive.AutoAlignPose;
 import frc.robot.subsystems.swervedrive.AutoCommand;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -67,7 +70,8 @@ public class RobotContainer {
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
         RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
 
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm, intakeSubsystem);
+        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm, intakeSubsystem,
+                        climberSubsystem);
 
         KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 
@@ -465,7 +469,7 @@ public class RobotContainer {
                                 .whileTrue(climberSubsystem.deClimb()).onFalse(climberSubsystem.climbStop()); // arm.goLittleDown(.05));//
 
                 new JoystickButton(operator, XboxController.Button.kY.value)
-                                .onTrue(intakeCommands.in());
+                                .whileTrue(swerveCommands.autoAlignClimb());
 
                 new JoystickButton(operator, XboxController.Button.kX.value)
                                 .onTrue(intakeCommands.intakeOut());
@@ -560,7 +564,7 @@ public class RobotContainer {
         }
 
         public AutoCommand getAutonomousCommand() {
-                return getAutonomousCommand(m_chooser.getSelected());
+                return getAutonomousCommand(m_chooser.getSelected()); // here
         }
 
         public void setIsBlue(boolean isBlue) {

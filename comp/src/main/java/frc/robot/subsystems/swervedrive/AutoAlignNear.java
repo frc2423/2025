@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,6 +22,7 @@ public class AutoAlignNear extends Command {
     private boolean reachedY = false;
     private boolean reachedX = false;
     private Optional<Integer> tagNumber = Optional.empty();
+    private Optional<Supplier<Pose2d>> climbPose = Optional.empty();
 
     private final static int FILTER_SIZE = 10;
     MedianFilter targetAngleFilter = new MedianFilter(FILTER_SIZE);
@@ -54,15 +56,26 @@ public class AutoAlignNear extends Command {
         this.addRequirements(swerve);
     }
 
+    public AutoAlignNear(SwerveSubsystem swerve, SwerveCommands swerveCommands, Supplier<Pose2d> climberPoseSupplier) {
+        this.isAlgae = true;
+        this.swerve = swerve;
+        this.swerveCommands = swerveCommands;
+        this.addRequirements(swerve);
+        this.climbPose = Optional.of(climberPoseSupplier);
+    }
+
     @Override
     public void initialize() {
         reachedY = false;
         reachedX = false;
         if (tagNumber.isPresent()) {
             pose = Vision.getTagPose(tagNumber.get());
-        } else {
+        } else if (climbPose.isEmpty()) {
             pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
+        } else {
+            pose = climbPose.get().get();
         }
+
         targetAngleFilter.reset();
         swerveAngleFilter.reset();
         for (double i = 0; i < FILTER_SIZE; i++) {
@@ -73,8 +86,14 @@ public class AutoAlignNear extends Command {
 
     @Override
     public void execute() {
-        Pose2d pose2d = isAlgae ? swerveCommands.addOffset(pose, dist, .1)
-                : swerveCommands.addScoringOffset(pose, dist, isRight);
+        Pose2d pose2d;
+
+        if (climbPose.isPresent())
+            pose2d = climbPose.get().get();
+        else if (isAlgae)
+            pose2d = swerveCommands.addOffset(pose, dist, .1);
+        else
+            pose2d = swerveCommands.addScoringOffset(pose, dist, isRight);
 
         Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
 
@@ -95,7 +114,8 @@ public class AutoAlignNear extends Command {
 
     @Override
     public boolean isFinished() {
-        Pose2d targetPose = swerveCommands.addScoringOffset(pose, dist, isRight);// .55
+        Pose2d targetPose = climbPose.isEmpty() ? swerveCommands.addScoringOffset(pose, dist, isRight)
+                : climbPose.get().get();// .55
 
         double averageTargetPose = targetAngleFilter.calculate(targetPose.getRotation().getRadians());
         double averageSwervePose = swerveAngleFilter.calculate(swerve.getPose().getRotation().getRadians());
