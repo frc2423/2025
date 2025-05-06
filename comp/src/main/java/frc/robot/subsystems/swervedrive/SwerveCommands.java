@@ -219,6 +219,33 @@ public class SwerveCommands {
         return command;
     }
 
+    public Pose2d getAutoIntakePose() {
+        if (PoseTransformUtils.isRedAlliance()) {
+            if (Vision.getAprilTagPose(1).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
+                    .getAprilTagPose(2).getTranslation().getDistance(swerve.getPose().getTranslation())) {
+                return new Pose2d(16.040, 7.280, Vision.getAprilTagPose(2).getRotation()); // go to 2
+            } else {
+                return new Pose2d(16.040, 0.698, Vision.getAprilTagPose(1).getRotation()); // go to 1
+            }
+        } else {
+            if (Vision.getAprilTagPose(13).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
+                    .getAprilTagPose(12).getTranslation().getDistance(swerve.getPose().getTranslation())) {
+                return new Pose2d(1.570, 0.680, Vision.getAprilTagPose(12).getRotation()); // go to 12
+            } else {
+                return new Pose2d(1.570, 7.376, Vision.getAprilTagPose(13).getRotation()); // go to 13
+            }
+        }
+    }
+
+    public Command autoAlignAndIntakeHP() {
+        Command command = Commands.parallel(
+                Commands.sequence(new AutoAlignFar(swerve, this, this::getAutoIntakePose),
+                        new AutoAlignNear(swerve, this, this::getAutoIntakePose)),
+                elevatorSubsystem.goDownAndIntake());
+        command.setName("autoAlignHP");
+        return command;
+    }
+
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
@@ -456,87 +483,6 @@ public class SwerveCommands {
             y = .5;
 
         }
-        x *= xSign;
-        y *= ySign;
-
-        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(x, y,
-                pose2d.getRotation());
-
-        final double maxRadsPerSecond = 5;
-
-        if (isAngleClose) {
-            // desiredSpeeds.omegaRadiansPerSecond = 0;
-        } else if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
-            desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond,
-                    desiredSpeeds.omegaRadiansPerSecond);
-        }
-
-        swerve.drive(desiredSpeeds);
-    }
-
-    public void actuallyMoveToFar(Pose2d pose2d, boolean enableX, boolean enableY) {
-
-        Pose2d robotPose = new Pose2d(swerve.getPose().getTranslation(), pose2d.getRotation());
-        Translation2d translationDiff = pose2d.relativeTo(robotPose).getTranslation();
-
-        boolean isAngleClose = AngleUtils.areAnglesClose(pose2d.getRotation(),
-                swerve.getPose().getRotation(),
-                Rotation2d.fromDegrees(1));
-
-        double xSign = Math.copySign(1, translationDiff.getX());
-        double ySign = Math.copySign(1, translationDiff.getY());
-
-        double xDistance = Math.abs(translationDiff.getX());
-        double yDistance = Math.abs(translationDiff.getY());
-
-        double x = 0;
-        double y = 0;
-
-        if (!enableX) {
-            x = 0;
-        } else {
-            x = MathUtil.interpolate(0.5, 1, (xDistance - 0.25) / (1.5 - 0.25));
-
-        }
-
-        // else if (xDistance > .7) {}
-        // x = .6;
-        // } else if (xDistance > .4) {
-        // x = .6;
-        // } else if (xDistance > .2) {
-        // x = .55;
-        // } else if (xDistance > .03) {
-        // x = .55;
-        // } else if (xDistance > .02) {
-        // x = .55;
-        // } else if (xDistance > .015) {
-        // x = .5;
-        // } else {
-        // x = 0;
-        // }
-
-        if (!enableY) {
-            y = 0;
-        } else {
-            y = MathUtil.interpolate(0.45, 0.9, (yDistance - 0.176) / (2 - 0.176));
-        }
-
-        // } else if (yDistance > .7) {
-        // y = .6;
-        // } else if (yDistance > .4) {
-        // y = .6;
-        // } else if (yDistance > .2) {
-        // y = .55;
-        // } else if (yDistance > .03) {
-        // y = .55;
-        // } else if (yDistance > .02) {
-        // y = .55;
-        // } else if (yDistance > .015) {
-        // y = .5;
-        // } else {
-        // y = 0;
-        // }
-
         x *= xSign;
         y *= ySign;
 

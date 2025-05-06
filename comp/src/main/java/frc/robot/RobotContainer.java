@@ -391,10 +391,11 @@ public class RobotContainer {
                                                 ledKwarqs.isAutoScoring(false)));
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(elevator.goDownAndIntake());
+                                .whileTrue(swerveCommands.autoAlignAndIntakeHP());// elevator.goDownAndIntake());
 
                 new JoystickButton(driverXbox, XboxController.Button.kY.value)
-                                .onTrue(swerveCommands.orbitReefCenter());
+                                .onFalse(swerveCommands.orbitReefCenter());
+                // .onTrue(swerveCommands.orbitReefCenter());
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .whileTrue(Commands.parallel(intakeCommands.eject(), ledKwarqs.isEjectingPOOP(true)))
