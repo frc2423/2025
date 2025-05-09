@@ -11,6 +11,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
@@ -116,6 +117,11 @@ public final class Constants {
         public static final double ALGAE_DUNK = .79;
 
         public static final double ZERO = -1; // not real
+    }
+
+    public static class QuestNavConstants {
+        public static final Transform2d QUEST_TO_ROBOT = new Transform2d(Units.inchesToMeters(-2.591),
+                Units.inchesToMeters(-8.013), Rotation2d.k180deg);
     }
 
     public static class AprilTagPoses {

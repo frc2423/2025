@@ -98,6 +98,8 @@ public class QuestNav {
     /** Last processed heartbeat request ID */
     private double lastProcessedHeartbeatId = 0;
 
+    private boolean questInitialPose = false;
+
     /**
      * Sets the FRC field relative pose of the Quest. This is the QUESTS POSITION,
      * NOT THE ROBOTS!
@@ -109,8 +111,13 @@ public class QuestNav {
                         pose.getX(),
                         pose.getY(),
                         pose.getRotation().getDegrees()
-                });
+                }); // here!!
         questMosi.set(Command.RESET_POSE);
+        questInitialPose = true;
+    }
+
+    public boolean hasInitialPose() {
+        return questInitialPose;
     }
 
     /**

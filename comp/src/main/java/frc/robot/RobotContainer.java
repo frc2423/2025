@@ -37,6 +37,7 @@ import java.util.Optional;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.FunnelSubsystem;
+import frc.robot.subsystems.QuackNav;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
@@ -69,6 +70,7 @@ public class RobotContainer {
         IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
         ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
         RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
+        QuackNav questNavSubsystem = new QuackNav();
 
         SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm, intakeSubsystem,
                         climberSubsystem);
