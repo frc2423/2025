@@ -64,3 +64,9 @@ This can be resolved by uninstalling the current version of the app:
 adb uninstall com.DerpyCatAviationLLC.QuestNav
 ```
 
+### Simulation
+
+1. The QuestNav app needs to be updated to connect to 127.0.0.1.
+2. 
+
+
