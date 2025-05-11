@@ -34,6 +34,22 @@ adb shell "dumpsys wifi | grep 'Wi-Fi is'"
 adb shell ping -c 4 10.24.23.2
 ```
 
+```bash
+# Start the app
+adb shell am start -n com.DerpyCatAviationLLC.QuestNav/com.unity3d.player.UnityPlayerGameActivity
+```
+
+```bash
+# Stop the app
+adb shell am force-stop com.DerpyCatAviationLLC.QuestNav
+```
+
+```bash
+# power off quest
+adb shell reboot -p
+```
+
+
 ### Development issues
 
 Error when creating a custom build (adding an apk using sidequest):
@@ -47,3 +63,12 @@ This can be resolved by uninstalling the current version of the app:
 # Uninstall the app
 adb uninstall com.DerpyCatAviationLLC.QuestNav
 ```
+
+### Simulation
+
+The app can work with simulated robot code when the quest is connected to your laptop running the simulation with this ADB command through SideQuest:
+
+```bash
+adb reverse tcp:5810 tcp:5810
+```
+
