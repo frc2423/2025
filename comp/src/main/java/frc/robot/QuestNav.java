@@ -100,20 +100,24 @@ public class QuestNav {
 
     private boolean questInitialPose = false;
 
+    private Pose2d offset;
+
     /**
      * Sets the FRC field relative pose of the Quest. This is the QUESTS POSITION,
      * NOT THE ROBOTS!
      * Make sure you correctly offset back from the center of your robot first!
      */
     public void setPose(Pose2d pose) {
-        resetPosePub.set(
-                new double[] {
-                        pose.getX(),
-                        pose.getY(),
-                        pose.getRotation().getDegrees()
-                }); // here!!
-        questMosi.set(Command.RESET_POSE);
+        // resetPosePub.set(
+        // new double[] {
+        // pose.getX() - offset.getX(),
+        // pose.getY() - offset.getY(),
+        // pose.getRotation().getDegrees()
+        // }); // here!!
+        // questMosi.set(Command.RESET_POSE);
         questInitialPose = true;
+        Pose2d questPose = getPose();
+        offset = new Pose2d(pose.minus(questPose).getTranslation(), pose.getRotation().minus(questPose.getRotation()));
     }
 
     public boolean hasInitialPose() {
@@ -257,6 +261,11 @@ public class QuestNav {
      * @return The pose as a Pose2d object
      */
     public Pose2d getPose() {
-        return new Pose2d(getTranslation(), getYaw());
+        return new Pose2d(getTranslation().plus(offset.getTranslation()), getYaw().plus(offset.getRotation()));
     }
+
+    // public Pose2d getPose(Pose2d pose) {
+    // Translation2d questPose = getTranslation();
+    // return new Pose2d(questPose.plus(offset), getYaw());
+    // }
 }
