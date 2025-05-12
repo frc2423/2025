@@ -100,7 +100,7 @@ public class QuestNav {
 
     private boolean questInitialPose = false;
 
-    private Pose2d offset;
+    private Pose2d offset = new Pose2d();
 
     /**
      * Sets the FRC field relative pose of the Quest. This is the QUESTS POSITION,
@@ -118,6 +118,7 @@ public class QuestNav {
         questInitialPose = true;
         Pose2d questPose = getPose();
         offset = new Pose2d(pose.minus(questPose).getTranslation(), pose.getRotation().minus(questPose.getRotation()));
+        System.out.println("OFFSET MAMA: " + offset.getX() + ", " + offset.getY());
     }
 
     public boolean hasInitialPose() {
@@ -261,7 +262,10 @@ public class QuestNav {
      * @return The pose as a Pose2d object
      */
     public Pose2d getPose() {
-        return new Pose2d(getTranslation().plus(offset.getTranslation()), getYaw().plus(offset.getRotation()));
+        Pose2d pose = new Pose2d(getTranslation().plus(offset.getTranslation()), getYaw().plus(offset.getRotation()));
+        // System.out.println("OFFSET ...: " + offset.getX() + ", " + offset.getY());
+
+        return pose;
     }
 
     // public Pose2d getPose(Pose2d pose) {
