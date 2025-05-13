@@ -15,11 +15,15 @@ import frc.robot.Robot;
 
 public class QuackNav {
     public QuestNav questNav = new QuestNav();
+    private boolean questInitialPose = false;
 
     public QuackNav() {
         SmartDashboard.putData("/QuackNavCommands/zeroAngle", zeroAngle());
         SmartDashboard.putData("/QuackNavCommands/zeroPose", zeroPose());
         SmartDashboard.putData("/QuackNavCommands/randomizePose", randomizePose());
+        SmartDashboard.putData("/QuackNavCommands/clearInitialPose", Commands.runOnce(() -> {
+            clearInitialPose();
+        }));
     }
 
     private Command zeroAngle() {
@@ -27,6 +31,10 @@ public class QuackNav {
             Pose2d pose = new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Math.random() * .001));
             updateQuestPose(pose);
         });
+    }
+
+    public void zeroPose(Pose2d pose) {
+        updateQuestPose(pose);
     }
 
     private Command zeroPose() {
@@ -51,9 +59,9 @@ public class QuackNav {
 
     public boolean isQuestMode() {
         if (Robot.isSimulation()) {
-            return questNav.getConnected() && questNav.hasInitialPose() && questNav.getTrackingStatus();
+            return questNav.getConnected() && hasInitialPose() && questNav.getTrackingStatus();
         }
-        return questNav.getConnected() && questNav.hasInitialPose() && questNav.getTrackingStatus();
+        return questNav.getConnected() && hasInitialPose() && questNav.getTrackingStatus();
     }
 
     public double getTimestamp() {
@@ -69,13 +77,18 @@ public class QuackNav {
         }
 
         // Transform by the offset to get your final pose!
-        Pose2d robotPose = questPose.transformBy(Constants.QuestNavConstants.QUEST_TO_ROBOT.inverse());
+        // Pose2d robotPose =
+        // questPose.transformBy(Constants.QuestNavConstants.QUEST_TO_ROBOT.inverse());
 
-        return robotPose;
+        return questPose;
     }
 
     public boolean hasInitialPose() {
-        return questNav.hasInitialPose();
+        return questInitialPose;
+    }
+
+    public void clearInitialPose() {
+        questInitialPose = false;
     }
 
     public boolean isConnected() {
@@ -100,6 +113,7 @@ public class QuackNav {
             isTrustworthy = true;
 
         if (isTrustworthy) {
+            questInitialPose = true;
             questNav.setPose(
                     Robot.isSimulation() ? pose : pose.transformBy(Constants.QuestNavConstants.QUEST_TO_ROBOT));
         }

@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Quaternion;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.Timer;
@@ -98,8 +99,6 @@ public class QuestNav {
     /** Last processed heartbeat request ID */
     private double lastProcessedHeartbeatId = 0;
 
-    private boolean questInitialPose = false;
-
     private Pose2d offset = new Pose2d();
 
     /**
@@ -115,14 +114,9 @@ public class QuestNav {
         // pose.getRotation().getDegrees()
         // }); // here!!
         // questMosi.set(Command.RESET_POSE);
-        questInitialPose = true;
-        Pose2d questPose = getPose();
+        Pose2d questPose = new Pose2d(getTranslation(), getYaw());
         offset = new Pose2d(pose.minus(questPose).getTranslation(), pose.getRotation().minus(questPose.getRotation()));
         System.out.println("OFFSET MAMA: " + offset.getX() + ", " + offset.getY());
-    }
-
-    public boolean hasInitialPose() {
-        return questInitialPose;
     }
 
     /**
@@ -262,10 +256,14 @@ public class QuestNav {
      * @return The pose as a Pose2d object
      */
     public Pose2d getPose() {
-        Pose2d pose = new Pose2d(getTranslation().plus(offset.getTranslation()), getYaw().plus(offset.getRotation()));
+        Pose2d relativePose = new Pose2d(getTranslation(), getYaw());
+        Transform2d transform = new Transform2d(offset.getTranslation(), offset.getRotation());
+        return relativePose.transformBy(Constants.QuestNavConstants.QUEST_TO_ROBOT.inverse()).transformBy(transform);
+        // Pose2d pose = new Pose2d(getTranslation().plus(offset.getTranslation()),
+        // getYaw().plus(offset.getRotation()));
         // System.out.println("OFFSET ...: " + offset.getX() + ", " + offset.getY());
 
-        return pose;
+        // return pose;
     }
 
     // public Pose2d getPose(Pose2d pose) {
