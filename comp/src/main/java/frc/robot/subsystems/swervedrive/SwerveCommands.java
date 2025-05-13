@@ -219,6 +219,33 @@ public class SwerveCommands {
         return command;
     }
 
+    public Pose2d getAutoIntakePose() {
+        if (PoseTransformUtils.isRedAlliance()) {
+            if (Vision.getAprilTagPose(1).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
+                    .getAprilTagPose(2).getTranslation().getDistance(swerve.getPose().getTranslation())) {
+                return new Pose2d(16.040, 7.280, Vision.getAprilTagPose(2).getRotation()); // go to 2
+            } else {
+                return new Pose2d(16.040, 0.698, Vision.getAprilTagPose(1).getRotation()); // go to 1
+            }
+        } else {
+            if (Vision.getAprilTagPose(13).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
+                    .getAprilTagPose(12).getTranslation().getDistance(swerve.getPose().getTranslation())) {
+                return new Pose2d(1.570, 0.680, Vision.getAprilTagPose(12).getRotation()); // go to 12
+            } else {
+                return new Pose2d(1.570, 7.376, Vision.getAprilTagPose(13).getRotation()); // go to 13
+            }
+        }
+    }
+
+    public Command autoAlignAndIntakeHP() {
+        Command command = Commands.parallel(
+                Commands.sequence(new AutoAlignFar(swerve, this, this::getAutoIntakePose),
+                        new AutoAlignNear(swerve, this, this::getAutoIntakePose)),
+                elevatorSubsystem.goDownAndIntake());
+        command.setName("autoAlignHP");
+        return command;
+    }
+
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
@@ -245,12 +272,56 @@ public class SwerveCommands {
                         Commands.sequence(new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
-                intakeCommands.intakeJustOutRun().withTimeout(.5), intakeCommands.intakeOut());
+                intakeCommands.intakeJustOutRun().withTimeout(.5), elevatorLevelPicker.setScoredLevel(),
+                intakeCommands.intakeOut());
 
         command.setName("autoScoralClosest");
 
         return command;
     }
+
+    public Command autoHPIntake(Optional<Boolean> isRight) {
+        Command autoAlignHPCommand = new AutoAlignHP(swerve, this, isRight);
+        return autoAlignHPCommand;
+    }
+
+    // public Pose2d autoIntakePose(){
+    // if (PoseTransformUtils.isRedAlliance()) {
+    // if
+    // (Vision.getAprilTagPose(1).getTranslation().getDistance(swerve.getPose().getTranslation())
+    // >= Vision
+    // .getAprilTagPose(2).getTranslation().getDistance(swerve.getPose().getTranslation()))
+    // {
+    // return new Pose2d()
+    // } else {
+    // pose = new
+    // }
+    // } else {
+    // if
+    // (Vision.getAprilTagPose(13).getTranslation().getDistance(swerve.getPose().getTranslation())
+    // >= Vision
+    // .getAprilTagPose(12).getTranslation().getDistance(swerve.getPose().getTranslation()))
+    // {
+    // pose =
+    // } else {
+    // pose =
+    // }
+    // }
+
+    // return pose;
+    // }
+
+    // public Command autoIntakeCoral() {
+    // boolean isRed = PoseTransformUtils.isRedAlliance();
+    // Commands.either(Commands.print("command 1"), Commands.print("Command 2"), ()
+    // -> PoseTransformUtils.isRedAlliance());
+    // Optional<Boolean> isRight = Optional.of(right);
+
+    // var command = Commands.sequence(
+    // new AutoAlignFar(autoIntakePose()),
+    // new AutoAlignNear());
+    // return command;
+    // }
 
     public Command autoScoral(Optional<Integer> tagNumber, double setpoint, boolean isRight) {
         Command command = Commands.run(() -> {
@@ -277,7 +348,8 @@ public class SwerveCommands {
                 false);
 
         Command whichSide = Commands.either(scoreLeft, scoreRight, () -> elevatorLevelPicker.isRightOpen());
-        return Commands.sequence(whichSide, elevatorLevelPicker.setScoredLevel());
+        return whichSide;
+        // return Commands.sequence(whichSide, elevatorLevelPicker.setScoredLevel());
     }
 
     public Command autoScoralClosest(double setpoint, boolean isRight) {
