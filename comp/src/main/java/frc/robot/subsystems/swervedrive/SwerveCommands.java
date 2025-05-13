@@ -272,7 +272,8 @@ public class SwerveCommands {
                         Commands.sequence(new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
-                intakeCommands.intakeJustOutRun().withTimeout(.5), intakeCommands.intakeOut());
+                intakeCommands.intakeJustOutRun().withTimeout(.5), elevatorLevelPicker.setScoredLevel(),
+                intakeCommands.intakeOut());
 
         command.setName("autoScoralClosest");
 
@@ -347,7 +348,8 @@ public class SwerveCommands {
                 false);
 
         Command whichSide = Commands.either(scoreLeft, scoreRight, () -> elevatorLevelPicker.isRightOpen());
-        return Commands.sequence(whichSide, elevatorLevelPicker.setScoredLevel());
+        return whichSide;
+        // return Commands.sequence(whichSide, elevatorLevelPicker.setScoredLevel());
     }
 
     public Command autoScoralClosest(double setpoint, boolean isRight) {
