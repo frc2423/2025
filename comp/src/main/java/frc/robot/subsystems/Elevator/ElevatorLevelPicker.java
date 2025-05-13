@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Elevator;
 
 import java.lang.module.ModuleDescriptor.Builder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,22 +47,31 @@ public class ElevatorLevelPicker {
     boolean[] frontMiddleReef = new boolean[6];
     boolean[] backMiddleReef = new boolean[6];
 
+    String[] reefPositionNames = { "frontLeft", "frontRight", "frontMiddle", "backLeft", "backRight", "backMiddle" };
+    Map<String, boolean[]> nameToReefMap = Map.ofEntries(Map.entry("frontLeft", frontLeftReef),
+            Map.entry("frontRight", frontRightReef), Map.entry("frontMiddle", frontMiddleReef),
+            Map.entry("backLeft", backLeftReef), Map.entry("backRight", backRightReef),
+            Map.entry("backMiddle", backMiddleReef));
+
     public ElevatorLevelPicker(ElevatorSubsystem elevatorSubsystem, SwerveSubsystem swerve) {
 
         this.elevatorSubsystem = elevatorSubsystem;
         this.swerve = swerve;
 
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
-        NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
-        NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
 
         double[] defaultLevelValues = { 0, 0, 0, 0, 0, 0 };
-        NTHelper.setDoubleArray("/elevatorLevelPicker/frontDashboard", defaultLevelValues);
 
-        NTHelper.listen("/elevatorLevelPicker/frontDashboard", (event) -> {
-            double[] newValues = NTHelper.getDoubleArray("/elevatorLevelPicker/frontDashboard", defaultLevelValues);
-            setDash(newValues);
-        });
+        for (var name : reefPositionNames) {
+            NTHelper.setBooleanArray("/elevatorLevelPicker/" + name, nameToReefMap.get(name));
+            NTHelper.setDoubleArray("/elevatorLevelPicker/" + name + "Dashboard", defaultLevelValues);
+            NTHelper.listen("/elevatorLevelPicker/" + name + "Dashboard", (event) -> {
+                double[] newValues = NTHelper.getDoubleArray("/elevatorLevelPicker/" + name + "Dashboard",
+                        defaultLevelValues);
+                setDash(newValues, nameToReefMap.get(name), "/elevatorLevelPicker/" + name);
+            });
+
+        }
 
     }
 
@@ -83,6 +93,27 @@ public class ElevatorLevelPicker {
             return frontMiddleReef;
         } else {
             return backMiddleReef;
+        }
+    }
+
+    public String getClosestReefName() {
+        int ID = swerve.vision.findClosestTagID(swerve.getPose());
+        if (ID == 19 || ID == 6) {
+            return "frontLeft";
+        }
+        if (ID == 17 || ID == 8) {
+            return "frontRight";
+        }
+        if (ID == 20 || ID == 11) {
+            return "backLeft";
+        }
+        if (ID == 22 || ID == 9) {
+            return "backRight";
+        }
+        if (ID == 18 || ID == 7) {
+            return "frontMiddle";
+        } else {
+            return "backMiddle";
         }
     }
 
@@ -142,7 +173,8 @@ public class ElevatorLevelPicker {
 
     public Command setScoredLevel() {
         return Commands.runOnce(() -> {
-            var array = getClosestReef();
+            String reefName = getClosestReefName();
+            var array = nameToReefMap.get(reefName);
 
             for (int i = 0; i < 6; i++) {
                 if (!array[i]) {
@@ -153,23 +185,20 @@ public class ElevatorLevelPicker {
 
             var dash = getDash(array);
 
-            NTHelper.setBooleanArray("/elevatorLevelPicker/back", backLeftReef);
-            NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
-            NTHelper.setDoubleArray("/elevatorLevelPicker/frontDashboard", dash);
-
+            NTHelper.setBooleanArray("/elevatorLevelPicker/" + reefName, array);
+            NTHelper.setDoubleArray("/elevatorLevelPicker/" + reefName + "Dashboard", dash);
         });
     }
 
-    public void setDash(double[] array) {
+    public void setDash(double[] array, boolean[] reef, String key) {
         for (int i = 0; i < array.length; i++) {
             if (array[i] == 1) {
-                frontLeftReef[i] = true;
+                reef[i] = true;
             } else {
-                frontLeftReef[i] = false;
+                reef[i] = false;
             }
         }
-        NTHelper.setBooleanArray("/elevatorLevelPicker/front", frontLeftReef);
-
+        NTHelper.setBooleanArray(key, reef);
     }
 
     public double[] getDash(boolean[] array) {
