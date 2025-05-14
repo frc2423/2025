@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -14,8 +16,10 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 
 import frc.robot.Constants;
 import frc.robot.NTHelper;
-import frc.robot.Constants.Vision;
+import frc.robot.PoseTransformUtils;
+import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.swervedrive.Vision;
 import frc.robot.NTHelper;
 
 public class ElevatorLevelPicker {
@@ -53,6 +57,16 @@ public class ElevatorLevelPicker {
             Map.entry("backLeft", backLeftReef), Map.entry("backRight", backRightReef),
             Map.entry("backMiddle", backMiddleReef));
 
+    Map<String, Integer> nameToIdMapRed = Map.ofEntries(Map.entry("frontLeft", 19),
+            Map.entry("frontRight", 17), Map.entry("frontMiddle", 18),
+            Map.entry("backLeft", 20), Map.entry("backRight", 22),
+            Map.entry("backMiddle", 21));
+
+    Map<String, Integer> nameToIdMapBlue = Map.ofEntries(Map.entry("frontLeft", 6),
+            Map.entry("frontRight", 8), Map.entry("frontMiddle", 7),
+            Map.entry("backLeft", 11), Map.entry("backRight", 9),
+            Map.entry("backMiddle", 10));
+
     public ElevatorLevelPicker(ElevatorSubsystem elevatorSubsystem, SwerveSubsystem swerve) {
 
         this.elevatorSubsystem = elevatorSubsystem;
@@ -75,25 +89,128 @@ public class ElevatorLevelPicker {
 
     }
 
-    public boolean[] getClosestReef() {
+    public String getClosestReefString() {
         int ID = swerve.vision.findClosestTagID(swerve.getPose());
         if (ID == 19 || ID == 6) {
-            return frontLeftReef;
+            return "frontLeft";
         }
         if (ID == 17 || ID == 8) {
-            return frontRightReef;
+            return "frontRightReef";
         }
         if (ID == 20 || ID == 11) {
-            return backLeftReef;
+            return "backLeftReef";
         }
         if (ID == 22 || ID == 9) {
-            return backRightReef;
+            return "backRightReef";
         }
         if (ID == 18 || ID == 7) {
-            return frontMiddleReef;
+            return "frontMiddleReef";
         } else {
-            return backMiddleReef;
+            return "backMiddleReef";
         }
+    }
+
+    public boolean[] getClosestReef() {
+        String name = getClosestReefName();
+        return nameToReefMap.get(name);
+    }
+
+    public boolean reefIsOpen(String name) {
+        boolean[] reef = nameToReefMap.get(name);
+
+        for (boolean bool : reef) {
+            if (bool == false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean reefIsOpen(boolean[] reef) {
+        for (boolean bool : reef) {
+            if (bool == false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public Pose2d getNearestOpenReefPose() {
+        String name = getNearestOpenReefName();
+
+        return Vision.getAprilTagPose(getIdFromReefName(name));
+    }
+
+    public boolean[] getNearestOpenReef() {
+        String name = getNearestOpenReefName();
+
+        return nameToReefMap.get(name);
+    }
+
+    public String getNearestOpenReefName() {
+        String[] options = getAdjacentReefNames();
+        Pose2d pose1 = Vision.getAprilTagPose(getIdFromReefName(options[0]));
+        Pose2d pose2 = Vision.getAprilTagPose(getIdFromReefName(options[1]));
+        String closestPose = getClosestReefName();
+
+        if (reefIsOpen(closestPose)) {
+            return closestPose;
+        }
+
+        if (swerve.getPose().getTranslation().getDistance(pose1.getTranslation()) >= swerve.getPose().getTranslation()
+                .getDistance(pose2.getTranslation())) {
+            if (reefIsOpen(options[1]))
+                return options[1];
+            else
+                return options[0];
+        } else if (swerve.getPose().getTranslation().getDistance(pose1.getTranslation()) < swerve.getPose()
+                .getTranslation()
+                .getDistance(pose2.getTranslation())) {
+            if (reefIsOpen(options[0]))
+                return options[0];
+            else
+                return options[1];
+        }
+
+        return closestPose;
+    }
+
+    public int getIdFromReefName(String name) {
+        if (PoseTransformUtils.isRedAlliance()) {
+            return nameToIdMapRed.get(name);
+        } else {
+            return nameToIdMapBlue.get(name);
+        }
+    }
+
+    public String[] getAdjacentReefNames() {
+        String closestReef = getClosestReefName();
+        int index = indexOfStringArray(closestReef, reefPositionNames);
+        String[] options = { "", "" };
+
+        if (index > 0 && index < 5) {
+            options[0] = reefPositionNames[index - 1];
+            options[1] = reefPositionNames[index + 1];
+        } else if (index == 0) {
+            options[0] = reefPositionNames[5];
+            options[1] = reefPositionNames[1];
+        } else if (index == 5) {
+            options[0] = reefPositionNames[4];
+            options[1] = reefPositionNames[0];
+        }
+
+        return options;
+    }
+
+    public int indexOfStringArray(String string, String[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].equals(string)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public String getClosestReefName() {
