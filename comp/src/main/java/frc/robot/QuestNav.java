@@ -107,16 +107,13 @@ public class QuestNav {
      * Make sure you correctly offset back from the center of your robot first!
      */
     public void setPose(Pose2d pose) {
-        // resetPosePub.set(
-        // new double[] {
-        // pose.getX() - offset.getX(),
-        // pose.getY() - offset.getY(),
-        // pose.getRotation().getDegrees()
-        // }); // here!!
-        // questMosi.set(Command.RESET_POSE);
-        Pose2d questPose = new Pose2d(getTranslation(), getYaw());
-        offset = new Pose2d(pose.minus(questPose).getTranslation(), pose.getRotation().minus(questPose.getRotation()));
-        System.out.println("OFFSET MAMA: " + offset.getX() + ", " + offset.getY());
+        resetPosePub.set(
+                new double[] {
+                        pose.getX() - offset.getX(),
+                        pose.getY() - offset.getY(),
+                        pose.getRotation().getDegrees()
+                }); // here!!
+        questMosi.set(Command.RESET_POSE);
     }
 
     /**
@@ -256,14 +253,10 @@ public class QuestNav {
      * @return The pose as a Pose2d object
      */
     public Pose2d getPose() {
-        Pose2d relativePose = new Pose2d(getTranslation(), getYaw());
-        Transform2d transform = new Transform2d(offset.getTranslation(), offset.getRotation());
-        return relativePose.transformBy(Constants.QuestNavConstants.QUEST_TO_ROBOT.inverse()).transformBy(transform);
-        // Pose2d pose = new Pose2d(getTranslation().plus(offset.getTranslation()),
-        // getYaw().plus(offset.getRotation()));
-        // System.out.println("OFFSET ...: " + offset.getX() + ", " + offset.getY());
+        Pose2d pose = new Pose2d(getTranslation().plus(offset.getTranslation()),
+                getYaw().plus(offset.getRotation()));
 
-        // return pose;
+        return pose;
     }
 
     // public Pose2d getPose(Pose2d pose) {

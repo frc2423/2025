@@ -4,18 +4,25 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants;
 import frc.robot.QuestNav;
 import frc.robot.Robot;
 
 public class QuackNav {
     public QuestNav questNav = new QuestNav();
     private boolean questInitialPose = false;
+
+    private Pose2d questPoseAtReset = Pose2d.kZero;
+    private Pose2d questRelativePoseAtReset = Pose2d.kZero;
+
+    public static final Transform2d QUEST_TO_ROBOT = new Transform2d(Units.inchesToMeters(-2.591),
+            Units.inchesToMeters(-8.013), Rotation2d.k180deg);
 
     public QuackNav() {
         SmartDashboard.putData("/QuackNavCommands/zeroAngle", zeroAngle());
@@ -39,7 +46,6 @@ public class QuackNav {
 
     private Command zeroPose() {
         return Commands.runOnce(() -> {
-            System.out.println("ZERO POSE");
             updateQuestPose(new Pose2d(Math.random() * .001, Math.random() * .001, Rotation2d.kZero));
         });
     }
@@ -70,17 +76,12 @@ public class QuackNav {
 
     public Pose2d getPose() {
         // Get the Quest pose
-        Pose2d questPose = questNav.getPose();
+        Pose2d relativeToReset = questNav.getPose().relativeTo(questRelativePoseAtReset);
+        Pose2d questPose = questPoseAtReset
+                .plus(new Transform2d(relativeToReset.getTranslation(), relativeToReset.getRotation()));
+        Pose2d robotPose = questPose.plus(QUEST_TO_ROBOT);
 
-        if (Robot.isSimulation()) {
-            return questPose;
-        }
-
-        // Transform by the offset to get your final pose!
-        // Pose2d robotPose =
-        // questPose.transformBy(Constants.QuestNavConstants.QUEST_TO_ROBOT.inverse());
-
-        return questPose;
+        return robotPose;
     }
 
     public boolean hasInitialPose() {
@@ -114,8 +115,8 @@ public class QuackNav {
 
         if (isTrustworthy) {
             questInitialPose = true;
-            questNav.setPose(
-                    Robot.isSimulation() ? pose : pose.transformBy(Constants.QuestNavConstants.QUEST_TO_ROBOT));
+            questPoseAtReset = pose.plus(QUEST_TO_ROBOT.inverse());
+            questRelativePoseAtReset = questNav.getPose();
         }
     }
 }

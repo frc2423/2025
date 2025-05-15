@@ -119,11 +119,6 @@ public final class Constants {
         public static final double ZERO = -1; // not real
     }
 
-    public static class QuestNavConstants {
-        public static final Transform2d QUEST_TO_ROBOT = new Transform2d(Units.inchesToMeters(-2.591),
-                Units.inchesToMeters(-8.013), Rotation2d.k180deg);
-    }
-
     public static class AprilTagPoses {
         public static final Rotation2d REEF_TAG_6_Rotation = new Rotation2d(Math.PI / 3);
         public static final Pose2d REEF_TAG_6 = new Pose2d(2.76, 13.786, REEF_TAG_6_Rotation);
