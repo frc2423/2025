@@ -51,18 +51,18 @@ public class ElevatorLevelPicker {
     boolean[] frontMiddleReef = new boolean[6];
     boolean[] backMiddleReef = new boolean[6];
 
-    String[] reefPositionNames = { "frontLeft", "frontRight", "frontMiddle", "backLeft", "backRight", "backMiddle" };
+    String[] reefPositionNames = { "frontLeft", "backLeft", "backMiddle", "backRight", "frontRight", "frontMiddle" };
     Map<String, boolean[]> nameToReefMap = Map.ofEntries(Map.entry("frontLeft", frontLeftReef),
             Map.entry("frontRight", frontRightReef), Map.entry("frontMiddle", frontMiddleReef),
             Map.entry("backLeft", backLeftReef), Map.entry("backRight", backRightReef),
             Map.entry("backMiddle", backMiddleReef));
 
-    Map<String, Integer> nameToIdMapRed = Map.ofEntries(Map.entry("frontLeft", 19),
+    Map<String, Integer> nameToIdMapBlue = Map.ofEntries(Map.entry("frontLeft", 19),
             Map.entry("frontRight", 17), Map.entry("frontMiddle", 18),
             Map.entry("backLeft", 20), Map.entry("backRight", 22),
             Map.entry("backMiddle", 21));
 
-    Map<String, Integer> nameToIdMapBlue = Map.ofEntries(Map.entry("frontLeft", 6),
+    Map<String, Integer> nameToIdMapRed = Map.ofEntries(Map.entry("frontLeft", 6),
             Map.entry("frontRight", 8), Map.entry("frontMiddle", 7),
             Map.entry("backLeft", 11), Map.entry("backRight", 9),
             Map.entry("backMiddle", 10));
@@ -246,7 +246,7 @@ public class ElevatorLevelPicker {
     }
 
     public boolean isRightOpen() {
-        return isRightOpen(getClosestReef());
+        return isRightOpen(getNearestOpenReef());
     }
 
     private ElevatorLevel selectElevatorLevel() {
@@ -285,7 +285,7 @@ public class ElevatorLevelPicker {
     }
 
     public ElevatorLevel getElevatorLevelAuto() {
-        return getElevatorLevelAuto(getClosestReef());
+        return getElevatorLevelAuto(getNearestOpenReef());
     }
 
     public Command setScoredLevel() {

@@ -38,6 +38,7 @@ import swervelib.SwerveInputStream;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.FunnelSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
+import frc.robot.subsystems.Elevator.ElevatorLevelPicker;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
 import frc.robot.subsystems.Intake.IntakeSubsystem;
 import frc.robot.subsystems.LED.KwarqsLed;
@@ -55,25 +56,25 @@ import frc.robot.subsystems.Intake.IntakeCommands;
 public class RobotContainer {
         // Replace with CommandPS4Controller or CommandJoystick if needed
         // final CommandXboxController driverXbox = new CommandXboxController(0);
-        XboxController driverXbox = new XboxController(0);
-        XboxController operator = new XboxController(1);
+        public final XboxController driverXbox = new XboxController(0);
+        public final XboxController operator = new XboxController(1);
         String deployDirectory = (Robot.isSimulation()) ? "sim-swerve/neo" : "swerve";
         // The robot's subsystems and commands are defined here...
-        private final SwerveSubsystem drivebase = new SwerveSubsystem(
+        public final SwerveSubsystem drivebase = new SwerveSubsystem(
                         new File(Filesystem.getDeployDirectory(), deployDirectory));
 
-        IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-        ArmSubsystem arm = new ArmSubsystem();
-        ClimberSubsystem climberSubsystem = new ClimberSubsystem();
-        FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
-        IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
-        ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
-        RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
+        public final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+        public final ArmSubsystem arm = new ArmSubsystem();
+        public final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
+        public final FunnelSubsystem funnelSubsystem = new FunnelSubsystem();
+        public final IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, funnelSubsystem);
+        public final ElevatorSubsystem elevator = new ElevatorSubsystem(arm, intakeCommands);
+        public final RobotTelemetry robotTelemetry = new RobotTelemetry(elevator, arm);
+        public final ElevatorLevelPicker elevatorLevelPicker = new ElevatorLevelPicker(elevator, drivebase);
 
-        SwerveCommands swerveCommands = new SwerveCommands(drivebase, elevator, intakeCommands, arm, intakeSubsystem,
-                        climberSubsystem);
+        public final SwerveCommands swerveCommands = new SwerveCommands(this);
 
-        KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
+        public final KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 
         private static boolean runOnce = false;
 
