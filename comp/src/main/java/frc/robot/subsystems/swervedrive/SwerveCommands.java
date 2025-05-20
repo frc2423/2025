@@ -265,7 +265,10 @@ public class SwerveCommands {
 
         var command = Commands.sequence(
                 Commands.parallel(prepareElevator,
-                        Commands.sequence(new AutoAlignFar(container, 0.6, isRight, tagNumber),
+                        Commands.sequence(new GoToWaypoint(tagNumber, swerve, this, isRight), // new
+                                                                                              // AutoAlignFar(container,
+                                                                                              // 0.6,
+                                // isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
                 intakeCommands.intakeJustOutRun().withTimeout(.5), elevatorLevelPicker.setScoredLevel(),
@@ -273,6 +276,16 @@ public class SwerveCommands {
 
         command.setName("autoScoralClosest");
 
+        return command;
+    }
+
+    public Command autoScoralAdjacent(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
+        Pose2d waypoint = addOffset(Vision.getTagPose(tagNumber.get()), 1, 0);
+        Translation2d translationDiff = waypoint.getTranslation().minus(swerve.getPose().getTranslation());
+        double angle = Math.atan2(translationDiff.getY(), translationDiff.getX());
+        Command goToWaypoint = swerve.driveCommand(() -> translationDiff.getX(), () -> translationDiff.getY(),
+                () -> angle);
+        var command = Commands.sequence(goToWaypoint, autoScoral(tagNumber, elevatorLevelCommand, isRight));
         return command;
     }
 

@@ -27,6 +27,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.AutoAlign;
 import frc.robot.subsystems.swervedrive.AutoAlignPose;
 import frc.robot.subsystems.swervedrive.AutoCommand;
+import frc.robot.subsystems.swervedrive.GoToWaypoint;
 import frc.robot.subsystems.swervedrive.SwerveCommands;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
@@ -73,6 +74,7 @@ public class RobotContainer {
         public final ElevatorLevelPicker elevatorLevelPicker = new ElevatorLevelPicker(elevator, drivebase);
 
         public final SwerveCommands swerveCommands = new SwerveCommands(this);
+        public final GoToWaypoint goToWaypoint = new GoToWaypoint(Optional.empty(), drivebase, swerveCommands);
 
         public final KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 
@@ -396,6 +398,9 @@ public class RobotContainer {
                                 .onFalse(swerveCommands.orbitReefCenter());
 
                 // .onTrue(swerveCommands.orbitReefCenter());
+
+                // new JoystickButton(driverXbox, XboxController.Button.kY.value)
+                // .whileTrue(new GoToWaypoint(Optional.empty(), drivebase, swerveCommands));
 
                 new JoystickButton(driverXbox, XboxController.Button.kA.value)
                                 .whileTrue(Commands.parallel(intakeCommands.eject(), ledKwarqs.isEjectingPOOP(true)))
