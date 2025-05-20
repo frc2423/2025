@@ -18,7 +18,8 @@ public class GoToWaypoint extends Command {
 
     private final SwerveSubsystem swerve;
     private final SwerveCommands swerveCommands;
-    private double dist = .5;
+    private double distLeeway = .0508;
+    private double distance;
     private Pose2d waypoint;
     private Optional<Integer> tagNumber;
     private double diffX;
@@ -51,11 +52,6 @@ public class GoToWaypoint extends Command {
                     Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose())), 1,
                     isRight);
         }
-        Translation2d translationDiff = waypoint.getTranslation().minus(swerve.getPose().getTranslation());
-        diffX = translationDiff.getX() / translationDiff.getNorm();
-        diffY = translationDiff.getY() / translationDiff.getNorm();
-
-        angle = new Rotation2d(Math.atan2(diffX, diffY));
     }
 
     @Override
@@ -72,8 +68,13 @@ public class GoToWaypoint extends Command {
     // }
 
     public void execute() {
+        Translation2d translationDiff = waypoint.getTranslation().minus(swerve.getPose().getTranslation());
+        diffX = translationDiff.getX() / translationDiff.getNorm();
+        diffY = translationDiff.getY() / translationDiff.getNorm();
 
-        double distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
+        angle = new Rotation2d(Math.atan2(diffX, diffY));
+
+        distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
 
         double percent = MathUtil.interpolate(.75, 1, distance / 2);
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(diffX * percent, diffY * percent, waypoint.getRotation());
@@ -88,7 +89,7 @@ public class GoToWaypoint extends Command {
 
     @Override
     public boolean isFinished() {
-        return waypoint.getTranslation().getDistance(swerve.getPose().getTranslation()) < dist;
+        return distance < distLeeway;
     }
 
 }
