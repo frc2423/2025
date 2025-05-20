@@ -74,7 +74,7 @@ public class RobotContainer {
         public final ElevatorLevelPicker elevatorLevelPicker = new ElevatorLevelPicker(elevator, drivebase);
 
         public final SwerveCommands swerveCommands = new SwerveCommands(this);
-        public final GoToWaypoint goToWaypoint = new GoToWaypoint(Optional.empty(), drivebase, swerveCommands);
+        public final GoToWaypoint goToWaypoint = new GoToWaypoint(Optional.empty(), this);
 
         public final KwarqsLed ledKwarqs = new KwarqsLed(swerveCommands.getVisionFromSwerve(), driverXbox);
 

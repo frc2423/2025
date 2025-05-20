@@ -265,9 +265,9 @@ public class SwerveCommands {
 
         var command = Commands.sequence(
                 Commands.parallel(prepareElevator,
-                        Commands.sequence(new GoToWaypoint(tagNumber, swerve, this, isRight), // new
-                                                                                              // AutoAlignFar(container,
-                                                                                              // 0.6,
+                        Commands.sequence(new GoToWaypoint(tagNumber, container, isRight), // new
+                                                                                           // AutoAlignFar(container,
+                                                                                           // 0.6,
                                 // isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
