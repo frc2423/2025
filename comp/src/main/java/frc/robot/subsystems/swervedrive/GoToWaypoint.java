@@ -27,8 +27,8 @@ public class GoToWaypoint extends Command {
     private Optional<Integer> tagNumber;
     private double diffX;
     private double diffY;
-    private Rotation2d angle;
     private boolean isRight;
+    private double dist = .6;
 
     public GoToWaypoint(Optional<Integer> tagNumber, RobotContainer container) {
         this.tagNumber = tagNumber;
@@ -48,12 +48,23 @@ public class GoToWaypoint extends Command {
         addRequirements(swerve);
     }
 
+    public GoToWaypoint(Optional<Integer> tagNumber, RobotContainer container,
+            boolean isRight, double dist) {
+        this.tagNumber = tagNumber;
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.levelPicker = container.elevatorLevelPicker;
+        this.isRight = isRight;
+        this.dist = dist;
+        addRequirements(swerve);
+    }
+
     @Override
     public void initialize() {
         if (tagNumber.isPresent()) {
-            waypoint = swerveCommands.addScoringOffset(Vision.getTagPose(tagNumber.get()), .6, isRight);
+            waypoint = swerveCommands.addScoringOffset(Vision.getTagPose(tagNumber.get()), dist, isRight);
         } else {
-            waypoint = swerveCommands.addScoringOffset(levelPicker.getNearestOpenReefPose(), .6, isRight);
+            waypoint = swerveCommands.addScoringOffset(levelPicker.getNearestOpenReefPose(), dist, isRight);
         }
     }
 
@@ -63,11 +74,9 @@ public class GoToWaypoint extends Command {
         diffX = translationDiff.getX() / translationDiff.getNorm();
         diffY = translationDiff.getY() / translationDiff.getNorm();
 
-        angle = new Rotation2d(Math.atan2(diffX, diffY));
-
         distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
 
-        double percent = MathUtil.interpolate(.5, 1, distance / 2);
+        double percent = MathUtil.interpolate(.5, 1, distance / 1.2);
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(diffX * percent, diffY * percent, waypoint.getRotation());
 
         swerve.driveFieldOriented(desiredSpeeds);

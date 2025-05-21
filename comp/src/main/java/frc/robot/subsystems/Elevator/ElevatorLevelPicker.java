@@ -137,6 +137,10 @@ public class ElevatorLevelPicker {
         return false;
     }
 
+    public boolean closestReefIsOpen() {
+        return reefIsOpen(getClosestReef());
+    }
+
     public Pose2d getNearestOpenReefPose() {
         String name = getNearestOpenReefName();
 

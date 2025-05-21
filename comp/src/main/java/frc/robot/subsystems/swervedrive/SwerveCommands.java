@@ -263,11 +263,18 @@ public class SwerveCommands {
                     return armSubsystem.isAtSetpoint();
                 }));
 
+        var optionalWaypoint = Commands.either(
+                new GoToWaypoint(tagNumber, container, isRight, 1.5),
+                Commands.none(),
+                () -> !container.elevatorLevelPicker.closestReefIsOpen());
+
         var command = Commands.sequence(
                 Commands.parallel(prepareElevator,
-                        Commands.sequence(new GoToWaypoint(tagNumber, container, isRight), // new
-                                                                                           // AutoAlignFar(container,
-                                                                                           // 0.6,
+                        Commands.sequence(
+                                optionalWaypoint,
+                                new GoToWaypoint(tagNumber, container, isRight), // new
+                                                                                 // AutoAlignFar(container,
+                                                                                 // 0.6,
                                 // isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
@@ -279,15 +286,21 @@ public class SwerveCommands {
         return command;
     }
 
-    public Command autoScoralAdjacent(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
-        Pose2d waypoint = addOffset(Vision.getTagPose(tagNumber.get()), 1, 0);
-        Translation2d translationDiff = waypoint.getTranslation().minus(swerve.getPose().getTranslation());
-        double angle = Math.atan2(translationDiff.getY(), translationDiff.getX());
-        Command goToWaypoint = swerve.driveCommand(() -> translationDiff.getX(), () -> translationDiff.getY(),
-                () -> angle);
-        var command = Commands.sequence(goToWaypoint, autoScoral(tagNumber, elevatorLevelCommand, isRight));
-        return command;
-    }
+    // public Command autoScoralAdjacent(Optional<Integer> tagNumber, Command
+    // elevatorLevelCommand, boolean isRight) {
+    // Command waypoint = Commands.either(
+    // Commands.sequence(new GoToWaypoint(tagNumber, container, isRight, 3),
+    // new GoToWaypoint(tagNumber, container, isRight)),
+    // new GoToWaypoint(tagNumber, container, isRight),
+    // () -> !container.elevatorLevelPicker.closestReefIsOpen());
+    // Command autoAlignNearCommand = Commands.either(new AutoAlignNear(container,
+    // 0.51, isRight, tagNumber),
+    // new AutoAlignNear(container, 0.47, isRight, tagNumber), () ->
+    // elevatorSubsystem.getSetpoint() > 50)
+    // .withTimeout(2);
+    // var command = Commands.sequence(waypoint, autoAlignNearCommand);
+    // return command;
+    // }
 
     public Command autoHPIntake(Optional<Boolean> isRight) {
         Command autoAlignHPCommand = new AutoAlignHP(swerve, this, isRight);
