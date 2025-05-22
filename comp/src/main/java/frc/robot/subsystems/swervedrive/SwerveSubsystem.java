@@ -44,6 +44,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.NTHelper;
+import frc.robot.subsystems.QuackNav;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
@@ -97,6 +99,8 @@ public class SwerveSubsystem extends SubsystemBase {
   public Vision vision;
 
   private static Map<String, AutoCommand> autoStuff = new HashMap<>();
+
+  private QuackNav questNav = new QuackNav();
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -190,15 +194,27 @@ public class SwerveSubsystem extends SubsystemBase {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
+  public boolean isInRange() {
+    return (Vision.getAprilTagPose(vision.findClosestTagID(getPose())).getTranslation()
+        .getDistance(getPose().getTranslation()) < 1);
+  }
+
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest) {
+    vision.updatePoseEstimation(swerveDrive, questNav);
+    if (!questNav.isQuestMode()) {
       swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
     }
-
+    // } else {
+    // if (visionDriveTest) {
+    // vision.updatePoseEstimation(swerveDrive);
+    // }
+    // }
     vision.logCameras();
+    questNav.periodic();
+
+    NTHelper.setPose("/SmartDashboard/swerveSubsystem/questPose", questNav.getPose());
   }
 
   public void addCameraInput(Pose2d visionPose, double timestamp, Matrix<N3, N1> standardDeviations) {
@@ -677,7 +693,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return The robot's pose
    */
   public Pose2d getPose() {
-    return swerveDrive.getPose();
+    return swerveDrive.getPose(); // yomama
   }
 
   /**
@@ -894,7 +910,10 @@ public class SwerveSubsystem extends SubsystemBase {
     builder.addDoubleProperty("PoseHeading", () -> getPose().getRotation().getDegrees(), null);
     builder.addBooleanProperty("isLEDRing", () -> pdh.getSwitchableChannel(),
         (value) -> pdh.setSwitchableChannel(value));
-
+    builder.addBooleanProperty("questNavMode", () -> questNav.isQuestMode(), null);
+    builder.addBooleanProperty("questHasInitialPose", () -> questNav.hasInitialPose(), null);
+    builder.addBooleanProperty("questIsConnected", () -> questNav.isConnected(), null);
+    builder.addDoubleProperty("questBatteryPercent", () -> questNav.getBatteryPercent(), null);
   }
 
 }

@@ -38,6 +38,7 @@ import java.util.Optional;
 import swervelib.SwerveInputStream;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.FunnelSubsystem;
+import frc.robot.subsystems.QuackNav;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorLevelPicker;
 import frc.robot.subsystems.Elevator.ElevatorSubsystem;
