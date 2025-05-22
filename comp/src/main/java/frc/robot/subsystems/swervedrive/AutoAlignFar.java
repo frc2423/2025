@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.RobotContainer;
+import frc.robot.subsystems.Elevator.ElevatorLevelPicker;
 
 public class AutoAlignFar extends Command {
     private Pose2d pose;
@@ -15,6 +17,7 @@ public class AutoAlignFar extends Command {
     private double dist;
     private SwerveCommands swerveCommands;
     private SwerveSubsystem swerve;
+    private ElevatorLevelPicker elevatorLevelPicker;
     private boolean isAlgae = false;
     private Optional<Supplier<Pose2d>> climbPose = Optional.empty();
 
@@ -23,38 +26,42 @@ public class AutoAlignFar extends Command {
     private Optional<Integer> tagNumber = Optional.empty();
     private Timer timerY = new Timer();
 
-    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight) {
+    public AutoAlignFar(RobotContainer container, double dist, boolean isRight) {
         this.isRight = isRight;
         this.dist = dist;
-        this.swerve = swerve;
-        this.swerveCommands = swerveCommands;
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.elevatorLevelPicker = container.elevatorLevelPicker;
         this.addRequirements(swerve);
     }
 
-    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist, boolean isRight,
+    public AutoAlignFar(RobotContainer container, double dist, boolean isRight,
             Optional<Integer> tagNumber) {
         this.isRight = isRight;
         this.dist = dist;
-        this.swerve = swerve;
-        this.swerveCommands = swerveCommands;
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.elevatorLevelPicker = container.elevatorLevelPicker;
         this.tagNumber = tagNumber;
         this.addRequirements(swerve);
     }
 
-    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist,
+    public AutoAlignFar(RobotContainer container, double dist,
             Optional<Integer> tagNumber) {
         this.isAlgae = true;
         this.dist = dist;
-        this.swerve = swerve;
-        this.swerveCommands = swerveCommands;
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.elevatorLevelPicker = container.elevatorLevelPicker;
         this.tagNumber = tagNumber;
         this.addRequirements(swerve);
     }
 
-    public AutoAlignFar(SwerveSubsystem swerve, SwerveCommands swerveCommands, Supplier<Pose2d> climberPoseSupplier) {
+    public AutoAlignFar(RobotContainer container, Supplier<Pose2d> climberPoseSupplier) {
         this.isAlgae = true;
-        this.swerve = swerve;
-        this.swerveCommands = swerveCommands;
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.elevatorLevelPicker = container.elevatorLevelPicker;
         this.addRequirements(swerve);
         this.climbPose = Optional.of(climberPoseSupplier);
     }
@@ -64,7 +71,7 @@ public class AutoAlignFar extends Command {
         if (tagNumber.isPresent()) {
             pose = Vision.getTagPose(tagNumber.get());
         } else if (climbPose.isEmpty()) {
-            pose = Vision.getTagPose(swerve.vision.findClosestTagID(swerve.getPose()));
+            pose = elevatorLevelPicker.getNearestOpenReefPose();
         } else {
             pose = climbPose.get().get();
         }
@@ -106,8 +113,14 @@ public class AutoAlignFar extends Command {
         if (yDistance < Units.inchesToMeters(2)) {
             reachedY = true;
         }
+        if (Math.abs(yDistance) > Math.abs(xDistance)) {
+            swerveCommands.actuallyMoveToFar(pose2d, false, !reachedY/* timerY.get() <= 0.5 */);
 
-        swerveCommands.actuallyMoveToFar(pose2d, !reachedX, !reachedY/* timerY.get() <= 0.5 */);
+        } else {
+
+            swerveCommands.actuallyMoveToFar(pose2d, !reachedX, !reachedY/* timerY.get() <= 0.5 */);
+        }
+
     }
 
     @Override

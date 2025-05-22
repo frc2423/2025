@@ -481,6 +481,21 @@ public class SwerveSubsystem extends SubsystemBase {
         .forEach(it -> it.setAngle(0.0)));
   }
 
+  public Command pointModulesFieldOriented(Rotation2d fieldRelativeAngle) {
+    return Commands.run(() -> {
+      // Get the robot's current heading
+      Rotation2d robotHeading = getHeading();
+
+      // Convert field-relative angle to robot-relative angle
+      // by subtracting the robot's heading from the desired field angle
+      Rotation2d robotRelativeAngle = fieldRelativeAngle.minus(robotHeading);
+
+      // Set all modules to the calculated robot-relative angle
+      Arrays.asList(swerveDrive.getModules())
+          .forEach(module -> module.setAngle(robotRelativeAngle.getRadians()));
+    });
+  }
+
   /**
    * Returns a Command that drives the swerve drive to a specific distance at a
    * given speed.
@@ -785,6 +800,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
     return swerveDrive.swerveController.getTargetSpeeds(scaledInputs.getX(),
         scaledInputs.getY(),
+        angle.getRadians(),
+        getHeading().getRadians(),
+        Constants.MAX_SPEED);
+  }
+
+  public ChassisSpeeds getTargetSpeedsUnscaled(double xInput, double yInput, Rotation2d angle) {
+
+    return swerveDrive.swerveController.getTargetSpeeds(xInput,
+        yInput,
         angle.getRadians(),
         getHeading().getRadians(),
         Constants.MAX_SPEED);
