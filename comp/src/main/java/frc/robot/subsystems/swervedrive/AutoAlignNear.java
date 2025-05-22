@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import frc.robot.AngleUtils;
 import frc.robot.RobotContainer;
@@ -131,5 +132,10 @@ public class AutoAlignNear extends Command {
                 Rotation2d.fromDegrees(3));
 
         return reachedY && reachedX && isAngleClose;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        swerve.drive(new ChassisSpeeds());
     }
 }

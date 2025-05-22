@@ -216,21 +216,27 @@ public class SwerveCommands {
     }
 
     public Pose2d getAutoIntakePose() {
+        Translation2d robotPos = swerve.getPose().getTranslation();
+        double redLeftDist = Vision.getAprilTagPose(1).getTranslation().getDistance(robotPos);
+        double redRightDist = Vision.getAprilTagPose(2).getTranslation().getDistance(robotPos);
+        double blueLeftDist = Vision.getAprilTagPose(13).getTranslation().getDistance(robotPos);
+        double blueRightDist = Vision.getAprilTagPose(12).getTranslation().getDistance(robotPos);
+
+        int aprilTagId;
+        boolean isLeft = false;
+
         if (PoseTransformUtils.isRedAlliance()) {
-            if (Vision.getAprilTagPose(1).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
-                    .getAprilTagPose(2).getTranslation().getDistance(swerve.getPose().getTranslation())) {
-                return new Pose2d(16.040, 7.280, Vision.getAprilTagPose(2).getRotation()); // go to 2
-            } else {
-                return new Pose2d(16.040, 0.698, Vision.getAprilTagPose(1).getRotation()); // go to 1
-            }
+            isLeft = redLeftDist < redRightDist;
+            aprilTagId = isLeft ? 1 : 2;
         } else {
-            if (Vision.getAprilTagPose(13).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
-                    .getAprilTagPose(12).getTranslation().getDistance(swerve.getPose().getTranslation())) {
-                return new Pose2d(1.570, 0.680, Vision.getAprilTagPose(12).getRotation()); // go to 12
-            } else {
-                return new Pose2d(1.570, 7.376, Vision.getAprilTagPose(13).getRotation()); // go to 13
-            }
+            isLeft = blueLeftDist < blueRightDist;
+            aprilTagId = isLeft ? 13 : 12;
         }
+
+        double yOffset = isLeft ? .3 : -.3;
+        Pose2d pose = Vision.getAprilTagPose(aprilTagId).plus(new Transform2d(.2, yOffset, Rotation2d.kZero));
+
+        return pose;
     }
 
     public Command autoAlignAndIntakeHP() {
@@ -253,7 +259,7 @@ public class SwerveCommands {
                 intakeCommands.in(),
                 Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
                         (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
-                                : new Translation2d(4.507, 4.031)) < 2),
+                                : new Translation2d(4.507, 4.031)) < 3.5),
                 elevatorLevelCommand,
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
