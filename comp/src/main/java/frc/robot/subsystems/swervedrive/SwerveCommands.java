@@ -235,7 +235,7 @@ public class SwerveCommands {
 
     public Command autoAlignAndIntakeHP() {
         Command command = Commands.parallel(
-                Commands.sequence(new AutoAlignFar(container, this::getAutoIntakePose),
+                Commands.sequence(new GoToWaypoint(container, this::getAutoIntakePose),
                         new AutoAlignNear(container, this::getAutoIntakePose)),
                 elevatorSubsystem.goDownAndIntake());
         command.setName("autoAlignHP");

@@ -23,7 +23,7 @@ function ReefFace(props: ReefFaceProps) {
         "repeat(3, auto)" /* Creates 3 rows with automatic height */,
       gap: "5px" /* Sets a 5px gap between both rows and columns */,
       position: "absolute",
-      transform: `translate(${x}px,${y}px) rotate(${angle + Math.PI / 2}rad)`
+      transform: `translate(${x}px,${y}px) rotate(${angle - Math.PI / 2}rad)`
     }}
   >
     {(props.values ?? []).map((value, index) => {

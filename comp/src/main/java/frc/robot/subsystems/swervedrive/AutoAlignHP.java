@@ -26,12 +26,6 @@ public class AutoAlignHP extends Command {
     private Optional<Boolean> isRight = Optional.empty();
     private double offsetY = 0;
 
-    // private final static int FILTER_SIZE = 10;
-    // MedianFilter xDistanceFilter = new MedianFilter(FILTER_SIZE);
-    // MedianFilter yDistanceFilter = new MedianFilter(FILTER_SIZE);
-    // MedianFilter targetAngleFilter = new MedianFilter(FILTER_SIZE);
-    // MedianFilter swerveAngleFilter = new MedianFilter(FILTER_SIZE);
-
     public AutoAlignHP(SwerveSubsystem swerve, SwerveCommands swerveCommands, Optional<Boolean> isRight) {
         this.isRight = isRight;
         this.swerve = swerve;
@@ -73,16 +67,6 @@ public class AutoAlignHP extends Command {
         }
 
         waypoint = swerveCommands.addOffset(pose, dist, offsetY);
-        // xDistanceFilter.reset();
-        // yDistanceFilter.reset();
-        // targetAngleFilter.reset();
-        // swerveAngleFilter.reset();
-        // for (double i = 0; i < FILTER_SIZE; i++) {
-        // xDistanceFilter.calculate(100000);
-        // yDistanceFilter.calculate(100000);
-        // targetAngleFilter.calculate(100000);
-        // swerveAngleFilter.calculate(100000);
-        // }
     }
 
     @Override
@@ -91,10 +75,13 @@ public class AutoAlignHP extends Command {
         diffX = translationDiff.getX() / translationDiff.getNorm();
         diffY = translationDiff.getY() / translationDiff.getNorm();
 
+        System.out.println(diffX * diffX + diffY * diffY);
+
         distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
 
         double percent = MathUtil.interpolate(.5, 1, distance / 2);
-        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(diffX * percent, diffY * percent, waypoint.getRotation());
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeedsUnscaled(diffX * percent, diffY * percent,
+                waypoint.getRotation());
 
         swerve.driveFieldOriented(desiredSpeeds);
     }
@@ -106,23 +93,6 @@ public class AutoAlignHP extends Command {
 
     @Override
     public boolean isFinished() {
-        // Pose2d targetPose = swerveCommands.addOffset(pose, dist, offsetY);// .55
-
-        // double averageXDistance =
-        // xDistanceFilter.calculate(Math.abs(targetPose.getX() -
-        // swerve.getPose().getX()));
-        // double averageYDistance =
-        // yDistanceFilter.calculate(Math.abs(targetPose.getY() -
-        // swerve.getPose().getY()));
-        // double averageTargetPose =
-        // targetAngleFilter.calculate(targetPose.getRotation().getRadians());
-        // double averageSwervePose =
-        // swerveAngleFilter.calculate(swerve.getPose().getRotation().getRadians());
-        // boolean isAngleClose = AngleUtils.areAnglesClose(new
-        // Rotation2d(averageTargetPose),
-        // new Rotation2d(averageSwervePose),
-        // Rotation2d.fromDegrees(4));
-
         return distance < Units.inchesToMeters(2);
     }
 }

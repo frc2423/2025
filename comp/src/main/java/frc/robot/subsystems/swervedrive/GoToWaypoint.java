@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swervedrive;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -24,11 +25,12 @@ public class GoToWaypoint extends Command {
     private double distLeeway = .0508;
     private double distance;
     private Pose2d waypoint;
-    private Optional<Integer> tagNumber;
+    private Optional<Integer> tagNumber = Optional.empty();
     private double diffX;
     private double diffY;
     private boolean isRight;
     private double dist = .6;
+    private Optional<Supplier<Pose2d>> poseSupplier = Optional.empty();
 
     public GoToWaypoint(Optional<Integer> tagNumber, RobotContainer container) {
         this.tagNumber = tagNumber;
@@ -59,10 +61,20 @@ public class GoToWaypoint extends Command {
         addRequirements(swerve);
     }
 
+    public GoToWaypoint(RobotContainer container, Supplier<Pose2d> poseSupplier) {
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.levelPicker = container.elevatorLevelPicker;
+        this.addRequirements(swerve);
+        this.poseSupplier = Optional.of(poseSupplier);
+    }
+
     @Override
     public void initialize() {
         if (tagNumber.isPresent()) {
             waypoint = swerveCommands.addScoringOffset(Vision.getTagPose(tagNumber.get()), dist, isRight);
+        } else if (!this.poseSupplier.isEmpty()) {
+            waypoint = this.poseSupplier.get().get();
         } else {
             waypoint = swerveCommands.addScoringOffset(levelPicker.getNearestOpenReefPose(), dist, isRight);
         }
@@ -77,7 +89,8 @@ public class GoToWaypoint extends Command {
         distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
 
         double percent = MathUtil.interpolate(.5, 1, distance / 1.2);
-        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeeds(diffX * percent, diffY * percent, waypoint.getRotation());
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeedsUnscaled(diffX * percent, diffY * percent,
+                waypoint.getRotation());
 
         swerve.driveFieldOriented(desiredSpeeds);
     }
