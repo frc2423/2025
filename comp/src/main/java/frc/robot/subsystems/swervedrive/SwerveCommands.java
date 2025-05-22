@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import frc.robot.PoseTransformUtils;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Elevator.ElevatorLevelPicker;
@@ -49,23 +50,23 @@ public class SwerveCommands {
     private IntakeSubsystem intakesubsystem;
     private ClimberSubsystem climberSubsystem;
     private ElevatorLevelPicker elevatorLevelPicker;
-
     private ElevatorSubsystem elevatorSubsystem;
+    private final RobotContainer container;
+
     private XboxController driverXbox = new XboxController(0);
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
 
     ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
 
-    public SwerveCommands(SwerveSubsystem swerve, ElevatorSubsystem elevatorSubsystem,
-            IntakeCommands intakeCommands, ArmSubsystem armSubsystem, IntakeSubsystem intakesubsystem,
-            ClimberSubsystem climberSubsystem) {
-        this.intakesubsystem = intakesubsystem;
-        this.elevatorLevelPicker = new ElevatorLevelPicker(elevatorSubsystem, swerve);
-        this.swerve = swerve;
-        this.elevatorSubsystem = elevatorSubsystem;
-        this.intakeCommands = intakeCommands;
-        this.armSubsystem = armSubsystem;
-        this.climberSubsystem = climberSubsystem;
+    public SwerveCommands(RobotContainer container) {
+        this.container = container;
+        this.intakesubsystem = container.intakeSubsystem;
+        this.elevatorLevelPicker = container.elevatorLevelPicker;
+        this.swerve = container.drivebase;
+        this.elevatorSubsystem = container.elevator;
+        this.intakeCommands = container.intakeCommands;
+        this.armSubsystem = container.arm;
+        this.climberSubsystem = container.climberSubsystem;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
         SmartDashboard.putData("climbChooser", climbPositionChooser);
 
@@ -80,11 +81,6 @@ public class SwerveCommands {
 
     public Vision getVisionFromSwerve() {
         return swerve.vision;
-    }
-
-    // The enum used as keys for selecting the command to run.
-    private enum ElevatorLevel {
-        T, L2, L3, L4
     }
 
     // An example selector method for the selectcommand. Returns the selector that
@@ -158,9 +154,9 @@ public class SwerveCommands {
         // Command dunkIt =
         // Commands.sequence(armSubsystem.goToSetpoint(Constants.ArmConstants.ALGAE_DUNK),
         // intakeCommands.intakeAlgae());
-        Command autoAlignCommand1 = new AutoAlignFar(swerve, this, .6, Optional.empty()); // yo yo auto align
-        Command autoAlignCommand2 = new AutoAlignNear(swerve, this, .4, Optional.empty());
-        Command autoAlignCommand3 = new AutoAlignNear(swerve, this, .6, Optional.empty());
+        Command autoAlignCommand1 = new AutoAlignFar(container, .6, Optional.empty()); // yo yo auto align
+        Command autoAlignCommand2 = new AutoAlignNear(container, .4, Optional.empty());
+        Command autoAlignCommand3 = new AutoAlignNear(container, .6, Optional.empty());
 
         var command = Commands.sequence(
                 Commands.deadline(
@@ -210,8 +206,8 @@ public class SwerveCommands {
 
     public Command autoAlignClimb() {
         Command command = Commands.sequence(
-                new AutoAlignFar(swerve, this, this::getCloserClimbPose2d),
-                Commands.parallel(new AutoAlignNear(swerve, this, this::getClimbPose2d), climberSubsystem.deClimb()),
+                new AutoAlignFar(container, this::getCloserClimbPose2d),
+                Commands.parallel(new AutoAlignNear(container, this::getClimbPose2d), climberSubsystem.deClimb()),
                 new MoveForward(swerve, Units.inchesToMeters(9), -.35),
                 Commands.waitSeconds(2),
                 Commands.either(climberSubsystem.climb(), Commands.none(), climberSubsystem::limitSwitch));
@@ -220,27 +216,33 @@ public class SwerveCommands {
     }
 
     public Pose2d getAutoIntakePose() {
+        Translation2d robotPos = swerve.getPose().getTranslation();
+        double redLeftDist = Vision.getAprilTagPose(1).getTranslation().getDistance(robotPos);
+        double redRightDist = Vision.getAprilTagPose(2).getTranslation().getDistance(robotPos);
+        double blueLeftDist = Vision.getAprilTagPose(13).getTranslation().getDistance(robotPos);
+        double blueRightDist = Vision.getAprilTagPose(12).getTranslation().getDistance(robotPos);
+
+        int aprilTagId;
+        boolean isLeft = false;
+
         if (PoseTransformUtils.isRedAlliance()) {
-            if (Vision.getAprilTagPose(1).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
-                    .getAprilTagPose(2).getTranslation().getDistance(swerve.getPose().getTranslation())) {
-                return new Pose2d(16.040, 7.280, Vision.getAprilTagPose(2).getRotation()); // go to 2
-            } else {
-                return new Pose2d(16.040, 0.698, Vision.getAprilTagPose(1).getRotation()); // go to 1
-            }
+            isLeft = redLeftDist < redRightDist;
+            aprilTagId = isLeft ? 1 : 2;
         } else {
-            if (Vision.getAprilTagPose(13).getTranslation().getDistance(swerve.getPose().getTranslation()) >= Vision
-                    .getAprilTagPose(12).getTranslation().getDistance(swerve.getPose().getTranslation())) {
-                return new Pose2d(1.570, 0.680, Vision.getAprilTagPose(12).getRotation()); // go to 12
-            } else {
-                return new Pose2d(1.570, 7.376, Vision.getAprilTagPose(13).getRotation()); // go to 13
-            }
+            isLeft = blueLeftDist < blueRightDist;
+            aprilTagId = isLeft ? 13 : 12;
         }
+
+        double yOffset = isLeft ? .3 : -.3;
+        Pose2d pose = Vision.getAprilTagPose(aprilTagId).plus(new Transform2d(.2, yOffset, Rotation2d.kZero));
+
+        return pose;
     }
 
     public Command autoAlignAndIntakeHP() {
         Command command = Commands.parallel(
-                Commands.sequence(new AutoAlignFar(swerve, this, this::getAutoIntakePose),
-                        new AutoAlignNear(swerve, this, this::getAutoIntakePose)),
+                Commands.sequence(new GoToWaypoint(container, this::getAutoIntakePose),
+                        new AutoAlignNear(container, this::getAutoIntakePose)),
                 elevatorSubsystem.goDownAndIntake());
         command.setName("autoAlignHP");
         return command;
@@ -249,15 +251,15 @@ public class SwerveCommands {
     public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
-        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(swerve, this, 0.51, isRight, tagNumber),
-                new AutoAlignNear(swerve, this, 0.47, isRight, tagNumber),
+        Command autoAlignNearCommand = Commands.either(new AutoAlignNear(container, 0.51, isRight, tagNumber),
+                new AutoAlignNear(container, 0.47, isRight, tagNumber),
                 () -> elevatorSubsystem.getSetpoint() > 50).withTimeout(2);
 
         Command prepareElevator = Commands.sequence(
                 intakeCommands.in(),
                 Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
                         (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
-                                : new Translation2d(4.507, 4.031)) < 2),
+                                : new Translation2d(4.507, 4.031)) < 3.5),
                 elevatorLevelCommand,
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
@@ -267,9 +269,19 @@ public class SwerveCommands {
                     return armSubsystem.isAtSetpoint();
                 }));
 
+        var optionalWaypoint = Commands.either(
+                new GoToWaypoint(tagNumber, container, isRight, 1.5),
+                Commands.none(),
+                () -> !container.elevatorLevelPicker.closestReefIsOpen());
+
         var command = Commands.sequence(
                 Commands.parallel(prepareElevator,
-                        Commands.sequence(new AutoAlignFar(swerve, this, 0.6, isRight, tagNumber),
+                        Commands.sequence(
+                                optionalWaypoint,
+                                new GoToWaypoint(tagNumber, container, isRight), // new
+                                                                                 // AutoAlignFar(container,
+                                                                                 // 0.6,
+                                // isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
                 intakeCommands.intakeJustOutRun().withTimeout(.5), elevatorLevelPicker.setScoredLevel(),
@@ -279,6 +291,22 @@ public class SwerveCommands {
 
         return command;
     }
+
+    // public Command autoScoralAdjacent(Optional<Integer> tagNumber, Command
+    // elevatorLevelCommand, boolean isRight) {
+    // Command waypoint = Commands.either(
+    // Commands.sequence(new GoToWaypoint(tagNumber, container, isRight, 3),
+    // new GoToWaypoint(tagNumber, container, isRight)),
+    // new GoToWaypoint(tagNumber, container, isRight),
+    // () -> !container.elevatorLevelPicker.closestReefIsOpen());
+    // Command autoAlignNearCommand = Commands.either(new AutoAlignNear(container,
+    // 0.51, isRight, tagNumber),
+    // new AutoAlignNear(container, 0.47, isRight, tagNumber), () ->
+    // elevatorSubsystem.getSetpoint() > 50)
+    // .withTimeout(2);
+    // var command = Commands.sequence(waypoint, autoAlignNearCommand);
+    // return command;
+    // }
 
     public Command autoHPIntake(Optional<Boolean> isRight) {
         Command autoAlignHPCommand = new AutoAlignHP(swerve, this, isRight);
@@ -335,16 +363,20 @@ public class SwerveCommands {
         // return autoScoral(tagNumber, elevatorSubsystem.goToSetpoint(setpoint),
         // isRight);
 
-    }
+    }// here
 
     public Command autoScoralClosest(boolean isRight) {
         return autoScoral(Optional.empty(), elevatorLevelPicker.getElevatorLevelCommand(), isRight);
     }
 
     public Command autoScoralClosestAuto() {
-        Command scoreLeft = autoScoral(Optional.empty(), elevatorLevelPicker.getElevatorLevelCommandAuto(),
+        Command scoreLeft = autoScoral(
+                Optional.empty(),
+                elevatorLevelPicker.getElevatorLevelCommandAuto(),
                 true);
-        Command scoreRight = autoScoral(Optional.empty(), elevatorLevelPicker.getElevatorLevelCommandAuto(),
+        Command scoreRight = autoScoral(
+                Optional.empty(),
+                elevatorLevelPicker.getElevatorLevelCommandAuto(),
                 false);
 
         Command whichSide = Commands.either(scoreLeft, scoreRight, () -> elevatorLevelPicker.isRightOpen());
