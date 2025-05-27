@@ -197,9 +197,7 @@ public class Vision {
               QUESTNAV_STD_DEVS);
         }
 
-        if (!quackNav.hasInitialPose()) {
-          quackNav.updateQuestPose(pose.estimatedPose.toPose2d(), camera.curStdDevs);
-        }
+        quackNav.updateQuestPose(swerveDrive.getPose(), camera.curStdDevs);
 
         var stdDev = camera.curStdDevs;
         NTHelper.setDouble("/swerveSubsystem/vision/stdDevX", stdDev.get(0, 0));

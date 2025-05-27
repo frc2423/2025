@@ -194,25 +194,18 @@ public class SwerveSubsystem extends SubsystemBase {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
-  public boolean isInRange() {
-    return (Vision.getAprilTagPose(vision.findClosestTagID(getPose())).getTranslation()
-        .getDistance(getPose().getTranslation()) < 1);
-  }
-
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
-    vision.updatePoseEstimation(swerveDrive, questNav);
-    if (!questNav.isQuestMode()) {
+    if (visionDriveTest) {
       swerveDrive.updateOdometry();
+      vision.updatePoseEstimation(swerveDrive, questNav);
     }
-    // } else {
-    // if (visionDriveTest) {
-    // vision.updatePoseEstimation(swerveDrive);
-    // }
-    // }
+
     vision.logCameras();
     questNav.periodic();
+
+    swerveDrive.field.getObject("questNavPose").setPose(questNav.getPose());
 
     NTHelper.setPose("/SmartDashboard/swerveSubsystem/questPose", questNav.getPose());
   }
@@ -693,7 +686,10 @@ public class SwerveSubsystem extends SubsystemBase {
    * @return The robot's pose
    */
   public Pose2d getPose() {
-    return swerveDrive.getPose(); // yomama
+    if (questNav.isQuestMode()) {
+      return questNav.getPose();
+    }
+    return swerveDrive.getPose();
   }
 
   /**
