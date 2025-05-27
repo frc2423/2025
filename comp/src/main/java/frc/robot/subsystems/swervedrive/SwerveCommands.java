@@ -259,7 +259,7 @@ public class SwerveCommands {
                 intakeCommands.in(),
                 Commands.waitUntil(() -> swerve.getPose().getTranslation().getDistance(
                         (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
-                                : new Translation2d(4.507, 4.031)) < 3.5),
+                                : new Translation2d(4.507, 4.031)) < 2.75),
                 elevatorLevelCommand,
                 Commands.waitUntil(() -> {
                     return elevatorSubsystem.isAtSetpoint();
