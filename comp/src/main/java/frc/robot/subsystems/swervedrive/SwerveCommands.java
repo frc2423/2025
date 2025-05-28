@@ -190,11 +190,11 @@ public class SwerveCommands {
             case "Blue right (reef)":
                 return new Pose2d(7.121 - offset, 5.075, Rotation2d.fromDegrees(-90));
             case "Red left (wall)":
-                return new Pose2d(10.441 + offset, 3, Rotation2d.fromDegrees(90));
+                return new Pose2d(9.116450 + offset, 2.1413 - 1.067, Rotation2d.fromDegrees(90));
             case "Red middle":
-                return new Pose2d(10.441 + offset, 1.885, Rotation2d.fromDegrees(90));
+                return new Pose2d(9.116450 + offset, 2.1413, Rotation2d.fromDegrees(90));
             case "Red right (reef)":
-                return new Pose2d(10.441 + offset, 0.806, Rotation2d.fromDegrees(90));
+                return new Pose2d(9.116450 + offset, 2.1413 + 1.067, Rotation2d.fromDegrees(90));
             default:
                 return new Pose2d(7.121 - offset, 7.280, Rotation2d.fromDegrees(-90));
         }
@@ -205,7 +205,7 @@ public class SwerveCommands {
     }
 
     public Pose2d getCloserClimbPose2d() {
-        return getClimbPose2d(.5);
+        return getClimbPose2d(1);
     }
 
     public Command autoAlignClimb() {
