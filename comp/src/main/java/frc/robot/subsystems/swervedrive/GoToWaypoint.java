@@ -88,7 +88,7 @@ public class GoToWaypoint extends Command {
 
         distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
 
-        double percent = MathUtil.interpolate(.3, 1, distance / 2);
+        double percent = MathUtil.interpolate(.2, .9, distance / 1);
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeedsUnscaled(diffX * percent, diffY * percent,
                 waypoint.getRotation());
 
