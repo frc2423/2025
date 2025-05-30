@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.NTHelper;
 import frc.robot.Robot;
+import frc.robot.subsystems.QuackNav;
+
 import java.awt.Desktop;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +48,9 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+
+import com.ctre.phoenix6.Utils;
+
 import swervelib.SwerveDrive;
 import swervelib.telemetry.SwerveDriveTelemetry;
 
@@ -150,7 +155,7 @@ public class Vision {
    * @param swerveDrive
    *          {@link SwerveDrive} instance.
    */
-  public void updatePoseEstimation(SwerveDrive swerveDrive) {
+  public void updatePoseEstimation(SwerveDrive swerveDrive, QuackNav quackNav) {
     if (SwerveDriveTelemetry.isSimulation && swerveDrive.getSimulationDriveTrainPose().isPresent()) {
       /*
        * In the maple-sim, odometry is simulated using encoder values, accounting for
@@ -172,15 +177,32 @@ public class Vision {
         NTHelper.setDouble("/swerveSubsystem/vision/poseX", pose.estimatedPose.getY());
         NTHelper.setDouble("/swerveSubsystem/vision/poseX",
             pose.estimatedPose.getRotation().toRotation2d().getDegrees());
-        swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-            pose.timestampSeconds,
-            camera.curStdDevs);
+
+        if (!quackNav.isQuestMode()) {
+          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+              pose.timestampSeconds,
+              camera.curStdDevs);
+        } else {
+          Matrix<N3, N1> QUESTNAV_STD_DEVS = VecBuilder.fill(
+              0.02, // Trust down to 2cm in X direction
+              0.02, // Trust down to 2cm in Y direction
+              0.035 // Trust down to 2 degrees rotational
+          );
+          // Get timestamp from the QuestNav instance
+          double timestamp = quackNav.getTimestamp();
+
+          // Convert FPGA timestamp to CTRE's time domain using Phoenix 6 utility
+          double ctreTimestamp = Utils.fpgaToCurrentTime(timestamp);
+          swerveDrive.addVisionMeasurement(quackNav.getPose(), ctreTimestamp,
+              QUESTNAV_STD_DEVS);
+        }
+
+        quackNav.updateQuestPose(swerveDrive.getPose(), camera.curStdDevs);
 
         var stdDev = camera.curStdDevs;
         NTHelper.setDouble("/swerveSubsystem/vision/stdDevX", stdDev.get(0, 0));
         NTHelper.setDouble("/swerveSubsystem/vision/stdDevY", stdDev.get(1, 0));
         NTHelper.setDouble("/swerveSubsystem/vision/stdDevAngle", stdDev.get(2, 0));
-
       }
     }
 
