@@ -364,7 +364,9 @@ public class SwerveSubsystem extends SubsystemBase {
     if (autoStuff.containsKey(pathName)) {
       return autoStuff.get(pathName);
     } else {
-      return autoStuff.put(pathName, new AutoCommand(pathName, isRed));
+      AutoCommand command = new AutoCommand(pathName, isRed);
+      autoStuff.put(pathName, command);
+      return command;
     }
     // Create a path following command using AutoBuilder. This will also trigger
     // event markers.

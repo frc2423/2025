@@ -168,8 +168,8 @@ public class RobotContainer {
                 // m_chooser.addOption("Middle Side Auto L4", "Middle Side Auto L4");
                 m_chooser.addOption("Left Side 2 Piece RED I & K", "Left Side 2 Piece RED I & K");
                 m_chooser.addOption("Right Side 2 Piece RED E & D", "Right Side 2 Piece RED E & D");
-                m_chooser.addOption("Back Right Single (Robot Oriented)", "Back Right Single (Robot Oriented)");
-                m_chooser.addOption("Back Left Single (robot oriented)", "Back Left Single (robot oriented)");
+                m_chooser.addOption("Back Right Single", "Back Right Single");
+                m_chooser.addOption("Back Left Single", "Back Left Single");
                 m_chooser.addOption("Left Side 2 3/4", "Left Side 3 Piece BLUE E & C & D");
                 // m_chooser.addOption("Right Side 3 BLUE", "Right Side 3 Piece BLUE E & C &
                 // D");
@@ -286,8 +286,8 @@ public class RobotContainer {
                 addAutoScoreCommand("AutoScoral 9/22 right", 9, 22, true);
                 addAutoScoreCommand("AutoScoral right far", 8, 17, false);
                 addAutoScoreCommand("AutoScoral 8/17 right", 8, 17, true);
-                addAutoScoreCommand("AutoScoral back right (robot oriented)", 10, 21, true);
-                addAutoScoreCommand("AutoScoral back left (robot oriented)", 10, 21, false);
+                addAutoScoreCommand("AutoScoral back right", 10, 21, true);
+                addAutoScoreCommand("AutoScoral back left", 10, 21, false);
 
                 // Command autoScore11Left
                 // NamedCommands.registerCommand("AutoScoral Right",
@@ -542,6 +542,7 @@ public class RobotContainer {
                                 .whileTrue(intakeCommands.ejectAlgae())
                                 .onFalse(Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.HANDOFF_POSE),
                                                 intakeCommands.intakeStop()));
+
                 // .onTrue(elevator.goLittleUp(1));
 
                 new JoystickButton(operator, XboxController.Button.kRightBumper.value)

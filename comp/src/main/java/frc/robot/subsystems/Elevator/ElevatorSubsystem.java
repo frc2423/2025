@@ -17,7 +17,7 @@ import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private final double safeElevatorSpeedMultiplier = .5;
+    private final double safeElevatorSpeedMultiplier = 0.5; // .15; // 0.5
     private double maxVel = 240 * safeElevatorSpeedMultiplier;
     private double maxAccel = 300 * safeElevatorSpeedMultiplier;
 
@@ -73,8 +73,10 @@ public class ElevatorSubsystem extends SubsystemBase {
             elevatorVoltage = Math.max(elevatorVoltage, 0);
         }
 
-        if (encoderPosition < 7) {
-            elevatorVoltage = Math.max(-.1, elevatorVoltage);
+        elevatorVoltage = Math.max(-.65, elevatorVoltage); // Used to be -0.2
+
+        if (encoderPosition < 15) {
+            elevatorVoltage = Math.max(-.2, elevatorVoltage); // Used to be -0.1
         }
 
         if (!arm.isInSafeArea() && !Robot.isSimulation()) {
