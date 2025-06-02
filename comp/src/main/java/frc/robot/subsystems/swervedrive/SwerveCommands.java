@@ -55,6 +55,7 @@ public class SwerveCommands {
 
     private XboxController driverXbox = new XboxController(0);
     private final String[] DEFAULT_ELEVATOR_LEVEL = { "off" };
+    private final String[] DEFAULT_HP_CHOICE = { "Closest" };
 
     ProfiledPIDController alignFarPID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(10, 10));
 
@@ -69,6 +70,7 @@ public class SwerveCommands {
         this.climberSubsystem = container.climberSubsystem;
         NTHelper.setStringArray("/elevatorLevel", DEFAULT_ELEVATOR_LEVEL);
         SmartDashboard.putData("climbChooser", climbPositionChooser);
+        NTHelper.setStringArray("/HPChooser", DEFAULT_HP_CHOICE);
 
         climbPositionChooser.addOption("Blue left (wall)", "Blue left (wall)");
         climbPositionChooser.addOption("Blue middle", "Blue middle");
@@ -110,6 +112,17 @@ public class SwerveCommands {
         Command stopCommand = Commands.runOnce(() -> swerve.drive(new ChassisSpeeds()));
         stopCommand.addRequirements(swerve);
         return stopCommand;
+    }
+
+    public Command hpChooser() {
+        String hpSide = getHPChooserValue();
+        if (hpSide.equals("Left")) {
+            return new AutoAlignHP(swerve, this, Optional.of(false));
+        } else if (hpSide.equals("Right")) {
+            return new AutoAlignHP(swerve, this, Optional.of(true));
+        } else {
+            return new AutoAlignHP(swerve, this);
+        }
     }
 
     public Command lookAtNearestHPTag() {
@@ -215,6 +228,22 @@ public class SwerveCommands {
         return command;
     }
 
+    public Pose2d getAutoIntakePoseLeft() {
+        if (PoseTransformUtils.isRedAlliance()) {
+            return Vision.getAprilTagPose(1).plus(new Transform2d(.2, .3, Rotation2d.kZero));
+        } else {
+            return Vision.getAprilTagPose(13).plus(new Transform2d(.2, -.3, Rotation2d.kZero));
+        }
+    }
+
+    public Pose2d getAutoIntakePoseRight() {
+        if (PoseTransformUtils.isRedAlliance()) {
+            return Vision.getAprilTagPose(2).plus(new Transform2d(.2, -.3, Rotation2d.kZero));
+        } else {
+            return Vision.getAprilTagPose(12).plus(new Transform2d(.2, .3, Rotation2d.kZero));
+        }
+    }
+
     public Pose2d getAutoIntakePose() {
         Translation2d robotPos = swerve.getPose().getTranslation();
         double redLeftDist = Vision.getAprilTagPose(1).getTranslation().getDistance(robotPos);
@@ -239,10 +268,42 @@ public class SwerveCommands {
         return pose;
     }
 
+    public Boolean intakePosRight() {
+
+        if (getHPChooserValue().equals("Right")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String getHPChooserValue() {
+        String[] hpSide = NTHelper.getStringArray("/HPChooser", DEFAULT_HP_CHOICE);
+        if (hpSide.length == 0) {
+            return "Closest";
+        }
+        return hpSide[0];
+    }
+
+    public Boolean intakeClosest() {
+        if (getHPChooserValue().equals("Closest")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Command autoAlignAndIntakeHP() {
+        Command leftOrRightWaypoint = Commands.either(new GoToWaypoint(container, this::getAutoIntakePoseRight),
+                new GoToWaypoint(container, this::getAutoIntakePoseLeft), () -> intakePosRight());
+        Command leftOrRightAlign = Commands.either(new AutoAlignNear(container, this::getAutoIntakePoseRight),
+                new AutoAlignNear(container, this::getAutoIntakePoseLeft), () -> intakePosRight());
+        Command waypoint = Commands.either(new GoToWaypoint(container, this::getAutoIntakePose), leftOrRightWaypoint,
+                () -> intakeClosest());
+        Command align = Commands.either(new AutoAlignNear(container, this::getAutoIntakePose), leftOrRightAlign,
+                () -> intakeClosest());
         Command command = Commands.parallel(
-                Commands.sequence(new GoToWaypoint(container, this::getAutoIntakePose),
-                        new AutoAlignNear(container, this::getAutoIntakePose)),
+                Commands.sequence(waypoint, align),
                 elevatorSubsystem.goDownAndIntake());
         command.setName("autoAlignHP");
         return command;
