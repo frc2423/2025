@@ -309,7 +309,14 @@ public class SwerveCommands {
         return command;
     }
 
-    public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
+    public boolean isReefFar() {
+        return swerve.getPose().getTranslation().getDistance(
+                (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
+                        : new Translation2d(4.507, 4.031)) > 2.75;
+    }
+
+    public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand,
+            boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
         Command autoAlignNearCommand = Commands.either(new AutoAlignNear(container, 0.51, isRight, tagNumber),
