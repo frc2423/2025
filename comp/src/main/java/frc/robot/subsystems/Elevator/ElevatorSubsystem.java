@@ -17,7 +17,7 @@ import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private final double safeElevatorSpeedMultiplier = 0.5; // .15; // 0.5
+    private final double safeElevatorSpeedMultiplier = 0.1; // .15; // 0.5
     private double maxVel = 240 * safeElevatorSpeedMultiplier;
     private double maxAccel = 300 * safeElevatorSpeedMultiplier;
 
@@ -25,7 +25,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double encoderPosition = 0;
     private double setpoint = 0;
-    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.0015, 0, 0);
+    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.0015, 0, 0); // kg value with
+                                                                                                   // springs is 0.0015
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 63.5;
