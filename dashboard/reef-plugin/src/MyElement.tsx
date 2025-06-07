@@ -1,8 +1,9 @@
-import { createComponent, numberArrayProp } from "@frc-web-components/app";
+import { createComponent, numberArrayProp, booleanProp } from "@frc-web-components/app";
 
 interface ReefFaceProps {
   setProperty: (property: string, value: unknown) => unknown;
   values:number[];
+  faceDisabled: boolean;
   name:string;
   index:number;
 }
@@ -30,6 +31,11 @@ border: "3px solid green"
           }}>
             <input
             onClick={(e) => {
+              const faceDisabled = [props.faceDisabled];
+              faceDisabled[props.index] = !faceDisabled[props.index];
+              console.log(faceDisabled);
+              // props.setProperty("faceDisabled", !props.faceDisabled);
+              // console.log(props.faceDisabled);
               // for (let value in props.values) {
               //   if (value == "0") { 
               //       props.setProperty(props.name, [1, 1, 1, 1, 1, 1]);
@@ -41,7 +47,7 @@ border: "3px solid green"
               // }
               // console.log("value is 1");
               // props.setProperty(props.name, [0, 0, 0, 0, 0, 0]);
-              console.log(e.currentTarget.value)
+              // console.log(e.currentTarget.value)
 
             }}
 
@@ -76,7 +82,7 @@ border: "3px solid green"
           style={{
             width: 50,
             height: 50,
-            backgroundColor: value === 0 ? "lightgray" : "lime",
+            backgroundColor: props.faceDisabled ? "gray" : value === 0 ? "lightgray" : "lime",
             borderRadius: "50%",
             fontSize: 30,
             
@@ -115,19 +121,20 @@ export const myElement = createComponent(
       backRight: numberArrayProp({ defaultValue: [0, 0, 0, 0, 0, 0] }),
       frontRight: numberArrayProp({ defaultValue: [0, 0, 0, 0, 0, 0] }),
       frontMiddle: numberArrayProp({ defaultValue: [0, 0, 0, 0, 0, 0] }),
+      faceDisabled: numberArrayProp({ defaultValue: [0, 0, 0, 0, 0, 0] }),
     },
   },
-  ({ frontLeft, backLeft, backMiddle, backRight, frontRight, frontMiddle,  setProperty }) => {
+  ({ frontLeft, backLeft, backMiddle, backRight, frontRight, frontMiddle,faceDisabled,  setProperty }) => {
     return (
       <div style={{
         position: "relative",
       }}>
-        <ReefFace values={frontLeft} setProperty={setProperty} name={"frontLeft"} index={2}/>
-        <ReefFace values={backLeft} setProperty={setProperty} name={"backLeft"} index={3} />
-        <ReefFace values={backMiddle} setProperty={setProperty} name={"backMiddle"} index={4}/>
-        <ReefFace values={backRight} setProperty={setProperty} name={"backRight"} index={5}/>
-        <ReefFace values={frontRight} setProperty={setProperty} name={"frontRight"} index={0}/>
-        <ReefFace values={frontMiddle} setProperty={setProperty} name={"frontMiddle"} index={1}/>
+        <ReefFace values={frontLeft} setProperty={setProperty} name={"frontLeft"} index={2} faceDisabled={!!faceDisabled[2]}/>
+        <ReefFace values={backLeft} setProperty={setProperty} name={"backLeft"} index={3} faceDisabled={!!faceDisabled[3]}/>
+        <ReefFace values={backMiddle} setProperty={setProperty} name={"backMiddle"} index={4} faceDisabled={!!faceDisabled[4]}/>
+        <ReefFace values={backRight} setProperty={setProperty} name={"backRight"} index={5} faceDisabled={!!faceDisabled[5]}/>
+        <ReefFace values={frontRight} setProperty={setProperty} name={"frontRight"} index={0} faceDisabled={!!faceDisabled[0]}/>
+        <ReefFace values={frontMiddle} setProperty={setProperty} name={"frontMiddle"} index={1} faceDisabled={!!faceDisabled[1]}/>
       </div>
     );
   }
