@@ -34,6 +34,8 @@ public class ElevatorLevelPicker {
         T, L2, L3, L4
     }
 
+    double[] checkBoxes = { 0, 0, 0, 0, 0, 0 };
+
     // only make front left and back left lists for now
 
     ElevatorLevel[] elevatorLevels = {
@@ -76,6 +78,8 @@ public class ElevatorLevelPicker {
 
         double[] defaultLevelValues = { 0, 0, 0, 0, 0, 0 };
 
+        NTHelper.setDoubleArray("/elevatorLevelPicker/checkBoxes", checkBoxes);
+
         for (var name : reefPositionNames) {
             NTHelper.setBooleanArray("/elevatorLevelPicker/" + name, nameToReefMap.get(name));
             NTHelper.setDoubleArray("/elevatorLevelPicker/" + name + "Dashboard", defaultLevelValues);
@@ -87,6 +91,12 @@ public class ElevatorLevelPicker {
 
         }
 
+    }
+
+    public boolean checked(int i) {
+        double boxes[] = NTHelper.getDoubleArray("/elevatorLevelPicker/checkBoxes", checkBoxes);
+
+        return (boxes[i] == 1) ? true : false;
     }
 
     public String getClosestReefString() {
@@ -115,7 +125,27 @@ public class ElevatorLevelPicker {
         return nameToReefMap.get(name);
     }
 
+    public int stringToIndex(String faceName) {
+        if (faceName.equals("frontLeft")) {
+            return 2;
+        } else if (faceName.equals("backLeft")) {
+            return 3;
+        } else if (faceName.equals("backMiddle")) {
+            return 4;
+        } else if (faceName.equals("backRight")) {
+            return 5;
+        } else if (faceName.equals("frontRight")) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
     public boolean reefIsOpen(String name) {
+        if (checked(stringToIndex(name)) == true) {
+            return false;
+        }
+
         boolean[] reef = nameToReefMap.get(name);
 
         for (boolean bool : reef) {
