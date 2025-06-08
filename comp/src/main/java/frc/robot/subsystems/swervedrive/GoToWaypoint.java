@@ -29,6 +29,7 @@ public class GoToWaypoint extends Command {
     private double diffX;
     private double diffY;
     private boolean isRight;
+    private double slowDownDist = 1;
     private double dist = .6;
     private Optional<Supplier<Pose2d>> poseSupplier = Optional.empty();
 
@@ -38,6 +39,15 @@ public class GoToWaypoint extends Command {
         this.swerveCommands = container.swerveCommands;
         this.levelPicker = container.elevatorLevelPicker;
         addRequirements(swerve);
+    }
+
+    public GoToWaypoint(Optional<Integer> tagNumber, RobotContainer container, double slowDownDist) {
+        this.tagNumber = tagNumber;
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.levelPicker = container.elevatorLevelPicker;
+        addRequirements(swerve);
+        this.slowDownDist = slowDownDist;
     }
 
     public GoToWaypoint(Optional<Integer> tagNumber, RobotContainer container,
@@ -69,6 +79,15 @@ public class GoToWaypoint extends Command {
         this.poseSupplier = Optional.of(poseSupplier);
     }
 
+    public GoToWaypoint(RobotContainer container, Supplier<Pose2d> poseSupplier, double slowDownDist) {
+        this.swerve = container.drivebase;
+        this.swerveCommands = container.swerveCommands;
+        this.levelPicker = container.elevatorLevelPicker;
+        this.addRequirements(swerve);
+        this.poseSupplier = Optional.of(poseSupplier);
+        this.slowDownDist = slowDownDist;
+    }
+
     @Override
     public void initialize() {
         if (tagNumber.isPresent()) {
@@ -88,10 +107,10 @@ public class GoToWaypoint extends Command {
 
         distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
 
-        double percent = MathUtil.interpolate(.2, .8, distance / 1);
+        double percent = MathUtil.interpolate(.2, .8, distance / slowDownDist);
+
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeedsUnscaled(diffX * percent, diffY * percent,
                 waypoint.getRotation());
-
         swerve.driveFieldOriented(desiredSpeeds);
     }
 

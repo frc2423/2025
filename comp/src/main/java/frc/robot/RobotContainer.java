@@ -151,6 +151,7 @@ public class RobotContainer {
                 // Configure the trigger bindings
                 configureDriverBindings();
                 configureOperatorBindings();
+                configureOtherBindings();
                 Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
                 drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
                 DriverStation.silenceJoystickConnectionWarning(true);
@@ -358,6 +359,17 @@ public class RobotContainer {
                                 },
                                 () -> -driverXbox.getRightX());
                 return driveFieldOrientedAngularVelocity; // :P
+        }
+
+        private void configureOtherBindings() {
+                // new Trigger(() -> {
+                // double robotVelocity = drivebase.getRobotVelocityMagnitude();
+                // boolean value = DriverStation.isTeleop() && elevator.getSetpoint() > 2
+                // && swerveCommands.isReefFar() && robotVelocity > 0.5;
+                // return value;
+
+                // }).onTrue(elevator.goDown());
+
         }
 
         private void configureDriverBindings() { // RIP isPanel day 0, 2025 -> 3/25/2025

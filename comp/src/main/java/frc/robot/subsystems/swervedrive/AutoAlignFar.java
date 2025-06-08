@@ -87,7 +87,7 @@ public class AutoAlignFar extends Command {
         Pose2d pose2d;
 
         if (!climbPose.isPresent()) {
-            pose2d = isAlgae ? swerveCommands.addOffset(pose, dist, .1)
+            pose2d = isAlgae ? swerveCommands.addOffset(pose, dist, .2)
                     : swerveCommands.addScoringOffset(pose, dist, isRight);
         } else {
             pose2d = pose;

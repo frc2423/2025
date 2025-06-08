@@ -24,7 +24,7 @@ public class IntakeCommands {
     public Command intakeIn() {
         var command = Commands.run(() -> {
             // arm.goUp(),
-            intake.intake(.3); // .225
+            intake.intake(.35); // .225
         });
         command.setName("Intake In");
         command.addRequirements(intake);
@@ -33,7 +33,7 @@ public class IntakeCommands {
 
     public Command intakeStart() {
         var command = Commands.runOnce(() -> {
-            intake.intake(.25);
+            intake.intake(.35);
         });
         command.setName("Intake Once");
         command.addRequirements(intake);
@@ -41,7 +41,7 @@ public class IntakeCommands {
     }
 
     public Command intakeShort() {
-        return intakeHumanPlayer().withTimeout(0.5).withName("Run Intake Short");
+        return intakeHumanPlayer().withTimeout(.75).withName("Run Intake Short");
     }
 
     public Command intakeJustIn() {

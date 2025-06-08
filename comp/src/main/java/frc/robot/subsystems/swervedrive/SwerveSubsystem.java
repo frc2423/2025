@@ -436,6 +436,15 @@ public class SwerveSubsystem extends SubsystemBase {
         });
   }
 
+  // Get the magnitude of the robot's velocity (x,y components only)
+  public double getRobotVelocityMagnitude() {
+    ChassisSpeeds robotVelocity = swerveDrive.getRobotVelocity();
+    double xVelocity = robotVelocity.vxMetersPerSecond;
+    double yVelocity = robotVelocity.vyMetersPerSecond;
+
+    return Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
+  }
+
   /**
    * Drive with 254's Setpoint generator; port written by PathPlanner.
    *

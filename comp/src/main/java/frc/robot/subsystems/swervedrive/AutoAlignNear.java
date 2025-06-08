@@ -99,7 +99,7 @@ public class AutoAlignNear extends Command {
         if (climbPose.isPresent())
             pose2d = climbPose.get().get();
         else if (isAlgae)
-            pose2d = swerveCommands.addOffset(pose, dist, .1);
+            pose2d = swerveCommands.addOffset(pose, dist, .2);
         else
             pose2d = swerveCommands.addScoringOffset(pose, dist, isRight);
 
