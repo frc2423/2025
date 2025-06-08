@@ -17,7 +17,7 @@ import frc.robot.subsystems.Arm.ArmSubsystem;
 import frc.robot.subsystems.Intake.IntakeCommands;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private final double safeElevatorSpeedMultiplier = 0.1; // .15; // 0.5
+    private final double safeElevatorSpeedMultiplier = 0.75; // .15; // 0.5
     private double maxVel = 240 * safeElevatorSpeedMultiplier;
     private double maxAccel = 300 * safeElevatorSpeedMultiplier;
 
@@ -25,8 +25,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             new TrapezoidProfile.Constraints(maxVel, maxAccel));// noice
     private double encoderPosition = 0;
     private double setpoint = 0;
-    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.0015, 0, 0); // kg value with
-                                                                                                   // springs is 0.0015
+    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.015, 0, 0); // kg value with
+                                                                                                  // springs is 0.0015
     private SparkFlex motor1 = new SparkFlex(24, MotorType.kBrushless);
     private SparkFlex motor2 = new SparkFlex(26, MotorType.kBrushless);
     private double highestPoint = 63.5;
@@ -77,7 +77,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorVoltage = Math.max(-.65, elevatorVoltage); // Used to be -0.2
 
         if (encoderPosition < 15) {
-            elevatorVoltage = Math.max(-.2, elevatorVoltage); // Used to be -0.1
+            elevatorVoltage = Math.max(-.4, elevatorVoltage); // Used to be -0.1
         }
 
         if (!arm.isInSafeArea() && !Robot.isSimulation()) {
@@ -101,7 +101,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public Command goDown() { // for manual control, sick
         Command command = Commands.sequence(arm.goToSetpoint(Constants.ArmConstants.OUTSIDE_ELEVATOR), runOnce(() -> {
-            setSetpoint(lowestPoint + 2);
+            setSetpoint(lowestPoint + 1);
         }), Commands.waitUntil(() -> {
             return isAtSetpoint();
         }), arm.goToSetpoint(Constants.ArmConstants.HANDOFF_POSE));

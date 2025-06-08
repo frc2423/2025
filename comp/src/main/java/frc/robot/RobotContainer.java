@@ -362,13 +362,13 @@ public class RobotContainer {
         }
 
         private void configureOtherBindings() {
-                new Trigger(() -> {
-                        double robotVelocity = drivebase.getRobotVelocityMagnitude();
-                        boolean value = DriverStation.isTeleop() && elevator.getSetpoint() > 2
-                                        && swerveCommands.isReefFar() && robotVelocity > 0.5;
-                        return value;
+                // new Trigger(() -> {
+                // double robotVelocity = drivebase.getRobotVelocityMagnitude();
+                // boolean value = DriverStation.isTeleop() && elevator.getSetpoint() > 2
+                // && swerveCommands.isReefFar() && robotVelocity > 0.5;
+                // return value;
 
-                }).onTrue(elevator.goDown());
+                // }).onTrue(elevator.goDown());
 
         }
 
