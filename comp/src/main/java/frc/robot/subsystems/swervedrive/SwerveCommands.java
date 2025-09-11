@@ -181,9 +181,9 @@ public class SwerveCommands {
                                 autoAlignCommand2),
                         elevatorSubsystem.intakeAlgae(setpoint)),
                 Commands.parallel(
-                        armSubsystem.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                        armSubsystem.goToSetpoint(Constants.ArmConstants.ALGAE_DESCORING),
                         Commands.sequence(
-                                Commands.waitSeconds(.5),
+                                Commands.waitSeconds(1.25),
                                 autoAlignCommand3)));
         // intakeAlgaeCommand2));
         command.setName("autoIntakeAlgae");
@@ -294,11 +294,14 @@ public class SwerveCommands {
     }
 
     public Command autoAlignAndIntakeHP() {
-        Command leftOrRightWaypoint = Commands.either(new GoToWaypoint(container, this::getAutoIntakePoseRight),
-                new GoToWaypoint(container, this::getAutoIntakePoseLeft), () -> intakePosRight());
+        double slowDownDist = 1.5;
+        Command leftOrRightWaypoint = Commands.either(
+                new GoToWaypoint(container, this::getAutoIntakePoseRight, slowDownDist),
+                new GoToWaypoint(container, this::getAutoIntakePoseLeft, slowDownDist), () -> intakePosRight());
         Command leftOrRightAlign = Commands.either(new AutoAlignNear(container, this::getAutoIntakePoseRight),
                 new AutoAlignNear(container, this::getAutoIntakePoseLeft), () -> intakePosRight());
-        Command waypoint = Commands.either(new GoToWaypoint(container, this::getAutoIntakePose), leftOrRightWaypoint,
+        Command waypoint = Commands.either(new GoToWaypoint(container, this::getAutoIntakePose, slowDownDist),
+                leftOrRightWaypoint,
                 () -> intakeClosest());
         Command align = Commands.either(new AutoAlignNear(container, this::getAutoIntakePose), leftOrRightAlign,
                 () -> intakeClosest());
@@ -309,7 +312,14 @@ public class SwerveCommands {
         return command;
     }
 
-    public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand, boolean isRight) {
+    public boolean isReefFar() {
+        return swerve.getPose().getTranslation().getDistance(
+                (PoseTransformUtils.isRedAlliance()) ? new Translation2d(13.055, 4.007)
+                        : new Translation2d(4.507, 4.031)) > 3.25;
+    }
+
+    public Command autoScoral(Optional<Integer> tagNumber, Command elevatorLevelCommand,
+            boolean isRight) {
         Command goScoreCommand = Commands.either(armSubsystem.goScoreL4(), armSubsystem.goScore(),
                 () -> elevatorSubsystem.getSetpoint() > 50);
         Command autoAlignNearCommand = Commands.either(new AutoAlignNear(container, 0.51, isRight, tagNumber),
