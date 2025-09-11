@@ -23,6 +23,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public void periodic() {
         double position = getPosition();
+        double adjustedSetpoint = setpoint;
         if (Math.abs(setpoint - position) < .02) {
             motor1.set(0);
         } else if (position < setpoint) {
@@ -33,6 +34,9 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public double getPosition() {
+        if (motor1.getAbsoluteEncoder().getPosition() > 0 && motor1.getAbsoluteEncoder().getPosition() < 0.4) {
+            return motor1.getAbsoluteEncoder().getPosition() + 1;
+        }
         return motor1.getAbsoluteEncoder().getPosition();
     }
 
@@ -67,7 +71,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command climb() {
         var command = run(() -> {
-            setSetpoint(.407, 1);
+            setSetpoint(.59, 1);
         });
         command.setName("Climber going up");
         return command;
@@ -75,7 +79,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command deClimbMore() {
         var command = run(() -> {
-            setSetpoint(.85, 1);
+            setSetpoint(.94, 1);
         });
         command.setName("Climber going up");
         return command;
@@ -83,7 +87,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     public Command deClimb() {
         var command = run(() -> {
-            setSetpoint(.8, 1);
+            setSetpoint(.92, 1);
         }).until(() -> isAtSetpoint());
         command.setName("Climber going down");
         return command;
