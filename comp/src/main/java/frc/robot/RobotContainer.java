@@ -451,6 +451,15 @@ public class RobotContainer {
                                                 elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
                                                 intakeCommands.holdAlgae()));
 
+                new Trigger(() -> operator.getPOV() == 90)
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+
+                new Trigger(() -> operator.getPOV() == 270)
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.ZERO));
+
+                // new Trigger(() -> operator.getPOV() == 90)
+                // .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
+
                 // new JoystickButton(driverXbox, XboxController.Button.kA.value)
                 // .onTrue(elevator.goDown());
 
