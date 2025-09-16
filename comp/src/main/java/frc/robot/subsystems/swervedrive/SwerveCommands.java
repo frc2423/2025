@@ -475,6 +475,8 @@ public class SwerveCommands {
 
     public Command autoAlignProcessor() {
 
+        System.out.println("asfegghbuyfhyueuhueguhsuhiug");
+
         var command = Commands.sequence(new AutoAlignProcessor(swerve, this, 0.2),
                 intakeCommands.ejectAlgae().withTimeout(0.25), intakeCommands.ejectAlgae().withTimeout(0.25),
                 intakeCommands.ejectAlgae().withTimeout(0.25));
