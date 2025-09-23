@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Intake;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.None;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -96,6 +97,17 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean isStalled() {
+        var currentSpeed = motor.getEncoder().getVelocity();
+        var desiredSpeed = Math.abs(motor.get());
+
+        if (currentSpeed <= 1 && desiredSpeed >= 0) {
+            return true; // Stalled
+        } else {
+            return false; // Not stalled
+        }
+    }
+
     public boolean isOut() {
         return getRawSensorValue() > 60;
     }
@@ -117,6 +129,7 @@ public class IntakeSubsystem extends SubsystemBase {
         builder.addDoubleProperty("speed", () -> motor.get(), null);
         builder.addBooleanProperty("hasAlgae", () -> hasAlgae(), null);
         builder.addBooleanProperty("hasCoral", () -> !isOut(), null);
+        builder.addBooleanProperty("isStalled", () -> isStalled(), null);
 
         if (Robot.isSimulation()) {
             builder.addBooleanProperty("simulateHasCoral", () -> !isOut(), value -> {
