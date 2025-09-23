@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.AngleUtils;
 import frc.robot.PoseTransformUtils;
+import frc.robot.PosePIDController;
+import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 
 public class AutoAlignProcessor extends Command {
     private double distance;
@@ -36,6 +38,10 @@ public class AutoAlignProcessor extends Command {
     // this.swerveCommands = swerveCommands;
     // this.addRequirements(swerve);
     // }
+    // Pose2d pose2d;
+    PosePIDController posepid = new PosePIDController(1.0, 0, 0);
+    // Pose2d setpoint = new Pose2d(swerve.getPose().getTranslation(),
+    // pose2d.getRotation());
 
     public AutoAlignProcessor(SwerveSubsystem swerve, SwerveCommands swerveCommands, double dist) {
         this.dist = dist;
@@ -72,10 +78,21 @@ public class AutoAlignProcessor extends Command {
 
         System.out.println(diffX * diffX + diffY * diffY);
 
-        distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
-
-        double percent = MathUtil.interpolate(.5, 1, distance / 2);
-        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeedsUnscaled(diffX * percent, diffY * percent,
+        // distance =
+        // waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
+        distance = posepid.calculate(waypoint, swerve.getPose());
+        double percent = 0;
+        // System.out.println("Pose_PID output: " + distance); // closest to setpoint-
+        // output will be zero; farthest from
+        // // setpoint- output will be max 13;
+        if (distance < 13 && distance > 3.25) {
+            percent = 1;
+        } else if (distance <= 3.25 && distance > 0.75) {
+            percent = (distance - 0.75 / 2.5);
+        }
+        // double percent = MathUtil.interpolate(.5, 1, distance / 2);
+        ChassisSpeeds desiredSpeeds = swerve.getTargetSpeedsUnscaled(diffX * percent,
+                diffY * percent,
                 waypoint.getRotation());
 
         swerve.driveFieldOriented(desiredSpeeds);
