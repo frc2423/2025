@@ -87,13 +87,16 @@ public class AutoAlignProcessor extends Command {
         // // setpoint- output will be max 13;
         if (distance < 13 && distance > 3.25) {
             percent = 1;
-        } else if (distance <= 3.25 && distance > 0.75) {
-            percent = (distance - 0.75 / 2.5);
+        } else if (distance <= 3.25 && distance > 0.5) {
+            percent = (distance / 1.5);
+            if (percent > 1) {
+                percent = 1;
+            }
         }
         // double percent = MathUtil.interpolate(.5, 1, distance / 2);
         ChassisSpeeds desiredSpeeds = swerve.getTargetSpeedsUnscaled(diffX * percent,
                 diffY * percent,
-                waypoint.getRotation());
+                waypoint.getRotation().times(-1));
 
         swerve.driveFieldOriented(desiredSpeeds);
     }
