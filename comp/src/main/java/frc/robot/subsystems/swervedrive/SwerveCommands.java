@@ -40,6 +40,7 @@ import frc.robot.NTHelper;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.LED.KwarqsLed;
 
 public class SwerveCommands {
     SendableChooser<String> climbPositionChooser = new SendableChooser<>();
@@ -470,6 +471,17 @@ public class SwerveCommands {
 
     private boolean isRightStickBeingUsed() {
         return Math.abs(driverXbox.getRightX()) > .1 || Math.abs(driverXbox.getRightY()) > .1;
+    }
+
+    public Command autoAlignProcessor() {
+
+        System.out.println("asfegghbuyfhyueuhueguhsuhiug");
+
+        var command = Commands.sequence(new AutoAlignProcessor(swerve, this, 0.2),
+                intakeCommands.ejectAlgae().withTimeout(0.25), intakeCommands.ejectAlgae().withTimeout(0.25),
+                intakeCommands.ejectAlgae().withTimeout(0.25));
+
+        return command;
     }
 
     public Command orbitReefCenter() {

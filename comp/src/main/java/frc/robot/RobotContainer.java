@@ -410,8 +410,7 @@ public class RobotContainer {
                                                                 funnelSubsystem.stop())));
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
-                                .onTrue(intakeCommands.ejectAlgae().withTimeout(0.25)
-                                                .andThen(intakeCommands.stop()));
+                                .onTrue(swerveCommands.autoAlignProcessor());
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
                                 .onTrue(swerveCommands.orbitReefCenter());
 
@@ -450,6 +449,15 @@ public class RobotContainer {
                                                 arm.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
                                                 elevator.goToSetpoint(Constants.SetpointConstants.ZERO),
                                                 intakeCommands.holdAlgae()));
+
+                new Trigger(() -> operator.getPOV() == 90)
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L2));
+
+                new Trigger(() -> operator.getPOV() == 270)
+                                .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.ZERO));
+
+                // new Trigger(() -> operator.getPOV() == 90)
+                // .whileTrue(elevator.goToSetpoint(Constants.SetpointConstants.REEF_L4));
 
                 // new JoystickButton(driverXbox, XboxController.Button.kA.value)
                 // .onTrue(elevator.goDown());
