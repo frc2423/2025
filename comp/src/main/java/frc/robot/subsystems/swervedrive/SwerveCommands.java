@@ -168,8 +168,8 @@ public class SwerveCommands {
         // Commands.sequence(armSubsystem.goToSetpoint(Constants.ArmConstants.ALGAE_DUNK),
         // intakeCommands.intakeAlgae());
         Command autoAlignCommand1 = new AutoAlignFar(container, .6, Optional.empty()); // yo yo auto align
-        Command autoAlignCommand2 = new AutoAlignNear(container, .4, Optional.empty());
-        Command autoAlignCommand3 = new AutoAlignNear(container, .6, Optional.empty());
+        Command autoAlignCommand2 = new AutoAlignNear(container, .44, Optional.empty());
+        Command autoAlignCommand3 = new AutoAlignNear(container, .8, Optional.empty());
 
         var command = Commands.sequence(
                 Commands.deadline(
@@ -178,10 +178,15 @@ public class SwerveCommands {
                                 Commands.waitUntil(() -> {
                                     return elevatorSubsystem.isAtSetpoint();
                                 }),
-                                autoAlignCommand2),
+                                autoAlignCommand2
+                        // Commands.waitUntil(() -> {
+                        // return intakesubsystem.isStalled();
+                        // })
+                        ),
                         elevatorSubsystem.intakeAlgae(setpoint)),
                 Commands.parallel(
                         armSubsystem.goToSetpoint(Constants.ArmConstants.ALGAE_HOLD),
+                        intakeCommands.holdAlgae(),
                         Commands.sequence(
                                 Commands.waitSeconds(.5),
                                 autoAlignCommand3)));
@@ -335,6 +340,13 @@ public class SwerveCommands {
                 Commands.none(),
                 () -> !container.elevatorLevelPicker.closestReefIsOpen());
 
+        var finishScoring = Commands.parallel(
+                Commands.sequence(Commands.waitUntil(intakesubsystem::isOutMedianFilter),
+                        elevatorLevelPicker.setScoredLevel()),
+                Commands.sequence(
+                        intakeCommands.intakeJustOutRun().withTimeout(.5),
+                        intakeCommands.intakeOut()));
+
         var command = Commands.sequence(
                 Commands.parallel(prepareElevator,
                         Commands.sequence(
@@ -345,8 +357,7 @@ public class SwerveCommands {
                                 // isRight, tagNumber),
                                 Commands.waitSeconds(0.3),
                                 autoAlignNearCommand)),
-                intakeCommands.intakeJustOutRun().withTimeout(.5), elevatorLevelPicker.setScoredLevel(),
-                intakeCommands.intakeOut());
+                finishScoring);
 
         command.setName("autoScoralClosest");
 

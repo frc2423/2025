@@ -36,11 +36,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (hasAlgae() && !ejecting) {
-            motor.set(speed / 8);
-        } else {
-            motor.set(speed);
-        }
+        motor.set(speed);
 
         distMm = distanceFilter.calculate(getRawSensorValue());
         // if (motor.getOutputCurrent() > 60) {
@@ -98,10 +94,10 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public boolean isStalled() {
-        var currentSpeed = motor.getEncoder().getVelocity();
+        var currentSpeed = Math.abs(motor.getEncoder().getVelocity());
         var desiredSpeed = Math.abs(motor.get());
 
-        if (currentSpeed <= 1 && desiredSpeed >= 0) {
+        if (currentSpeed <= 100 && desiredSpeed > 0) {
             return true; // Stalled
         } else {
             return false; // Not stalled
@@ -126,10 +122,11 @@ public class IntakeSubsystem extends SubsystemBase {
         builder.addDoubleProperty("laserCan distance", () -> distMm(), null);
         builder.addDoubleProperty("laserCan Raw Value", () -> getRawSensorValue(), null);
         builder.addDoubleProperty("current current (haha)", () -> motor.getOutputCurrent(), null);
-        builder.addDoubleProperty("speed", () -> motor.get(), null);
         builder.addBooleanProperty("hasAlgae", () -> hasAlgae(), null);
         builder.addBooleanProperty("hasCoral", () -> !isOut(), null);
         builder.addBooleanProperty("isStalled", () -> isStalled(), null);
+        builder.addDoubleProperty("desiredSpeed", () -> motor.get(), null);
+        builder.addDoubleProperty("measuredSpeed", () -> motor.getEncoder().getVelocity(), null);
 
         if (Robot.isSimulation()) {
             builder.addBooleanProperty("simulateHasCoral", () -> !isOut(), value -> {
