@@ -105,7 +105,7 @@ public final class Constants {
         public static final double ALGAE_INTAKE = 0.809670;// -6.8; // all relative
         public static final double ALGAE_SCORE = 0.5; // 6; // relative can't use bc stupid
         public static final double ALGAE_GROUND = 0.718154; // -14.5; // NOT REAL relative
-        public static final double ALGAE_HOLD = 0.885966; // relative
+        public static final double ALGAE_HOLD = 0.885966;// 0.8156; // relative
         public static final double ALGAE_PROCESS = 0.85; // relative
 
         public static final double HANDOFF_POSE = 0.911322;
