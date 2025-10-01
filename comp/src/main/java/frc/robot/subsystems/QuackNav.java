@@ -35,12 +35,24 @@ public class QuackNav {
 
     private Command zeroAngle() {
         return Commands.runOnce(() -> {
-            Pose2d pose = new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Math.random() * .001));
+            Pose2d pose = new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Math.random() * .001)); // random
+                                                                                                                // number
+                                                                                                                // is
+                                                                                                                // for
+                                                                                                                // change
+                                                                                                                // in
+                                                                                                                // network
+                                                                                                                // tables
+                                                                                                                // to
+                                                                                                                // update
+                                                                                                                // -
+                                                                                                                // Amory
+                                                                                                                // thinks
             updateQuestPose(pose);
         });
     }
 
-    public void zeroPose(Pose2d pose) {
+    public void zeroPose(Pose2d pose) { // update pose rather than zero?
         updateQuestPose(pose);
     }
 

@@ -410,7 +410,7 @@ public class RobotContainer {
                                                                 funnelSubsystem.stop())));
 
                 new JoystickButton(driverXbox, XboxController.Button.kB.value)
-                                .onTrue(swerveCommands.autoAlignProcessor());
+                                .whileTrue(swerveCommands.autoAlignProcessor());
                 new JoystickButton(driverXbox, XboxController.Button.kBack.value)
                                 .onTrue(swerveCommands.orbitReefCenter());
 
