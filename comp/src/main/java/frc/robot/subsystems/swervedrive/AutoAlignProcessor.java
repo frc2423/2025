@@ -76,7 +76,7 @@ public class AutoAlignProcessor extends Command {
         diffX = translationDiff.getX() / translationDiff.getNorm();
         diffY = translationDiff.getY() / translationDiff.getNorm();
 
-        System.out.println(diffX * diffX + diffY * diffY);
+        // System.out.println(diffX * diffX + diffY * diffY);
 
         // distance =
         // waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
@@ -108,6 +108,8 @@ public class AutoAlignProcessor extends Command {
 
     @Override
     public boolean isFinished() {
-        return distance < Units.inchesToMeters(2);
+        System.out.println(posepid.getError());
+        return posepid.getError() < Units.inchesToMeters(2);
+
     }
 }

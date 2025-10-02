@@ -75,7 +75,7 @@ public class AutoAlignHP extends Command {
         diffX = translationDiff.getX() / translationDiff.getNorm();
         diffY = translationDiff.getY() / translationDiff.getNorm();
 
-        System.out.println(diffX * diffX + diffY * diffY);
+        // System.out.println(diffX * diffX + diffY * diffY);
 
         distance = waypoint.getTranslation().getDistance(swerve.getPose().getTranslation());
 
